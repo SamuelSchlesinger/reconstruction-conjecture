@@ -5,3 +5,10 @@ import Reconstruction.DegreeSequence
 import Reconstruction.Spectral
 import Reconstruction.KellyLemma
 import Reconstruction.KellyEdgeCount
+import Reconstruction.Regular
+import Reconstruction.ConnectedComponents
+import Reconstruction.Disconnected
+import Reconstruction.Trees
+import Reconstruction.TraceReconstruction
+import Reconstruction.Newton
+import Reconstruction.CharPolyFull
