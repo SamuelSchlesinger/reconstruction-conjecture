@@ -4,3 +4,4 @@ import Reconstruction.EdgeCount
 import Reconstruction.DegreeSequence
 import Reconstruction.Spectral
 import Reconstruction.KellyLemma
+import Reconstruction.KellyEdgeCount
