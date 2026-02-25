@@ -30,6 +30,8 @@ such that $G - v \cong H - \sigma(v)$ for all $v \in V$.
 | $\|E(G-v)\| + \deg(v) = \|E(G)\|$ | [`EdgeCount.lean`](Reconstruction/EdgeCount.lean) |
 | Edge count is reconstructible | [`EdgeCount.lean`](Reconstruction/EdgeCount.lean) |
 | Degree sequence is reconstructible | [`DegreeSequence.lean`](Reconstruction/DegreeSequence.lean) |
+| Kelly's counting identity: $(n-k) \cdot s(F,G) = \sum_v s(F, G-v)$ | [`KellyLemma.lean`](Reconstruction/KellyLemma.lean) |
+| Subgraph count is reconstructible (Kelly's Lemma) | [`KellyLemma.lean`](Reconstruction/KellyLemma.lean) |
 | Adjacency matrix of induced subgraph = principal submatrix | [`Spectral.lean`](Reconstruction/Spectral.lean) |
 | Isomorphic graphs have equal characteristic polynomials | [`Spectral.lean`](Reconstruction/Spectral.lean) |
 | $\varphi'(G) = \sum_v \varphi(G-v)$ (derivative formula) | [`Spectral.lean`](Reconstruction/Spectral.lean) |
@@ -40,19 +42,25 @@ such that $G - v \cong H - \sigma(v)$ for all $v \in V$.
 
 We prove reconstructibility results from Kelly's lemma and spectral graph theory:
 
-1. **Edge count** (`SameDeck.card_edgeFinset_eq`): Each edge appears in exactly
+1. **Subgraph counts — Kelly's Lemma** (`SameDeck.subgraphCount_eq`): For any graph
+   $F$ with $|V(F)| < |V(G)|$, the number of induced copies of $F$ in $G$ is
+   reconstructible from the deck. This is the central counting tool in reconstruction
+   theory, proved via the double-counting identity
+   $(n - k) \cdot s(F, G) = \sum_v s(F, G - v)$.
+
+2. **Edge count** (`SameDeck.card_edgeFinset_eq`): Each edge appears in exactly
    $n - 2$ of the $n$ vertex-deleted subgraphs, so the total edge count can be
    recovered from the deck.
 
-2. **Degree sequence** (`SameDeck.degreeMultiset_eq`): Since
+3. **Degree sequence** (`SameDeck.degreeMultiset_eq`): Since
    $\deg(v) = |E(G)| - |E(G - v)|$ and both quantities are determined by the
    deck, the full degree multiset is reconstructible.
 
-3. **Characteristic polynomial derivative** (`SameDeck.charPoly_derivative_eq`):
+4. **Characteristic polynomial derivative** (`SameDeck.charPoly_derivative_eq`):
    The derivative formula $\varphi'(G, x) = \sum_v \varphi(G-v, x)$ shows that
    same deck implies same characteristic polynomial derivative.
 
-4. **Non-constant coefficients** (`SameDeck.charPoly_coeff_eq`): Since the
+5. **Non-constant coefficients** (`SameDeck.charPoly_coeff_eq`): Since the
    derivative determines all coefficients of degree $\geq 1$, same deck implies
    agreement on all non-constant characteristic polynomial coefficients.
 
@@ -81,6 +89,7 @@ Reconstruction/
   Basic.lean           -- SameDeck equivalence relation, reconstruction_conjecture (sorry)
   EdgeCount.lean       -- Edge count formula, edge count is reconstructible
   DegreeSequence.lean  -- Degree multiset definition, degree sequence is reconstructible
+  KellyLemma.lean      -- Kelly's Lemma: subgraph counting identity and reconstructibility
   Spectral.lean        -- Characteristic polynomial, derivative formula, spectral reconstructibility
 ```
 
