@@ -52,6 +52,17 @@ derivative formula (`Spectral.lean`) and `tr(A^k)` from walk counting
 theorem SameDeck.charPoly_coeff_zero_eq (h : G.SameDeck H)
     (hV : 3 ≤ Fintype.card V) :
     (G.charPoly ℤ).coeff 0 = (H.charPoly ℤ).coeff 0 := by
+  -- TODO: The constant term c_0 = (-1)^n det(A) is determined by the
+  -- Cayley–Hamilton trace identity: n · c_0 = -(tr(A^n) + c_{n-1} tr(A^{n-1})
+  -- + ⋯ + c_1 tr(A)). The coefficients c_1,...,c_{n-1} are reconstructible
+  -- (Spectral.lean) and tr(A^k) for k < n is reconstructible
+  -- (TraceReconstruction.lean). The remaining ingredient is tr(A^n), which is NOT
+  -- directly covered by Kelly's Lemma (needs k < n). Schwenk's approach recovers
+  -- tr(A^n) via the Sachs coefficient formula expressing c_0 as a sum over
+  -- elementary spanning subgraphs; alternatively, a walk decomposition argument
+  -- expresses tr(A^n) in terms of reconstructible subgraph counts plus lower-order
+  -- traces.
+  -- Depends on: `trace_adjMatrix_pow_eq` and `newton_trace_charpoly`.
   sorry
 
 /-- **The full characteristic polynomial is reconstructible.**

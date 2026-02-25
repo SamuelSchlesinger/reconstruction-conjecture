@@ -55,6 +55,14 @@ vertices. -/
 theorem SameDeck.trace_adjMatrix_pow_eq (h : G.SameDeck H)
     (hV : 3 ≤ Fintype.card V) {k : ℕ} (hk : k < Fintype.card V) :
     trace ((G.adjMatrix ℤ) ^ k) = trace ((H.adjMatrix ℤ) ^ k) := by
+  -- TODO: tr(A^k) counts closed walks of length k, which visit at most k distinct
+  -- vertices. For k < n, decompose closed walks by which induced subgraph on ≤ k
+  -- vertices they inhabit. Each such subgraph F has |V(F)| ≤ k < n vertices, so
+  -- Kelly's Lemma gives s(F,G) = s(F,H), making tr(A_G^k) = tr(A_H^k).
+  -- The formalization challenge is expressing this walk decomposition: use
+  -- `adjMatrix_pow_apply_eq_card_walk` from Mathlib to relate (A^k)_{vv} to walks,
+  -- then partition walks by their vertex support.
+  -- Needed by `charPoly_coeff_zero_eq` for full charPoly reconstruction.
   sorry
 
 end SimpleGraph

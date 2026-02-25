@@ -59,4 +59,7 @@ theorem reconstruction_conjecture
     [Fintype V] (hV : 3 ≤ Fintype.card V)
     (G H : SimpleGraph V) (h : G.SameDeck H) :
     Nonempty (G ≃g H) := by
+  -- TODO: This is the full Ulam–Kelly reconstruction conjecture — an open problem
+  -- in mathematics since 1942. It asserts that every graph on ≥ 3 vertices is
+  -- determined up to isomorphism by its deck. No proof or counterexample is known.
   sorry

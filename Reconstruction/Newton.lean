@@ -66,6 +66,16 @@ theorem newton_trace_charpoly (A : Matrix n n R) {k : ℕ}
       A.charpoly.coeff (Fintype.card n - (j + 1)) *
       trace (A ^ (k - (j + 1))) +
     (k : R) * A.charpoly.coeff (Fintype.card n - k) = 0 := by
+  -- TODO: Newton's identity (Faddeev–LeVerrier) for general k. This is a purely
+  -- algebraic identity about matrices — no graph theory involved. The k = n case
+  -- follows from Cayley–Hamilton (proved below as `cayley_hamilton_trace`). For
+  -- k < n, the standard proof differentiates det(xI - A) and applies the product
+  -- rule to the Leibniz expansion, or equivalently multiplies the Cayley–Hamilton
+  -- relation p(A) = 0 by A^{k-n} and takes traces (valid for k ≤ n by using the
+  -- adjugate identity). An alternative approach bridges from
+  -- `MvPolynomial.mul_esymm_eq_sum` in Mathlib, connecting eigenvalue symmetric
+  -- polynomials to charpoly coefficients.
+  -- Needed by `charPoly_coeff_zero_eq` for full charPoly reconstruction.
   sorry
 
 /-- Helper: `trace(algebraMap r * M) = r * trace M` for scalar matrices. -/

@@ -55,6 +55,12 @@ of polynomial equations determines the multiset of component sizes, hence the
 number of components. -/
 theorem SameDeck.numComponents_eq (h : G.SameDeck H) (hV : 3 ≤ Fintype.card V) :
     G.numComponents = H.numComponents := by
+  -- TODO: Counting argument via Kelly's Lemma. The number of induced copies of the
+  -- edgeless graph on k vertices equals ∑_C C(|C|,k) summed over connected
+  -- components C. Kelly's Lemma gives these counts for k < n, and the resulting
+  -- system of binomial equations determines the multiset of component sizes (via
+  -- Vandermonde-style inversion), hence the number of components.
+  -- This sorry propagates to `connected` and transitively to `isTree`.
   sorry
 
 omit [DecidableEq V] [DecidableRel G.Adj] [DecidableRel H.Adj] in

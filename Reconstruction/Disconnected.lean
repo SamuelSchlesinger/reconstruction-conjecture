@@ -42,6 +42,12 @@ components via Kelly's Lemma: components with fewer than `n` vertices are
 counted directly, and the largest component is determined as the remainder. -/
 theorem SameDeck.iso_of_not_connected (h : G.SameDeck H) (hV : 3 ≤ Fintype.card V)
     (hdisc : ¬G.Connected) : Nonempty (G ≃g H) := by
+  -- TODO: Kelly's 1942 proof that disconnected graphs are reconstructible.
+  -- If G has components of sizes n₁ ≥ n₂ ≥ ⋯ ≥ nₖ with k ≥ 2, then n₂ ≤ n/2 < n,
+  -- so all components except possibly the largest have < n vertices and can be
+  -- identified via Kelly's Lemma. The largest component is the remainder.
+  -- This is a full reconstruction result (producing G ≃g H), not just an invariant
+  -- equality, which makes it substantially harder to formalize than the other sorry's.
   sorry
 
 end SimpleGraph
