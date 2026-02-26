@@ -76,10 +76,18 @@ determination" is where the difficulty lies.
 
 ### What Remains Open
 
-The only `sorry` is the conjecture itself (`reconstruction_conjecture` in
-[`Basic.lean`](Reconstruction/Basic.lean)): same deck implies isomorphic,
-for graphs on $\geq 3$ vertices. All supporting lemmas and reconstructibility
-results are fully proved.
+Current open declarations (`sorry`) are:
+
+- [`reconstruction_conjecture`](Reconstruction/Basic.lean) (the main conjecture)
+- [`SameDeck.numComponents_eq`](Reconstruction/ConnectedComponents.lean)
+- [`SameDeck.iso_of_not_connected`](Reconstruction/Disconnected.lean)
+- [`SameDeck.trace_adjMatrix_pow_eq`](Reconstruction/TraceReconstruction.lean)
+- [`Matrix.newton_trace_charpoly`](Reconstruction/Newton.lean)
+- [`SameDeck.charPoly_coeff_zero_eq`](Reconstruction/CharPolyFull.lean)
+
+Core deck machinery (`SameDeck`, Kelly's lemma, edge count, degree sequence,
+and non-constant characteristic-polynomial coefficients) is proved. The open
+items are staged extensions toward stronger reconstruction results.
 
 ## File Structure
 
@@ -90,7 +98,15 @@ Reconstruction/
   EdgeCount.lean       -- Edge count formula, edge count is reconstructible
   DegreeSequence.lean  -- Degree multiset definition, degree sequence is reconstructible
   KellyLemma.lean      -- Kelly's Lemma: subgraph counting identity and reconstructibility
+  KellyEdgeCount.lean  -- Alternate edge-count reconstruction via Kelly's Lemma
+  Regular.lean         -- Regularity is reconstructible from degree sequence
+  ConnectedComponents.lean -- Component-count reconstructibility target (sorry)
+  Disconnected.lean    -- Disconnected-case reconstruction target (sorry)
+  Trees.lean           -- Tree-case consequences from component machinery
   Spectral.lean        -- Characteristic polynomial, derivative formula, spectral reconstructibility
+  TraceReconstruction.lean -- Trace(A^k) reconstructibility target (sorry)
+  Newton.lean          -- Newton/Faddeev-LeVerrier identity target (sorry)
+  CharPolyFull.lean    -- Constant-term + full charpoly reconstruction target (sorry)
 ```
 
 ## Building
