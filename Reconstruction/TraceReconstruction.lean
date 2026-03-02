@@ -1,5 +1,6 @@
 import Reconstruction.KellyLemma
 import Reconstruction.Spectral
+import Reconstruction.Newton
 import Mathlib.LinearAlgebra.Matrix.Trace
 
 /-!
@@ -14,21 +15,21 @@ for powers less than the number of vertices.
 
 ## Proof outline
 
-The trace `tr(A^k) = ∑_v (A^k)_{vv}` counts the number of closed walks of
-length `k` in `G`. A closed walk of length `k` visits at most `k` distinct
-vertices. For `k < n`, express `tr(A^k)` as a sum over subgraph counts of
-graphs on at most `k` vertices. By Kelly's Lemma, all these counts are
-reconstructible since `k < n`.
+By strong induction on `k`, using Newton's identity (`Newton.lean`):
 
-More precisely, for each graph `F` on at most `k` vertices, the number of
-closed walks of length `k` that visit exactly `V(F)` as their vertex set can
-be expressed in terms of subgraph counts of `F`. Since `|V(F)| ≤ k < n`,
-Kelly's Lemma applies.
+  `tr(A^k) + ∑_{j=1}^{k-1} c_{N-j} · tr(A^{k-j}) + k · c_{N-k} = 0`
+
+For `k = 0`: both traces equal `|V|` (trace of the identity matrix).
+
+For `1 ≤ k < |V|`: the characteristic polynomial coefficients `c_1, ..., c_{N-1}`
+are reconstructible (`charPoly_coeff_eq`), and the lower-order traces are
+reconstructible by the induction hypothesis. Newton's identity then determines
+`tr(A^k)` uniquely.
 
 ## References
 
 * Schwenk, A. J. (1979). "Spectral reconstruction problems".
-* Tutte, W. T. (1979). "All the king's horses".
+* Newton, I. (1707). *Arithmetica Universalis*.
 -/
 
 namespace SimpleGraph
@@ -36,7 +37,7 @@ namespace SimpleGraph
 variable {V : Type*} [Fintype V] [DecidableEq V]
 variable (G : SimpleGraph V) [DecidableRel G.Adj]
 
-open Matrix
+open Matrix Finset
 
 /-- The trace of the `k`-th power of the adjacency matrix counts closed walks
 of length `k`. This is the diagonal sum `∑_v (A^k)_{vv}`. -/
@@ -47,22 +48,45 @@ variable {G} {H : SimpleGraph V} [DecidableRel H.Adj]
 
 /-- **Traces of adjacency matrix powers are reconstructible** for powers `< |V|`.
 
-`tr(A_G^k) = tr(A_H^k)` for all `k < |V|`. The key insight is that `tr(A^k)`
-counts closed walks of length `k`, which visit at most `k` vertices. These
-walks can be decomposed according to which induced subgraph they inhabit,
-and Kelly's Lemma reconstructs all subgraph counts for graphs on `< |V|`
-vertices. -/
+`tr(A_G^k) = tr(A_H^k)` for all `k < |V|`. The proof uses Newton's identity
+to express `tr(A^k)` in terms of characteristic polynomial coefficients
+(reconstructible by `charPoly_coeff_eq`) and lower-order traces (reconstructible
+by the induction hypothesis). -/
 theorem SameDeck.trace_adjMatrix_pow_eq (h : G.SameDeck H)
-    (hV : 3 ≤ Fintype.card V) {k : ℕ} (hk : k < Fintype.card V) :
+    (_hV : 3 ≤ Fintype.card V) {k : ℕ} (hk : k < Fintype.card V) :
     trace ((G.adjMatrix ℤ) ^ k) = trace ((H.adjMatrix ℤ) ^ k) := by
-  -- TODO: tr(A^k) counts closed walks of length k, which visit at most k distinct
-  -- vertices. For k < n, decompose closed walks by which induced subgraph on ≤ k
-  -- vertices they inhabit. Each such subgraph F has |V(F)| ≤ k < n vertices, so
-  -- Kelly's Lemma gives s(F,G) = s(F,H), making tr(A_G^k) = tr(A_H^k).
-  -- The formalization challenge is expressing this walk decomposition: use
-  -- `adjMatrix_pow_apply_eq_card_walk` from Mathlib to relate (A^k)_{vv} to walks,
-  -- then partition walks by their vertex support.
-  -- Needed by `charPoly_coeff_zero_eq` for full charPoly reconstruction.
-  sorry
+  -- Strong induction on k
+  induction k using Nat.strongRecOn with
+  | ind k ih =>
+  -- Base case: k = 0
+  by_cases hk0 : k = 0
+  · subst hk0; simp [pow_zero]
+  -- Inductive case: 1 ≤ k < |V|
+  · have hk1 : 1 ≤ k := by omega
+    -- Newton's identity for G and H
+    have newtonG := newton_trace_charpoly (G.adjMatrix ℤ) hk1 (le_of_lt hk)
+    have newtonH := newton_trace_charpoly (H.adjMatrix ℤ) hk1 (le_of_lt hk)
+    -- Characteristic polynomial coefficients agree
+    -- (charPoly G ℤ = (G.adjMatrix ℤ).charpoly by definition)
+    have hcoeff : ∀ i, 1 ≤ i →
+        (G.adjMatrix ℤ).charpoly.coeff i = (H.adjMatrix ℤ).charpoly.coeff i :=
+      fun i hi => h.charPoly_coeff_eq ℤ hi
+    -- The middle sums in Newton's identity agree
+    have hsum : ∑ j ∈ range (k - 1),
+        (G.adjMatrix ℤ).charpoly.coeff (Fintype.card V - (j + 1)) *
+          trace ((G.adjMatrix ℤ) ^ (k - (j + 1))) =
+      ∑ j ∈ range (k - 1),
+        (H.adjMatrix ℤ).charpoly.coeff (Fintype.card V - (j + 1)) *
+          trace ((H.adjMatrix ℤ) ^ (k - (j + 1))) := by
+      apply sum_congr rfl; intro j hj
+      simp only [mem_range] at hj
+      rw [hcoeff (Fintype.card V - (j + 1)) (by omega),
+          ih (k - (j + 1)) (by omega) (by omega)]
+    -- The constant terms agree
+    have hc : (↑k : ℤ) * (G.adjMatrix ℤ).charpoly.coeff (Fintype.card V - k) =
+              (↑k : ℤ) * (H.adjMatrix ℤ).charpoly.coeff (Fintype.card V - k) := by
+      congr 1; exact hcoeff (Fintype.card V - k) (by omega)
+    -- Conclude from the two Newton identities
+    linarith
 
 end SimpleGraph
