@@ -1,5 +1,6 @@
 import Reconstruction.ConnectedComponents
 import Reconstruction.KellyLemma
+import Reconstruction.Disconnected.ComponentCount
 
 /-!
 # Reconstruction Conjecture — Disconnected Graphs

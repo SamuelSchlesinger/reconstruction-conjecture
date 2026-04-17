@@ -7,6 +7,7 @@ import Reconstruction.KellyLemma
 import Reconstruction.KellyEdgeCount
 import Reconstruction.Regular
 import Reconstruction.ConnectedComponents
+import Reconstruction.Disconnected.ComponentCount
 import Reconstruction.Disconnected
 import Reconstruction.Trees
 import Reconstruction.TraceReconstruction
