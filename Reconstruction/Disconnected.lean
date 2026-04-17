@@ -11,6 +11,10 @@ disconnected and has the same deck as `H`, then `G ≅ H`.
 
 * `SimpleGraph.isoSigmaComponents` — every graph is isomorphic to the disjoint
   union of its connected components (via a Sigma type).
+* `SimpleGraph.SameDeck.card_isolated_eq` — the number of isolated vertices
+  (degree-0 vertices, equivalently the number of `K₁` components) is
+  reconstructible. This is the base case of Kelly's 1942 multiset-recovery
+  induction.
 * `SimpleGraph.SameDeck.iso_of_not_connected` — disconnected graphs are
   reconstructible (**currently a `sorry`**, see below).
 
@@ -136,6 +140,39 @@ def isoSigmaComponents (G : SimpleGraph V) :
 
 variable [Fintype V] [DecidableEq V]
 variable {G H : SimpleGraph V} [DecidableRel G.Adj] [DecidableRel H.Adj]
+
+/-- **The number of isolated vertices is reconstructible.**
+
+If `G` and `H` have the same deck on ≥ 3 vertices, then they have the same
+number of degree-0 vertices. This is the base case of Kelly's 1942
+multiset-recovery induction: a vertex has degree 0 iff its connected component
+is a single isolated vertex (a `K₁` component), so this counts the number of
+`K₁` components as well.
+
+The proof transports the G-side degree-0 filter across the bijection
+`σ : V ≃ V` from `SameDeck.degree_eq`, using that σ preserves degrees. -/
+theorem SameDeck.card_isolated_eq (h : G.SameDeck H) (hV : 3 ≤ Fintype.card V) :
+    (Finset.univ.filter (fun v : V => G.degree v = 0)).card =
+    (Finset.univ.filter (fun v : V => H.degree v = 0)).card := by
+  obtain ⟨σ, hdeg⟩ := h.degree_eq hV
+  -- Show `image σ` of the G-filter equals the H-filter, then use injectivity.
+  have himg :
+      (Finset.univ.filter (fun v : V => G.degree v = 0)).image σ =
+        Finset.univ.filter (fun v : V => H.degree v = 0) := by
+    ext w
+    simp only [Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and]
+    refine ⟨?_, ?_⟩
+    · rintro ⟨v, hv, rfl⟩
+      exact (hdeg v) ▸ hv
+    · intro hw
+      refine ⟨σ.symm w, ?_, σ.apply_symm_apply w⟩
+      have := hdeg (σ.symm w)
+      rw [σ.apply_symm_apply] at this
+      exact this.trans hw
+  calc (Finset.univ.filter (fun v : V => G.degree v = 0)).card
+      = ((Finset.univ.filter (fun v : V => G.degree v = 0)).image σ).card :=
+        (Finset.card_image_of_injective _ σ.injective).symm
+    _ = (Finset.univ.filter (fun v : V => H.degree v = 0)).card := by rw [himg]
 
 /-- **Disconnected graphs are reconstructible** (Kelly 1942).
 
