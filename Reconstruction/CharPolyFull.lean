@@ -1,5 +1,6 @@
 import Reconstruction.Spectral
 import Reconstruction.TraceReconstruction
+import Reconstruction.TopTrace
 import Reconstruction.Newton
 
 /-!
@@ -10,6 +11,11 @@ reconstructible graph invariant.
 
 ## Main results
 
+* `SimpleGraph.SameDeck.charPoly_coeff_zero_eq_of_trace_card_eq` — the
+  constant term follows from equality of the top trace `tr(A^|V|)`.
+* `SimpleGraph.SameDeck.charPoly_coeff_zero_eq_of_support_counts_eq` — the
+  constant term follows from equality of the proper-support and full-support
+  top-length closed-walk counts.
 * `SimpleGraph.SameDeck.charPoly_coeff_zero_eq` — the constant term is reconstructible
 * `SimpleGraph.SameDeck.charPoly_eq` — the full characteristic polynomial is reconstructible
 
@@ -41,6 +47,94 @@ namespace SimpleGraph
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 variable {G H : SimpleGraph V} [DecidableRel G.Adj] [DecidableRel H.Adj]
+
+open Matrix Finset
+
+/-- Conditional constant-term reconstruction from the missing top trace.
+
+The Cayley-Hamilton trace identity says
+`∑ i, c_i tr(A^i) = 0`. All non-constant coefficients are already
+reconstructible, and traces of powers `< |V|` are reconstructible by
+`SameDeck.trace_adjMatrix_pow_eq`. Therefore the constant coefficient follows
+as soon as the remaining top trace `tr(A^|V|)` is known to agree. -/
+theorem SameDeck.charPoly_coeff_zero_eq_of_trace_card_eq (h : G.SameDeck H)
+    (hV : 3 ≤ Fintype.card V)
+    (htrace :
+      trace ((G.adjMatrix ℤ) ^ Fintype.card V) =
+        trace ((H.adjMatrix ℤ) ^ Fintype.card V)) :
+    (G.charPoly ℤ).coeff 0 = (H.charPoly ℤ).coeff 0 := by
+  let N := Fintype.card V
+  let termG : ℕ → ℤ := fun i =>
+    (G.adjMatrix ℤ).charpoly.coeff i * trace ((G.adjMatrix ℤ) ^ i)
+  let termH : ℕ → ℤ := fun i =>
+    (H.adjMatrix ℤ).charpoly.coeff i * trace ((H.adjMatrix ℤ) ^ i)
+  have hN_ne : (N : ℤ) ≠ 0 := by
+    exact_mod_cast (by omega : N ≠ 0)
+  have hrest :
+      ∑ i ∈ (range (N + 1)).erase 0, termG i =
+        ∑ i ∈ (range (N + 1)).erase 0, termH i := by
+    apply sum_congr rfl
+    intro i hi
+    rw [mem_erase, mem_range] at hi
+    have hi_pos : 1 ≤ i := by omega
+    have hi_le : i ≤ N := by omega
+    have hcoeff :
+        (G.adjMatrix ℤ).charpoly.coeff i =
+          (H.adjMatrix ℤ).charpoly.coeff i := by
+      simpa [charPoly] using h.charPoly_coeff_eq ℤ hi_pos
+    have htrace_i :
+        trace ((G.adjMatrix ℤ) ^ i) =
+          trace ((H.adjMatrix ℤ) ^ i) := by
+      by_cases hiN : i = N
+      · subst hiN
+        simpa [N] using htrace
+      · exact h.trace_adjMatrix_pow_eq hV (k := i) (by omega)
+    simp [termG, termH, hcoeff, htrace_i]
+  have hCHG :
+      ∑ i ∈ range (N + 1), termG i = 0 := by
+    simpa [termG, N] using cayley_hamilton_trace (G.adjMatrix ℤ)
+  have hCHH :
+      ∑ i ∈ range (N + 1), termH i = 0 := by
+    simpa [termH, N] using cayley_hamilton_trace (H.adjMatrix ℤ)
+  have hsplitG :
+      termG 0 + ∑ i ∈ (range (N + 1)).erase 0, termG i = 0 := by
+    rw [Finset.add_sum_erase (s := range (N + 1)) (a := 0)
+      (f := termG) (by simp)]
+    exact hCHG
+  have hsplitH :
+      termH 0 + ∑ i ∈ (range (N + 1)).erase 0, termH i = 0 := by
+    rw [Finset.add_sum_erase (s := range (N + 1)) (a := 0)
+      (f := termH) (by simp)]
+    exact hCHH
+  have hmul :
+      (G.charPoly ℤ).coeff 0 * (N : ℤ) =
+        (H.charPoly ℤ).coeff 0 * (N : ℤ) := by
+    have htermG :
+        termG 0 = (G.charPoly ℤ).coeff 0 * (N : ℤ) := by
+      simp [termG, charPoly, N, Matrix.trace_one]
+    have htermH :
+        termH 0 = (H.charPoly ℤ).coeff 0 * (N : ℤ) := by
+      simp [termH, charPoly, N, Matrix.trace_one]
+    linarith
+  exact mul_right_cancel₀ hN_ne hmul
+
+/-- Conditional constant-term reconstruction from the support split of the
+missing top trace.
+
+The remaining top trace is the sum of closed walks with proper support and
+closed walks with full support.  Thus the constant term follows from equality
+of those two support-count pieces. -/
+theorem SameDeck.charPoly_coeff_zero_eq_of_support_counts_eq (h : G.SameDeck H)
+    (hV : 3 ≤ Fintype.card V)
+    (hproper :
+      G.properSupportClosedWalkCount (Fintype.card V) =
+        H.properSupportClosedWalkCount (Fintype.card V))
+    (hfull :
+      G.fullSupportClosedWalkCount (Fintype.card V) =
+        H.fullSupportClosedWalkCount (Fintype.card V)) :
+    (G.charPoly ℤ).coeff 0 = (H.charPoly ℤ).coeff 0 :=
+  h.charPoly_coeff_zero_eq_of_trace_card_eq hV
+    (trace_adjMatrix_card_eq_of_support_counts_eq hproper hfull)
 
 /-- **The constant term of the characteristic polynomial is reconstructible.**
 

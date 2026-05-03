@@ -12,7 +12,11 @@ they have the same number of edges.
 ## Main results
 
 * `SimpleGraph.deleteVert_edgeFinset_card_add_degree` — `|E(G - v)| + deg(v) = |E(G)|`
+* `SimpleGraph.degree_eq_card_edgeFinset_sub_deleteVert` —
+  `deg(v) = |E(G)| - |E(G-v)|`
 * `SimpleGraph.sum_card_edgeFinset_deleteVert_add` — `∑ v, |E(G-v)| + 2|E(G)| = n · |E(G)|`
+* `SimpleGraph.sum_card_edgeFinset_deleteVert` —
+  `∑ v, |E(G-v)| = (n - 2)|E(G)|`
 * `SimpleGraph.SameDeck.card_edgeFinset_eq` — same deck → same edge count
 
 ## References
@@ -61,6 +65,13 @@ theorem deleteVert_edgeFinset_card_add_degree (v : V) :
   have hpart := Finset.card_sdiff_add_card_inter G.edgeFinset s.toFinset.sym2
   omega
 
+/-- The degree of a deleted vertex is the difference between the original
+edge count and the edge count of its vertex-deleted card. -/
+theorem degree_eq_card_edgeFinset_sub_deleteVert (v : V) :
+    G.degree v = G.edgeFinset.card - (G.deleteVert v).edgeFinset.card := by
+  have h := G.deleteVert_edgeFinset_card_add_degree v
+  omega
+
 /-- Summing the per-vertex edge count formula over all vertices:
 `∑ v, |E(G - v)| + 2|E(G)| = |V| · |E(G)|`.
 
@@ -73,6 +84,22 @@ theorem sum_card_edgeFinset_deleteVert_add :
     Finset.sum_congr rfl fun v _ => G.deleteVert_edgeFinset_card_add_degree v
   rw [Finset.sum_add_distrib, sum_degrees_eq_twice_card_edges] at key
   simpa [Finset.sum_const, Finset.card_univ] using key
+
+/-- The deck-sum edge count formula:
+`∑ v, |E(G-v)| = (|V| - 2) * |E(G)|`.
+
+Thus, for graphs with at least three vertices, the original edge count is
+recoverable from the multiset of vertex-deleted cards. -/
+theorem sum_card_edgeFinset_deleteVert (hV : 2 ≤ Fintype.card V) :
+    ∑ v : V, (G.deleteVert v).edgeFinset.card =
+      (Fintype.card V - 2) * G.edgeFinset.card := by
+  have h_restore : Fintype.card V - 2 + 2 = Fintype.card V :=
+    Nat.sub_add_cancel hV
+  have hsplit :
+      (Fintype.card V - 2) * G.edgeFinset.card + 2 * G.edgeFinset.card =
+        Fintype.card V * G.edgeFinset.card := by
+    rw [← add_mul, h_restore]
+  exact Nat.add_right_cancel (G.sum_card_edgeFinset_deleteVert_add.trans hsplit.symm)
 
 end EdgeCount
 
@@ -99,17 +126,13 @@ theorem SameDeck.card_edgeFinset_eq (h : G.SameDeck H)
           Finset.sum_congr rfl fun v _ => hcard v
       _ = ∑ v, (H.deleteVert v).edgeFinset.card :=
           σ.sum_comp (fun w => (H.deleteVert w).edgeFinset.card)
-  -- Factor: ∑ |E(K-v)| = (|V| - 2) * |E(K)| for any graph K
-  have h_restore : Fintype.card V - 2 + 2 = Fintype.card V :=
-    Nat.sub_add_cancel (by omega : 2 ≤ Fintype.card V)
+  -- Factor: ∑ |E(K-v)| = (|V| - 2) * |E(K)| for any graph K.
   have sum_factor : ∀ (K : SimpleGraph V) [DecidableRel K.Adj],
       ∑ v : V, (K.deleteVert v).edgeFinset.card =
       (Fintype.card V - 2) * K.edgeFinset.card := by
     intro K inst
     letI : DecidableRel K.Adj := inst
-    have hsplit : (Fintype.card V - 2) * K.edgeFinset.card + 2 * K.edgeFinset.card =
-        Fintype.card V * K.edgeFinset.card := by rw [← add_mul, h_restore]
-    exact Nat.add_right_cancel (K.sum_card_edgeFinset_deleteVert_add.trans hsplit.symm)
+    exact K.sum_card_edgeFinset_deleteVert (by omega : 2 ≤ Fintype.card V)
   -- Cancel (|V| - 2) ≥ 1
   have hmul : (Fintype.card V - 2) * G.edgeFinset.card =
       (Fintype.card V - 2) * H.edgeFinset.card :=

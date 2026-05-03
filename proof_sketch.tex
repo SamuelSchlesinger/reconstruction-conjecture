@@ -1,0 +1,5224 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{enumitem}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+
+\newcommand{\Deck}{\operatorname{Deck}}
+\newcommand{\PDeck}{\operatorname{PDeck}}
+\newcommand{\Ext}{\operatorname{Ext}}
+\newcommand{\Aut}{\operatorname{Aut}}
+\newcommand{\Iso}{\operatorname{Iso}}
+\newcommand{\defect}{\operatorname{def}}
+\newcommand{\Err}{\operatorname{Err}}
+\newcommand{\V}{V}
+\newcommand{\E}{E}
+\newcommand{\one}{\mathbf{1}}
+
+\title{A Centered-Extension and Defect-Minimization Strategy for Graph Reconstruction}
+\author{Research sketch}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This note records an English proof strategy for the graph reconstruction
+conjecture.  The main reframing is to fix one common card and view two
+reconstructions as one-vertex extensions of that common card.  The problem
+then becomes: does the deck determine the attachment set of the missing
+vertex?  The proposed proof uses a defect set between two attachment sets and
+tries to show that any nonzero defect can be repaired by moving the deleted
+``hole'' to a better card alignment.  The sharp local form of the problem is
+that a matched rooted card gives a color-preserving bijection whose graph
+error is concentrated in one star; the desired descent says that some such
+one-star error is smaller than the original color defect.
+\end{abstract}
+
+\section{The centered-extension reduction}
+
+Let \(C\) be a finite simple graph with vertex set \(W\).  For a subset
+\(A \subseteq W\), define \(\Ext(C,A)\) to be the graph obtained from \(C\)
+by adding one new vertex \(\ast\), called the root, adjacent exactly to the
+vertices of \(A\).
+
+Thus
+\[
+  V(\Ext(C,A)) = W \sqcup \{\ast\},
+\]
+and
+\[
+  E(\Ext(C,A)) =
+    E(C) \cup \{\{\ast,u\} : u \in A\}.
+\]
+
+For \(u \in W\), deleting the old vertex \(u\) gives
+\[
+  \Ext(C,A)-u \cong \Ext(C-u, A \setminus \{u\}).
+\]
+Deleting the root gives
+\[
+  \Ext(C,A)-\ast \cong C.
+\]
+
+\begin{definition}[Punctured extension deck]
+The punctured extension deck of the attachment set \(A\) over \(C\) is the
+multiset
+\[
+  \PDeck_C(A)
+  =
+  \{\!\{\, \Ext(C-u, A\setminus\{u\}) : u \in W \,\}\!\},
+\]
+where entries are taken up to graph isomorphism.
+\end{definition}
+
+Then the full vertex deck of \(\Ext(C,A)\) is
+\[
+  \Deck(\Ext(C,A)) = \{\!\{ C \}\!\} + \PDeck_C(A).
+\]
+
+\begin{proposition}[Centered reduction]
+Suppose \(G\) and \(H\) are graphs on \(n \geq 3\) vertices with the same
+deck.  Choose a matched card \(G-x \cong H-y\), and identify both cards with a
+single graph \(C\).  Then there are subsets \(A,B \subseteq V(C)\) such that
+\[
+  G \cong \Ext(C,A),
+  \qquad
+  H \cong \Ext(C,B),
+\]
+and
+\[
+  \PDeck_C(A) = \PDeck_C(B).
+\]
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+The subset \(A\) is the neighborhood of \(x\), transported into the card
+\(G-x \cong C\).  Similarly \(B\) is the neighborhood of \(y\), transported
+into \(H-y \cong C\).  Since the full decks of \(G\) and \(H\) agree and both
+contain the chosen matched card \(C\), cancel one occurrence of \(C\) from the
+two deck multisets.
+\end{proof}
+
+Thus the reconstruction conjecture follows from the following centered theorem.
+
+\begin{conjecture}[Centered extension theorem]
+For every finite graph \(C\) and subsets \(A,B \subseteq V(C)\), if
+\[
+  \PDeck_C(A) = \PDeck_C(B),
+\]
+then
+\[
+  \Ext(C,A) \cong \Ext(C,B).
+\]
+\end{conjecture}
+
+\begin{conjecture}[Root-preserving centered theorem]
+If
+\[
+  \PDeck_C(A) = \PDeck_C(B),
+\]
+then \(A\) and \(B\) differ by
+an automorphism of \(C\):
+\[
+  \exists \alpha \in \Aut(C), \quad \alpha(A)=B.
+\]
+\end{conjecture}
+
+\begin{remark}
+This root-preserving version implies the centered extension theorem.  It is a
+stronger target because an isomorphism
+\(\Ext(C,A) \cong \Ext(C,B)\) might in principle send the root of one extension
+to a non-root vertex of the other.  Computationally, however, the stronger
+statement survives the small cases below.  For now we treat it as the primary
+target, while retaining root-moving isomorphisms as a possible escape hatch in
+the moving-hole argument.
+\end{remark}
+
+\begin{remark}[Computational evidence]
+A brute-force search found no counterexample to the root-preserving centered
+theorem for all labeled cards \(C\) on at most five vertices, and no
+counterexample for the 156 unlabeled cards \(C\) on six vertices.  The search
+buckets all attachment sets \(A\subseteq V(C)\) by \(\PDeck_C(A)\) and checks
+that every bucket is a single \(\Aut(C)\)-orbit.  This is only evidence, but it
+is useful: the stronger theorem survives the first small cases where nontrivial
+attachment-set buckets are abundant.
+\end{remark}
+
+\begin{remark}[Computational evidence for descent]
+In the same search range, a stronger one-step phenomenon held.  Whenever
+\(\PDeck_C(A)=\PDeck_C(B)\) and \(A\neq B\), there was a defect vertex
+\(u\in A\triangle B\), a vertex \(v\in V(C)\), and a root-preserving
+isomorphism
+\[
+  \Ext(C-u,A\setminus\{u\})
+  \cong
+  \Ext(C-v,B\setminus\{v\})
+\]
+whose recentering strictly reduced \(|A\triangle B|\).  For the 156 unlabeled
+six-vertex cards, this covered 11,008 nontrivial same-punctured-deck pairs.
+This suggests that the raw defect \(|A\triangle B|\) may itself be the right
+induction parameter.
+\end{remark}
+
+\begin{remark}[Computational evidence for the single-switch base case]
+A separate check of the single-switch situation
+\[
+  A=S\cup\{p\},\qquad B=S\cup\{q\}
+\]
+found no failure of the zero-error-match prediction for all unlabeled cards
+\(C\) on at most six vertices.  Among the 156 unlabeled six-vertex cards,
+there were 37,440 single-switch pairs, 7,328 of which had equal punctured
+extension decks.  Every same-punctured-deck pair had a root-preserving
+direct \(p\leftrightarrow q\) match with zero star error.  Exact two-error
+matches also occurred, in 1,240 of the same-punctured-deck pairs, but always
+alongside this direct zero-error companion.  This is useful evidence for the
+corrected base-case target: exact two-error matches are allowed, but they
+should never be the only available defect-rooted matches.
+A follow-up check showed that detouring matches also occur frequently: among
+the six-vertex same-punctured-deck single switches, 3,000 admitted a
+root-preserving match from a defect vertex to a vertex of \(S\).  Thus detours
+are not obstructions by themselves; the evidence is instead that a direct
+zero-error representative is always also available.
+A classification of the same six-vertex data found that all 7,328
+same-punctured-deck single switches satisfy
+\(\deg_S(p)=\deg_S(q)\); 5,568 are settled by twin collapse, while 1,760 are
+non-twin and therefore represent the genuinely interesting balanced witness
+case.
+\end{remark}
+
+\section{Defect}
+
+Fix \(C\) and two attachment sets \(A,B \subseteq V(C)\).  Define the defect
+set
+\[
+  D(A,B) = A \triangle B.
+\]
+Equivalently,
+\[
+  D_+ = A \setminus B,
+  \qquad
+  D_- = B \setminus A,
+  \qquad
+  D(A,B) = D_+ \sqcup D_-.
+\]
+If \(D(A,B)=\varnothing\), then the identity on \(C\), extended by root to
+root, is an isomorphism
+\[
+  \Ext(C,A) \cong \Ext(C,B).
+\]
+
+The plan is to prove that a nonempty defect cannot survive equality of
+punctured extension decks.
+
+\begin{conjecture}[No nontrivial centered trade]
+If \(\PDeck_C(A)=\PDeck_C(B)\), then either
+\[
+  \Ext(C,A) \cong \Ext(C,B),
+\]
+or there is another centered presentation of the same two extension graphs
+with strictly smaller defect.
+\end{conjecture}
+
+Since defect size is finite, repeated repair would terminate at defect zero or
+at an isomorphism that moves the root.  Either outcome proves reconstruction.
+
+\section{First shadow: edge counts}
+
+The defect is visible in aligned punctured shadows.
+
+\begin{lemma}[Aligned edge-count defect]
+For each \(u \in V(C)\),
+\[
+  |E(\Ext(C-u,A\setminus\{u\}))|
+  -
+  |E(\Ext(C-u,B\setminus\{u\}))|
+  =
+  \one_{u \in B} - \one_{u \in A}.
+\]
+\end{lemma}
+
+\begin{proof}
+Both graphs have the same base \(C-u\).  The first root has
+\(|A|-\one_{u\in A}\) incident edges, while the second root has
+\(|B|-\one_{u\in B}\) incident edges.  Since equality of the full decks of
+\(\Ext(C,A)\) and \(\Ext(C,B)\) implies equality of their total edge counts,
+we have \(|A|=|B|\).  Subtracting gives the displayed formula.
+\end{proof}
+
+Thus vertices in \(A\setminus B\) and vertices in \(B\setminus A\) create
+opposite edge-count errors in the aligned shadows.  Equality of punctured
+decks can hide these errors only by rematching cards.
+
+\begin{remark}
+This is the first conservation law.  It cannot by itself prove the theorem:
+the deck is an unlabelled multiset, so the card indexed by \(u\) on the
+\(A\)-side may be matched to a card indexed by some different \(v\) on the
+\(B\)-side.  The proof must exploit the entire isomorphism type of each
+punctured extension, not just its number of edges.
+\end{remark}
+
+\section{Higher shadows}
+
+Let \(F\) be any finite graph.  Consider the difference
+\[
+  s_F(\Ext(C-u,A\setminus\{u\}))
+  -
+  s_F(\Ext(C-u,B\setminus\{u\})),
+\]
+where \(s_F(X)\) denotes the number of induced copies of \(F\) in \(X\).
+Copies of \(F\) that avoid the root depend only on \(C-u\) and cancel.  The
+entire difference is caused by copies of \(F\) using the root.  Hence it is a
+function of the rooted neighborhood data \(A\setminus\{u\}\) versus
+\(B\setminus\{u\}\) inside \(C-u\).
+
+This gives a family of constraints:
+\[
+  \begin{aligned}
+  &\{\!\{\,
+      \text{rooted pattern profile of }(C-u,A\setminus\{u\})
+      : u \in V(C)
+    \,\}\!\}
+  \\
+  &\qquad =
+    \{\!\{\,
+      \text{rooted pattern profile of }(C-u,B\setminus\{u\})
+      : u \in V(C)
+    \,\}\!\}.
+  \end{aligned}
+\]
+Equivalently, for every finite pattern \(F\), let
+\(r_F(C-u,A\setminus\{u\})\) be the number of induced copies of \(F\) in
+\(\Ext(C-u,A\setminus\{u\})\) that use the root.  Then
+\[
+  \{\!\{\, r_F(C-u,A\setminus\{u\}) : u \in V(C) \,\}\!\}
+  =
+  \{\!\{\, r_F(C-u,B\setminus\{u\}) : u \in V(C) \,\}\!\}.
+\]
+
+The centered theorem says that no non-isomorphic pair of attachment sets can
+satisfy all of these constraints simultaneously.
+
+\section{The moving-hole repair lemma}
+
+The most promising proof mechanism is to use an isomorphism between two
+matched punctured shadows to move the deleted vertex, or ``hole''.
+
+Suppose
+\[
+  \theta :
+  \Ext(C-u,A\setminus\{u\})
+  \cong
+  \Ext(C-v,B\setminus\{v\})
+\]
+is one of the card isomorphisms supplied by
+\(\PDeck_C(A)=\PDeck_C(B)\).
+
+Recenter both full extensions at the deleted old vertices \(u\) and \(v\).
+The new common card is the left punctured extension
+\[
+  D = \Ext(C-u,A\setminus\{u\}),
+\]
+and the right punctured extension is identified with \(D\) by
+\(\theta^{-1}\).
+
+In the left full graph \(\Ext(C,A)\), the missing vertex \(u\) is adjacent in
+the new card \(D\) to
+\[
+  A_u^{\mathrm{new}}
+  =
+  N_C(u)\setminus\{u\}
+  \;\cup\;
+  \begin{cases}
+    \{\ast_A\}, & u \in A,\\
+    \varnothing, & u \notin A,
+  \end{cases}
+\]
+where \(\ast_A\) is the root of the left extension.  In the right full graph,
+the missing vertex \(v\) is adjacent in its punctured card to
+\[
+  B_v^{\mathrm{raw}}
+  =
+  N_C(v)\setminus\{v\}
+  \;\cup\;
+  \begin{cases}
+    \{\ast_B\}, & v \in B,\\
+    \varnothing, & v \notin B.
+  \end{cases}
+\]
+After transporting to the common card \(D\), the right attachment set is
+\[
+  B_v^{\mathrm{new}} = \theta^{-1}(B_v^{\mathrm{raw}}).
+\]
+Thus the recentered defect is
+\[
+  \Delta_{\theta}(u,v)
+  =
+  A_u^{\mathrm{new}} \triangle B_v^{\mathrm{new}}.
+\]
+
+The desired repair statement is therefore concrete:
+\[
+  |\Delta_{\theta}(u,v)| < |A\triangle B|
+\]
+unless the recentering already exhibits an isomorphism of the full extensions.
+
+There are two cases.
+
+\subsection{Case 1: the root maps to the root}
+
+Then \(\theta\) restricts to an isomorphism
+\[
+  \psi : C-u \cong C-v
+\]
+and carries \(A\setminus\{u\}\) to \(B\setminus\{v\}\).
+The new defect formula simplifies to
+\[
+\begin{aligned}
+  \Delta_{\theta}(u,v)
+  &=
+  \bigl(N_C(u)\setminus\{u\}\bigr)
+  \triangle
+  \psi^{-1}\bigl(N_C(v)\setminus\{v\}\bigr).
+\end{aligned}
+\]
+Indeed, because \(\theta\) maps root to root, it preserves root degree:
+\[
+  |A|-\one_{u\in A} = |B|-\one_{v\in B}.
+\]
+Since the full extensions have equal edge count, \(|A|=|B|\), and hence
+\(\one_{u\in A}=\one_{v\in B}\).  Thus the possible root term cancels.
+
+For an arbitrary unrooted card isomorphism, without assuming root maps to root,
+we only get the weaker conservation law
+\[
+  \deg_C(u)+\one_{u\in A}
+  =
+  \deg_C(v)+\one_{v\in B}.
+\]
+Equivalently, if root membership changes in an unrooted match, it is
+compensated by a one-unit change in the old-card degree.
+
+\begin{lemma}[Empty recentered defect extends]
+In the root-preserving case, if
+\[
+  \Delta_{\theta}(u,v)=\varnothing,
+\]
+then
+\[
+  \Ext(C,A)\cong \Ext(C,B).
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The equality \(\Delta_{\theta}(u,v)=\varnothing\) says that \(\psi\) carries
+the neighborhood of \(u\) in \(C\) to the neighborhood of \(v\) in \(C\).
+Therefore \(\psi\) extends over \(u\mapsto v\) to an isomorphism \(C\cong C\).
+The root-preserving card isomorphism also gives
+\(\psi(A\setminus\{u\})=B\setminus\{v\}\), and root-degree preservation gives
+\(u\in A\) if and only if \(v\in B\).  Hence the extended isomorphism carries
+\(A\) to \(B\), and then extends root-to-root to an isomorphism of
+\(\Ext(C,A)\) and \(\Ext(C,B)\).
+\end{proof}
+
+\subsection{Star-error reformulation}
+
+The root-preserving case can be stated more cleanly without mentioning the
+new centered graph \(D\).  Given a root-preserving card isomorphism
+\[
+  \theta:
+  \Ext(C-u,A\setminus\{u\})
+  \cong
+  \Ext(C-v,B\setminus\{v\}),
+\]
+let
+\[
+  \psi:C-u\cong C-v
+\]
+be its restriction to old vertices, and extend \(\psi\) to a bijection
+\[
+  \widehat\psi:V(C)\to V(C)
+\]
+by setting \(\widehat\psi(u)=v\).
+
+\begin{lemma}[A rooted card match is a one-star graph error]
+In the root-preserving case, \(\widehat\psi(A)=B\).  Moreover
+\(\widehat\psi\) preserves every edge and non-edge of \(C\) except possibly
+pairs incident to \(u\).  Its failure to be an automorphism is exactly
+\[
+  \Err_u(\widehat\psi)
+  =
+  \{\,w\in V(C)\setminus\{u\} :
+      (uw\in E(C))
+      \not\leftrightarrow
+      (\widehat\psi(u)\widehat\psi(w)\in E(C))
+  \,\}.
+\]
+Under the recentering identification,
+\[
+  |\Err_u(\widehat\psi)| = |\Delta_\theta(u,v)|.
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The card isomorphism gives
+\(\psi(A\setminus\{u\})=B\setminus\{v\}\).  Root degree preservation, together
+with \(|A|=|B|\), gives \(u\in A\) if and only if \(v\in B\).  Hence the
+extension \(\widehat\psi\) carries all of \(A\) to all of \(B\).  Since
+\(\psi\) is an isomorphism \(C-u\cong C-v\), every adjacency relation not
+involving \(u\) is preserved.  The only possible failures are the adjacencies
+from \(u\), and the set of such failures is precisely the neighborhood
+symmetric difference appearing in \(\Delta_\theta(u,v)\).
+\end{proof}
+
+\begin{lemma}[Parity of star error]
+In the same root-preserving situation,
+\[
+  \deg_C(u)=\deg_C(v),
+\]
+and therefore
+\[
+  |\Err_u(\widehat\psi)|
+  =
+  \left|
+    \bigl(N_C(u)\setminus\{u\}\bigr)
+    \triangle
+    \psi^{-1}\bigl(N_C(v)\setminus\{v\}\bigr)
+  \right|
+\]
+is even.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The restricted map \(\psi:C-u\cong C-v\) gives
+\[
+  |E(C-u)|=|E(C-v)|.
+\]
+Since
+\[
+  |E(C-u)|=|E(C)|-\deg_C(u)
+  \quad\text{and}\quad
+  |E(C-v)|=|E(C)|-\deg_C(v),
+\]
+the deleted vertices have equal degree.  The two neighborhoods compared in
+the symmetric difference therefore have equal cardinality, so their symmetric
+difference has even size.
+\end{proof}
+
+The parity lemma exposes a genuine base case.  If
+\[
+  |A\triangle B|=2,
+\]
+then a strict descent move must have star error \(0\), not merely a smaller
+positive error.  Thus the first nontrivial local theorem is the following.
+
+\begin{conjecture}[Single-switch rigidity]
+Suppose
+\[
+  A=S\cup\{p\},
+  \qquad
+  B=S\cup\{q\},
+  \qquad
+  p\neq q,
+\]
+with \(p,q\notin S\), and suppose
+\[
+  \PDeck_C(A)=\PDeck_C(B).
+\]
+Then \(\Ext(C,A)\cong\Ext(C,B)\).  In the root-preserving version, there is
+an automorphism of \(C\) carrying the set \(S\cup\{p\}\) to the set
+\(S\cup\{q\}\).
+\end{conjecture}
+
+This should be treated as the base case for the whole descent strategy.
+Computationally it is always resolved by a zero-error card match in the tested
+range.  Conceptually, it says that the deck cannot hide the movement of a
+single colored vertex unless the card already has the corresponding symmetry.
+
+\subsection{Single-switch constraints}
+
+For the rest of the single-switch analysis, work in the root-preserving
+regime: either root-moving matches have already given success/ambiguity
+descent, or we have extracted a root-preserving trade.  The rooted card-match
+graph and all root-degree arguments below are statements in that regime.
+
+In the single-switch situation, the two exceptional aligned shadows are
+visible even before using the full isomorphism type of the cards.  For
+\[
+  A=S\cup\{p\},
+  \qquad
+  B=S\cup\{q\},
+\]
+the aligned edge-count defect is
+\[
+  |E(\Ext(C-p,S))|-|E(\Ext(C-p,S\cup\{q\}))|=-1
+\]
+and
+\[
+  |E(\Ext(C-q,S\cup\{p\}))|-|E(\Ext(C-q,S))|=+1.
+\]
+All other aligned shadows have edge-count defect \(0\).  Therefore any deck
+matching must compensate for the missing root edge at \(p\) by rematching
+cards; it cannot simply align every old vertex with itself.
+
+\begin{lemma}[Single-switch degree balance]
+If \(\PDeck_C(S\cup\{p\})=\PDeck_C(S\cup\{q\})\), then
+\[
+  \deg_C(p)=\deg_C(q).
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The full extensions have the same vertex deck, so they have the same degree
+multiset.  The root has the same degree on both sides, namely \(|S|+1\).
+Every old vertex except \(p\) and \(q\) has the same full-extension degree on
+both sides.  At \(p\) and \(q\), the two multisets are
+\[
+  \{\!\{\, \deg_C(p)+1,\deg_C(q) \,\}\!\}
+  \quad\text{and}\quad
+  \{\!\{\, \deg_C(p),\deg_C(q)+1 \,\}\!\}.
+\]
+Equality of these two multisets forces \(\deg_C(p)=\deg_C(q)\).
+\end{proof}
+
+\begin{lemma}[Single-switch \(S\)-degree balance]
+If \(\PDeck_C(S\cup\{p\})=\PDeck_C(S\cup\{q\})\), then
+\[
+  \deg_S(p)=\deg_S(q).
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The full decks of
+\[
+  \Ext(C,S\cup\{p\})
+  \quad\text{and}\quad
+  \Ext(C,S\cup\{q\})
+\]
+are equal, because both are obtained from the common root-deleted card \(C\)
+plus the equal punctured extension decks.  Therefore they have the same
+number of triangles, since triangle counts are reconstructible from the
+vertex deck by Kelly's lemma.
+
+Triangles avoiding the root are just triangles of \(C\), hence cancel.  The
+root-using triangles are exactly the edges induced by the attachment set.  On
+the \(A\)-side this number is
+\[
+  |E(C[S])|+\deg_S(p),
+\]
+and on the \(B\)-side it is
+\[
+  |E(C[S])|+\deg_S(q).
+\]
+Equality of triangle counts gives \(\deg_S(p)=\deg_S(q)\).
+\end{proof}
+
+\begin{lemma}[Root-link profile balance]
+In the same single-switch setting, let \(F\) be any finite graph with fewer
+vertices than \(\Ext(C,S\cup\{p\})\).  Then the number of induced copies of
+\(F\) in \(\Ext(C,S\cup\{p\})\) that use the added root is equal to the
+number of induced copies of \(F\) in \(\Ext(C,S\cup\{q\})\) that use the
+added root.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The full decks of the two extensions are equal, so Kelly's lemma gives equal
+total induced \(F\)-counts.  Copies of \(F\) that avoid the added root lie
+entirely in the common card \(C\), so their counts are identical on the two
+sides.  Subtracting these common root-avoiding counts gives equality of the
+root-using counts.
+\end{proof}
+
+This is the real source of the low-order balances.  Taking \(F=K_3\) gives
+\(\deg_S(p)=\deg_S(q)\).  Larger choices of \(F\) say that the way \(p\)
+interacts with \(S\), and more generally with all of \(C\), has the same
+root-visible profile as the way \(q\) interacts with \(S\).  A non-twin
+single-switch state must therefore hide its witnesses from every proper
+root-link count; the only remaining distinction is how those witnesses are
+arranged globally in the card matching.
+
+Now suppose the \(p\)-shadow on the \(A\)-side is matched root-preservingly to
+the \(v\)-shadow on the \(B\)-side:
+\[
+  \Ext(C-p,S)
+  \cong
+  \Ext(C-v,B\setminus\{v\}).
+\]
+Root degree preservation forces
+\[
+  |S|=|B|-\one_{v\in B}=|S|+1-\one_{v\in B},
+\]
+so \(v\in B\).  Thus the \(A\)-side deleted defect vertex \(p\) can only be
+matched to a \(B\)-colored vertex \(v\in S\cup\{q\}\).  Symmetrically, the
+\(B\)-side deleted defect vertex \(q\) can only be matched to an
+\(A\)-colored vertex.
+
+This is a useful first step: in defect \(2\), the trade must move deleted
+defect vertices into the colored set on the other side.  If one of these
+matches has zero star error, we are done.  If not, parity says its star error
+is at least \(2\), which is exactly the original defect size.  Hence a
+minimal single-switch counterexample would have the following rigid form:
+every defect-rooted root-preserving card match has star error exactly \(2\) or
+larger, and no zero-error match exists.
+
+\begin{conjecture}[No exact two-error single switch]
+The rigid form just described cannot occur.  More concretely, if
+\[
+  A=S\cup\{p\},
+  \qquad
+  B=S\cup\{q\},
+\]
+and \(\PDeck_C(A)=\PDeck_C(B)\), then some root-preserving card match based at
+\(p\) or \(q\) has zero star error.
+\end{conjecture}
+
+\begin{conjecture}[Direct single-switch card match]
+In the same single-switch situation, deck equality already forces a
+root-preserving isomorphism
+\[
+  \Ext(C-p,S)\cong \Ext(C-q,S)
+\]
+whose recentered star error is zero.  Equivalently, there is an isomorphism
+\[
+  \psi:C-p\cong C-q
+\]
+with \(\psi(S)=S\) that extends by \(p\mapsto q\) to an automorphism of \(C\).
+\end{conjecture}
+
+This is stronger than merely asking for some zero-error defect-rooted match.
+It says that the two natural defect-deleted shadows already match each other.
+Computationally this stronger form holds in the tested range.  If true, it
+proves the single-switch base case in one shot.
+
+\subsection{Detours in the single-switch trade cycle}
+
+The direct card-match conjecture isolates the only way the base case can
+fail.  The natural \(p\)-deleted shadow
+\[
+  \Ext(C-p,S)
+\]
+has root degree \(|S|\).  On the \(B\)-side, a root-preserving match with the
+same root degree must delete a vertex \(v\in B=S\cup\{q\}\).  If \(v=q\), we
+are in the direct case.  Thus a failure of the direct conjecture means that
+every trade sends \(p\) first to some vertex of \(S\), creating a detour
+around the unique defect cycle before it reaches \(q\).
+
+Choose a root-preserving trade and let
+\[
+  p=x_0,\ x_1,\ldots,x_k=q
+\]
+be the directed arc of the \(\tau\)-cycle from \(p\) to \(q\), where
+\(\tau(x_i)=x_{i+1}\).  In the non-direct case, \(k\geq 2\), and the internal
+vertices \(x_1,\ldots,x_{k-1}\) lie in \(S\).  Along this arc, the rooted
+cards give isomorphisms
+\[
+  \Ext(C-x_i,A\setminus\{x_i\})
+  \cong
+  \Ext(C-x_{i+1},B\setminus\{x_{i+1}\}).
+\]
+For \(1\leq i<k\), both \(x_i\) and \(x_{i+1}\) lie in \(S\), so the color
+sets differ by moving the hole along \(S\) while keeping the switched vertex
+on opposite sides.  The final step into \(q\) is the only step that can repair
+the original missing color.
+
+\begin{conjecture}[Single-switch detour shortening]
+In a minimal single-switch counterexample, one can choose a root-preserving
+trade with no detour arc
+\[
+  p=x_0\to x_1\to\cdots\to x_k=q
+\]
+with \(k\geq 2\).  Equivalently, one can choose a trade with \(\tau(p)=q\).
+\end{conjecture}
+
+This is a plausible intermediate target between raw deck equality and the
+direct card-match conjecture.  The rooted invariant cycle-balance laws apply
+on the whole \(p\)-to-\(q\) cycle, while the internal detour vertices have
+zero edge-count charge.  If an internal detour exists, one hopes to splice the
+cycle or recenter at an internal vertex to obtain either a shorter detour or a
+zero-error direct match.
+
+Detouring trades are not themselves pathological.  They occur frequently in
+small terminal examples, sometimes even with zero star error.  The point is
+selection, not exclusion: the deck may admit many trades, but the conjecture
+asks for at least one direct representative.
+
+In the rooted card-match graph, this says that the edge \(p\leadsto q\) should
+exist.  If a particular perfect matching uses a detour edge \(p\leadsto s\)
+with \(s\in S\), that is not a contradiction; it only means the matching has
+chosen a non-direct representative.  The selection problem is to show that
+the match graph contains a direct good edge, and preferably that Hall
+alternation can modify any detouring perfect matching to one using it.
+
+\begin{lemma}[Detour arcs are degree-flat]
+Let
+\[
+  p=x_0\to x_1\to\cdots\to x_k=q
+\]
+be the \(p\)-to-\(q\) arc of a root-preserving single-switch trade, with
+internal vertices in \(S\).  Then
+\[
+  \deg_C(x_0)=\deg_C(x_1)=\cdots=\deg_C(x_k).
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+For any trade edge \(x_i\leadsto x_{i+1}\), equality of the edge counts of
+the matched rooted cards gives
+\[
+  \deg_C(x_i)+\one_{x_i\in A}
+  =
+  \deg_C(x_{i+1})+\one_{x_{i+1}\in B}.
+\]
+Along the \(p\)-to-\(q\) arc, \(x_i\in A\) and \(x_{i+1}\in B\) at every
+step: \(p\in A\), \(q\in B\), and every internal detour vertex lies in
+\(S\subseteq A\cap B\).  The indicator terms therefore cancel at each step.
+\end{proof}
+
+More generally, every rooted invariant gives a transport equation along the
+detour:
+\[
+  I_A(x_i)=I_B(x_{i+1}).
+\]
+For \(I=T\) and \(I=P\), these equations relate the rooted triangle and
+two-step profiles of consecutive detour vertices.  A detour is therefore a
+string of vertices that are not merely degree-equal; they are successively
+indistinguishable by the rooted card profiles determined by the switch.
+
+\begin{lemma}[Natural shadow isolation criterion]
+In the single-switch setting, suppose the rooted card
+\[
+  \Ext(C-p,S)
+\]
+is not isomorphic to any card of the form
+\[
+  \Ext(C-s,(S\setminus\{s\})\cup\{q\})
+  \qquad (s\in S).
+\]
+Then
+\[
+  \Ext(C-p,S)\cong \Ext(C-q,S).
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The card \(\Ext(C-p,S)\) appears on the \(A\)-side punctured extension deck.
+By equality of punctured decks it must appear on the \(B\)-side.  Root degree
+shows that any root-preserving occurrence on the \(B\)-side must delete a
+vertex of \(B=S\cup\{q\}\).  By hypothesis it cannot be obtained by deleting
+a vertex of \(S\), so it must be the \(q\)-deleted card.
+\end{proof}
+
+The difficult case is therefore exactly the non-isolated case: the natural
+\(p\)-shadow is profile-equivalent to at least one detour shadow.  The
+degree-flat lemma is the first invariant obstruction to such absorption; the
+rooted triangle and rooted two-step transport equations provide stronger
+filters.
+
+\subsection{Shadow-type flow}
+
+There is a useful multiplicity refinement of the isolation criterion.  Let
+\[
+  T_p=\Ext(C-p,S)
+\]
+be the natural \(p\)-deleted rooted card type.  Define
+\[
+  L(T_p)=\{u\in V(C):\Ext(C-u,A\setminus\{u\})\cong T_p\},
+\]
+and
+\[
+  R(T_p)=\{v\in V(C):\Ext(C-v,B\setminus\{v\})\cong T_p\}.
+\]
+Equality of punctured decks gives
+\[
+  |L(T_p)|=|R(T_p)|.
+\]
+The vertex \(p\) always lies in \(L(T_p)\).  The vertex \(q\) lies in
+\(R(T_p)\) exactly when the direct edge \(p\leadsto q\) exists.  The vertices
+of \(R(T_p)\cap S\) are precisely the \(p\)-absorbers.
+
+Thus if the direct edge is absent, the \(p\)-mass in the deck must be absorbed
+inside \(S\):
+\[
+  q\notin R(T_p)
+  \quad\Longrightarrow\quad
+  R(T_p)\subseteq S.
+\]
+Multiplicity balance then forces
+\[
+  |L(T_p)\setminus\{p\}|=|R(T_p)|.
+\]
+So every failed direct edge produces not only absorbers on the \(B\)-side, but
+also additional suppliers on the \(A\)-side: vertices
+\[
+  u\neq p
+  \quad\text{with}\quad
+  \Ext(C-u,A\setminus\{u\})\cong\Ext(C-p,S).
+\]
+
+\begin{conjecture}[No closed shadow-type flow]
+In the single-switch setting, the natural shadow type \(T_p\) cannot be
+supported entirely by a closed supplier--absorber flow avoiding \(q\).  In
+other words, multiplicity balance for \(T_p\), together with the absorber
+constraints for every vertex of \(R(T_p)\cap S\), forces \(q\in R(T_p)\).
+\end{conjecture}
+
+This is a sharper form of detour selection.  Instead of following one chosen
+perfect matching, it examines the whole fiber of the natural card type.  A
+counterexample would need a balanced population of \(T_p\)-suppliers and
+\(T_p\)-absorbers, all satisfying the same rooted profile constraints, with
+the natural destination \(q\) missing from the right fiber.
+
+There is also a dual flow.  Let
+\[
+  T_q=\Ext(C-q,S)
+\]
+be the natural \(q\)-deleted rooted card type on the \(B\)-side.  If the
+direct edge \(p\leadsto q\) is absent, then \(T_p\neq T_q\).  The type \(T_q\)
+appears at \(q\) on the \(B\)-side, and equality of punctured decks forces it
+to appear on the \(A\)-side.  Root degree again shows that every such
+\(A\)-side occurrence must delete a vertex of \(A=S\cup\{p\}\).  Since
+deleting \(p\) would give \(T_p\), not \(T_q\), the \(T_q\)-mass must also be
+routed through \(S\).
+
+\begin{conjecture}[No coupled closed shadow flows]
+In a single-switch same-deck state, it is impossible for both natural shadow
+types
+\[
+  T_p=\Ext(C-p,S),
+  \qquad
+  T_q=\Ext(C-q,S)
+\]
+to be routed entirely through the common set \(S\), avoiding the direct
+positions \(q\) and \(p\), respectively.
+\end{conjecture}
+
+This coupled-flow conjecture is another form of direct-edge selection.  It
+says that the common set \(S\) cannot simultaneously absorb all evidence of
+the \(p\)-deleted natural card and all evidence of the \(q\)-deleted natural
+card.  The two flows would have to pass through vertices with the same total
+degree, the same \(S\)-degree constraints, and compatible rooted profiles.
+The expectation is that these constraints force the two natural shadow types
+to coincide after all, producing the direct edge.
+
+\begin{definition}[Supplier]
+In the same setting, a vertex \(u\in S\) is a \(p\)-supplier if
+\[
+  \Ext(C-u,(S\setminus\{u\})\cup\{p\})
+  \cong
+  \Ext(C-p,S).
+\]
+Equivalently, \(u\in L(T_p)\setminus\{p\}\).
+\end{definition}
+
+\begin{lemma}[Supplier constraints]
+If \(u\in S\) is a \(p\)-supplier, then
+\[
+  \deg_C(u)=\deg_C(p)
+\]
+and
+\[
+  \deg_S(u)=\deg_{S\setminus\{u\}}(p).
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The root degree of the \(u\)-deleted \(A\)-side card is
+\[
+  |A|-\one_{u\in A}.
+\]
+To match \(T_p=\Ext(C-p,S)\), whose root degree is \(|S|\), we must have
+\(u\in A\).  Since \(u\neq p\), this puts \(u\in S\).  Equality of total edge
+counts then gives \(\deg_C(u)=\deg_C(p)\).
+
+For the second equality, compare root-using triangle counts.  The natural
+\(p\)-shadow has \(|E(C[S])|\) such triangles.  The \(u\)-deleted
+\(A\)-shadow has color set \((S\setminus\{u\})\cup\{p\}\), so its root-using
+triangle count is
+\[
+  |E(C[S])|-\deg_S(u)+\deg_{S\setminus\{u\}}(p).
+\]
+Equality gives the displayed constraint.
+\end{proof}
+
+\begin{definition}[Absorber]
+In the single-switch setting, a vertex \(s\in S\) is a \(p\)-absorber if
+there is a root-preserving isomorphism
+\[
+  \Ext(C-p,S)
+  \cong
+  \Ext(C-s,(S\setminus\{s\})\cup\{q\}).
+\]
+Equivalently, the natural \(p\)-deleted shadow can be matched to the
+\(s\)-deleted shadow on the \(B\)-side.
+\end{definition}
+
+\begin{lemma}[Absorber constraints]
+Suppose \(s\in S\) is a \(p\)-absorber.  Then the following numerical
+constraints hold:
+\[
+  \deg_C(s)=\deg_C(p),
+\]
+\[
+  \deg_S(s)=\deg_{S\setminus\{s\}}(q),
+\]
+and, assuming the single-switch degree balance
+\(\deg_C(p)=\deg_C(q)\),
+\[
+  \deg_S(p)=\deg_S(q).
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The first equality comes from equality of the total edge counts of the
+matched rooted cards:
+\[
+  |E(C-p)|+|S|
+  =
+  |E(C-s)|+|S|.
+\]
+For the second equality, compare root-using triangle counts.  The \(p\)-shadow
+has
+\[
+  |E(C[S])|
+\]
+root-using triangles, while the \(s\)-deleted \(B\)-shadow has
+\[
+  |E(C[(S\setminus\{s\})\cup\{q\}])|
+  =
+  |E(C[S])|-\deg_S(s)+\deg_{S\setminus\{s\}}(q).
+\]
+Equality gives the displayed triangle constraint.
+
+For the last equality, compare the rooted two-step counts \(P\).  The
+\(p\)-shadow gives
+\[
+  \sum_{x\in S}\deg_{C-p}(x)
+  =
+  \sum_{x\in S}\deg_C(x)-\deg_S(p).
+\]
+The \(s\)-deleted \(B\)-shadow gives
+\[
+  \sum_{x\in S\setminus\{s\}}\deg_{C-s}(x)+\deg_{C-s}(q)
+  =
+  \sum_{x\in S}\deg_C(x)-\deg_C(s)-\deg_S(s)+\deg_C(q)-\one_{sq\in E(C)}.
+\]
+Using \(\deg_C(s)=\deg_C(p)=\deg_C(q)\), this becomes
+\[
+  \sum_{x\in S}\deg_C(x)-\deg_S(s)-\one_{sq\in E(C)}.
+\]
+Together with
+\[
+  \deg_S(s)=\deg_{S\setminus\{s\}}(q)
+  =
+  \deg_S(q)-\one_{sq\in E(C)},
+\]
+the two-step equality gives \(\deg_S(p)=\deg_S(q)\).
+\end{proof}
+
+Thus absorption is already quite restrictive.  A \(p\)-absorber must have the
+same total degree as \(p\), must see \(S\) exactly as \(q\) sees
+\(S\setminus\{s\}\), and is compatible with the global \(S\)-degree balance
+forced by triangle reconstruction.  If these absorber constraints fail for
+every \(s\in S\), the natural \(p\)-shadow is isolated and the direct
+\(p\leadsto q\) edge is forced.
+
+Therefore the hard detour-selection case is not just degree-balanced in
+\(C\); it is also balanced relative to the common color:
+\[
+  \deg_C(p)=\deg_C(q),
+  \qquad
+  \deg_S(p)=\deg_S(q).
+\]
+Equivalently, \(p\) and \(q\) have the same number of neighbors in
+\(V(C)\setminus(S\cup\{p,q\})\) as well.  The remaining witnesses must be
+balanced both inside and outside the common color.
+
+\subsection{Absorber chains}
+
+Absorbers should be organized into paths, not treated as isolated accidents.
+Define the absorption digraph for the single-switch state as follows.  Its
+vertices are
+\[
+  S\cup\{q\}.
+\]
+There is an edge
+\[
+  p\to y
+\]
+if the natural \(p\)-deleted shadow can be matched root-preservingly to the
+\(y\)-deleted \(B\)-side shadow.  Thus \(y=q\) is the desired direct edge,
+and \(y\in S\) is a \(p\)-absorber.  More generally, along a chosen
+root-preserving trade cycle
+\[
+  p=x_0\to x_1\to\cdots\to x_k=q,
+\]
+each step \(x_i\to x_{i+1}\) is an absorption edge for the current deleted
+shadow.
+
+For any such step, equality of rooted card profiles gives transport equations
+\[
+  I_A(x_i)=I_B(x_{i+1})
+\]
+for every rooted invariant \(I\).  In particular, the whole chain is
+degree-flat:
+\[
+  \deg_C(x_0)=\deg_C(x_1)=\cdots=\deg_C(x_k),
+\]
+and it is also flat for every invariant that can be read from the rooted card
+after correcting for the moving color set.
+
+\begin{conjecture}[Absorber-chain shortening]
+If there is an absorption chain
+\[
+  p=x_0\to x_1\to\cdots\to x_k=q
+\]
+with \(k\geq 2\), then either there is a direct edge \(p\to q\), or there is a
+shorter absorption chain from \(p\) to \(q\).
+\end{conjecture}
+
+This is the Hall-alternation version of detour shortening.  The hope is to
+splice a chain at an internal absorber using the fact that all vertices on the
+chain have compatible rooted profiles.  The absorber constraints above are
+the first low-order consequences of this compatibility; higher rooted
+subgraph counts should make long chains increasingly rigid.
+
+\subsection{Choosing the extendable card isomorphism}
+
+Even after detour shortening, there is one remaining issue.  A direct
+root-preserving match gives
+\[
+  \psi:C-p\cong C-q,\qquad \psi(S)=S.
+\]
+This proves that \(p\) and \(q\) are deletion-similar relative to the color
+set \(S\), but it does not by itself prove that \(\psi\) extends over
+\(p\mapsto q\).  Extension is exactly the zero-star-error condition
+\[
+  \psi\bigl(N_C(p)\setminus\{p\}\bigr)=N_C(q)\setminus\{q\}.
+\]
+
+Thus the direct single-switch theorem has two layers:
+\[
+  \text{find a direct card match } C-p\cong C-q,
+\]
+then
+\[
+  \text{choose such a match that also carries }N_C(p)\text{ to }N_C(q).
+\]
+The first layer is detour shortening.  The second layer is neighborhood
+selection inside the isomorphism set
+\[
+  \Iso_S(C-p,C-q).
+\]
+
+\begin{conjecture}[Neighborhood selection]
+Assume \(\PDeck_C(S\cup\{p\})=\PDeck_C(S\cup\{q\})\), and assume
+\(\Iso_S(C-p,C-q)\) is nonempty.  Then there exists
+\[
+  \psi\in\Iso_S(C-p,C-q)
+\]
+such that
+\[
+  \psi(N_C(p)\setminus\{p\})=N_C(q)\setminus\{q\}.
+\]
+\end{conjecture}
+
+This is a colored version of the familiar obstruction that two vertices may
+have isomorphic deleted cards without being related by an automorphism.  The
+extra hypothesis here is not merely \(C-p\cong C-q\); it is equality of the
+entire punctured extension decks for the two one-vertex colorings.  The
+conjecture says that this extra deck information selects an extendable
+isomorphism of the common deleted card.
+
+\subsection{Stabilizer-orbit formulation}
+
+Neighborhood selection can be made completely algebraic.  Fix one direct
+card isomorphism
+\[
+  \psi_0:C-p\cong C-q,\qquad \psi_0(S)=S.
+\]
+Let
+\[
+  K=C-p,
+  \qquad
+  U=N_C(p)\setminus\{p\},
+  \qquad
+  V_0=\psi_0^{-1}(N_C(q)\setminus\{q\}).
+\]
+Let
+\[
+  \Aut(K,S)=\{\alpha\in\Aut(K):\alpha(S)=S\}.
+\]
+
+\begin{lemma}[Neighborhood selection is an orbit problem]
+There exists an \(S\)-preserving isomorphism
+\[
+  \psi:C-p\cong C-q
+\]
+that extends over \(p\mapsto q\) if and only if \(U\) and \(V_0\) are in the
+same \(\Aut(K,S)\)-orbit.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Every other \(S\)-preserving isomorphism \(C-p\cong C-q\) has the form
+\[
+  \psi=\psi_0\alpha
+\]
+with \(\alpha\in\Aut(K,S)\).  The transported \(q\)-neighborhood is then
+\[
+  \psi^{-1}(N_C(q)\setminus\{q\})
+  =
+  \alpha^{-1}(V_0).
+\]
+Thus \(\psi\) has zero star error exactly when
+\[
+  U=\alpha^{-1}(V_0),
+\]
+equivalently when \(U\) and \(V_0\) lie in the same orbit.
+\end{proof}
+
+So a failure of neighborhood selection is not vague.  It is a pair of subsets
+\[
+  U,V_0\subseteq V(K)
+\]
+that are indistinguishable enough to arise from the same full
+punctured-extension deck, but still lie in distinct \(\Aut(K,S)\)-orbits.
+This is the point where group action can replace some of the deck language.
+
+\begin{lemma}[Finite orbit separator]
+If \(U\) and \(V_0\) are not in the same \(\Aut(K,S)\)-orbit, then there is a
+finite two-colored rooted pattern \(F\) whose number of induced occurrences
+in the colored structure
+\[
+  (K,S,U)
+\]
+differs from its number of induced occurrences in
+\[
+  (K,S,V_0).
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The two finite colored structures \((K,S,U)\) and \((K,S,V_0)\) are
+non-isomorphic exactly when \(U\) and \(V_0\) are in distinct
+\(\Aut(K,S)\)-orbits.  Taking \(F\) to be the whole colored structure
+\((K,S,U)\) already separates them: it occurs in itself, with multiplicity
+\(|\Aut(K,S,U)|\), and has no surjective color-preserving induced occurrence
+in the non-isomorphic structure.  One can then choose a separator of minimal
+size or complexity.
+\end{proof}
+
+The minimal separator \(F\) is a possible measure of neighborhood-selection
+failure.  If \(F\) is small, it should appear in rooted triangle, path, or
+other low-order shadow counts.  If \(F\) is large, then all smaller colored
+patterns agree, which says \(U\) and \(V_0\) are locally indistinguishable
+relative to \(S\).  Either outcome is useful: a small separator feeds cycle
+balance, while a large minimal separator gives a strong local-equivalence
+normal form.
+
+\begin{lemma}[Anchored Kelly pressure]
+Suppose the distinguished root information is available in the deck, so that
+we can compare the one-vertex-deleted cards as rooted structures over the
+same first root.  Then equality of the anchored decks of
+\[
+  (K,S,U)
+  \quad\text{and}\quad
+  (K,S,V)
+\]
+implies equality of the number of induced occurrences of every proper
+two-colored pattern \(F\), meaning every \(F\) with fewer vertices than \(K\).
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+This is the colored version of Kelly's lemma.  Count pairs
+\[
+  (W,z)
+\]
+where \(W\) is an induced occurrence of \(F\) and \(z\) is a vertex outside
+that occurrence.  Each occurrence of \(F\) is counted \(|V(K)|-|V(F)|\) times,
+and the same pair count can be read from the anchored deck by summing the
+number of \(F\)-occurrences in each one-vertex-deleted anchored card.
+\end{proof}
+
+Consequently, under anchored deck equality, a finite orbit separator for
+\((K,S,U)\) and \((K,S,V)\) cannot be proper.  Any failure of neighborhood
+selection must be a full-size colored hypomorphism: all proper colored
+patterns agree, but the full colored structures are not isomorphic.  This is
+exactly the kind of rigid boundary case where reconstruction difficulties
+usually live.
+
+The caveat is important.  The original deck is unrooted.  The anchored Kelly
+pressure applies only after the root-moving ambiguity has been controlled, or
+inside a strengthened anchored subproblem where the distinguished root is
+part of the data.  Still, it explains why low-order invariants either quickly
+prove neighborhood selection or force the bad case into a very narrow
+full-size hypomorphic corner.
+
+\subsection{Fixed-host subset reconstruction}
+
+The neighborhood-selection problem can be isolated from graph reconstruction
+as follows.  Fix a colored host
+\[
+  (K,S).
+\]
+For a subset \(U\subseteq V(K)\), define its fixed-host deletion deck
+\[
+  \Deck_{K,S}(U)
+  =
+  \{\!\{\, (K-z,\ S\setminus\{z\},\ U\setminus\{z\}) : z\in V(K) \,\}\!\},
+\]
+where the cards are taken up to color-preserving graph isomorphism.
+
+\begin{conjecture}[Fixed-host subset reconstruction]
+If
+\[
+  \Deck_{K,S}(U)=\Deck_{K,S}(V),
+\]
+and
+\[
+  |U|=|V|,
+\]
+then \(U\) and \(V\) are in the same \(\Aut(K,S)\)-orbit.
+\end{conjecture}
+
+This conjecture is exactly the anchored neighborhood-selection problem once
+the first root has been recognized.  It is weaker-looking than graph
+reconstruction because the uncolored host \(K\) and the first color \(S\) are
+held fixed.  The only unknown is the second color class.  The equal-size
+hypothesis is essential: for a one-vertex host, the deletion deck cannot
+distinguish the empty second color from the singleton second color after the
+only vertex is deleted.  In the graph-reconstruction application, equal size
+is supplied by root-degree equality.
+
+\begin{remark}
+The fixed-host problem is still nontrivial.  The cards are not labelled
+subsets of \(K-z\); they are isomorphism types of colored deleted hosts.  A
+host with many deletion-similar vertices can hide the location of \(U\), which
+is exactly the phenomenon behind absorbers and detours.  But the problem has
+a finite group-action target: prove orbit equality under \(\Aut(K,S)\), not
+construct an arbitrary graph isomorphism.
+\end{remark}
+
+Anchored Kelly pressure says that any counterexample to fixed-host subset
+reconstruction must have all proper colored pattern counts equal.  Thus a
+minimal counterexample is a fixed-host colored hypomorphism:
+\[
+  (K,S,U)
+  \quad\text{and}\quad
+  (K,S,V)
+\]
+have equal colored deletion decks and equal proper colored substructure
+counts, but \(U\) and \(V\) are in different \(\Aut(K,S)\)-orbits.
+
+\begin{remark}[Computational evidence]
+A brute-force check found no counterexample to equal-size fixed-host subset
+reconstruction for all unlabeled hosts \(K\) on at most five vertices, all
+choices of \(S\), and all equal-size pairs \(U,V\).  The same check without
+the equal-size hypothesis fails immediately on the one-vertex host, as noted
+above.
+\end{remark}
+
+\subsection{Fixed-host trades and one-star errors}
+
+The fixed-host obstruction has the same local shape as the centered
+obstruction.  Assume
+\[
+  \Deck_{K,S}(U)=\Deck_{K,S}(V),
+  \qquad |U|=|V|.
+\]
+Choose a matching of the fixed-host decks.  Thus for each \(z\in V(K)\) there
+is a vertex \(\tau(z)\in V(K)\) and a color-preserving isomorphism
+\[
+  \eta_z:
+  (K-z,\ S\setminus\{z\},\ U\setminus\{z\})
+  \cong
+  (K-\tau(z),\ S\setminus\{\tau(z)\},\ V\setminus\{\tau(z)\}).
+\]
+
+\begin{lemma}[Deleted colors are preserved]
+For every matched pair \(z\leadsto \tau(z)\),
+\[
+  z\in S \Longleftrightarrow \tau(z)\in S,
+  \qquad
+  z\in U \Longleftrightarrow \tau(z)\in V.
+\]
+Consequently
+\[
+  \tau(S)=S,
+  \qquad
+  \tau(U)=V.
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The first color in the deleted card has size
+\[
+  |S|-\one_{z\in S}
+\]
+on the left and
+\[
+  |S|-\one_{\tau(z)\in S}
+\]
+on the right.  Since \(\eta_z\) is color-preserving, these sizes are equal,
+so \(z\in S\) if and only if \(\tau(z)\in S\).  The same argument for the
+second color uses \(|U|=|V|\) and gives
+\[
+  |U|-\one_{z\in U}
+  =
+  |V|-\one_{\tau(z)\in V}.
+\]
+The bijectivity of \(\tau\) then gives \(\tau(S)=S\) and \(\tau(U)=V\).
+\end{proof}
+
+Extend \(\eta_z\) to a bijection
+\[
+  \widehat\eta_z:V(K)\to V(K)
+\]
+by sending \(z\) to \(\tau(z)\).  The previous lemma says
+\[
+  \widehat\eta_z(S)=S,
+  \qquad
+  \widehat\eta_z(U)=V.
+\]
+Moreover \(\widehat\eta_z\) preserves all graph adjacencies except possibly
+those incident to \(z\).  Define its fixed-host star error by
+\[
+  \Err^{K}_z(\widehat\eta_z)
+  =
+  \{x\in V(K)\setminus\{z\}:
+    (zx\in E(K))
+    \not\leftrightarrow
+    (\tau(z)\widehat\eta_z(x)\in E(K))
+  \}.
+\]
+
+\begin{lemma}[Zero fixed-host star error is orbit success]
+If
+\[
+  \Err^{K}_z(\widehat\eta_z)=\varnothing
+\]
+for some fixed-host deck match, then \(U\) and \(V\) lie in the same
+\(\Aut(K,S)\)-orbit.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The map \(\eta_z\) is already an isomorphism away from \(z\).  Empty star
+error says it also preserves every adjacency incident to \(z\).  Hence
+\(\widehat\eta_z\in\Aut(K)\).  It preserves \(S\) and carries \(U\) to \(V\),
+so it is an element of \(\Aut(K,S)\) carrying \(U\) to \(V\).
+\end{proof}
+
+Thus a fixed-host counterexample supplies a concrete object: a coherent family
+of color-correct one-star maps with no zero-error member.  This is much
+sharper than the phrase ``full-size orbit failure'': the failure is witnessed
+locally by star errors, one for each chosen deletion-card match.
+
+\begin{lemma}[Fixed-host rehosting]
+Let \(z\leadsto w\) be a fixed-host deck match with isomorphism
+\[
+  \eta:(K-z,S\setminus\{z\},U\setminus\{z\})
+  \cong
+  (K-w,S\setminus\{w\},V\setminus\{w\}).
+\]
+Identify both deleted colored hosts with the common colored card
+\[
+  (L,S_L,U_L).
+\]
+Then the two full colored hosts are recovered from \(L\) by adding one new
+vertex with the same pair of color memberships, and with attachment sets
+\[
+  N_K(z)\setminus\{z\},
+  \qquad
+  \eta^{-1}(N_K(w)\setminus\{w\}).
+\]
+The attachment defect in this rehosted centered presentation is exactly
+\[
+  \Err^K_z(\widehat\eta).
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The deleted-colors lemma gives
+\[
+  z\in S \Longleftrightarrow w\in S,
+  \qquad
+  z\in U \Longleftrightarrow w\in V,
+\]
+so the re-added vertex has the same first-color and second-color status on
+both sides.  The deleted colored cards have already been identified by
+\(\eta\), so the only remaining information needed to reconstruct the full
+colored host is the neighborhood of the re-added vertex in the deleted card.
+The difference between these two neighborhoods is precisely the star-error
+set.
+\end{proof}
+
+This is the key exchange principle for the neighborhood-selection bottleneck.
+In the original centered problem, an attachment-color defect can be converted
+by a matched card into a one-star graph error.  In the fixed-host problem, a
+second-color orbit defect can also be converted by a matched card into a
+one-star graph error, but now the deleted card carries both colors as common
+data.  A full-size orbit failure would therefore have to be a closed system
+where these one-star errors never vanish and never descend.
+
+\begin{conjecture}[Fixed-host one-star descent]
+Assume
+\[
+  \Deck_{K,S}(U)=\Deck_{K,S}(V),
+  \qquad |U|=|V|,
+\]
+and \(U,V\) are not in the same \(\Aut(K,S)\)-orbit.  Then one can choose a
+fixed-host trade and a vertex \(z\in U\triangle V\) such that the rehosted
+star error satisfies
+\[
+  |\Err^K_z(\widehat\eta_z)| < |U\triangle V|.
+\]
+\end{conjecture}
+
+For \(|U\triangle V|=2\), this conjecture asks for zero star error, hence an
+orbit-success automorphism.  This is exactly the root-anchored base case
+needed after an exact edge-slide: the switch has moved from the original
+vertices \(p,q\) to a witness pair inside the direct recentered host, and the
+fixed-host descent must show that the new singleton switch cannot be a
+nonterminal sink.
+
+\begin{conjecture}[Fixed-host singleton switch]
+Let
+\[
+  U=T\cup\{a\},
+  \qquad
+  V=T\cup\{b\},
+  \qquad
+  a,b\notin T.
+\]
+If
+\[
+  \Deck_{K,S}(U)=\Deck_{K,S}(V),
+\]
+then some automorphism of \(K\) preserving \(S\) carries \(U\) to \(V\).
+\end{conjecture}
+
+This is the pure fixed-host analogue of single-switch rigidity.  It rules out
+nonconjugate singleton moves inside the fixed background.  Proving this
+singleton statement would settle the exact two-error endpoint of the
+root-anchored descent.
+
+\begin{remark}[Computational evidence for fixed-host singleton]
+A brute-force check over all unlabeled hosts \(K\) on at most six vertices,
+all choices of \(S\) and \(T\), and all ordered pairs \(a,b\notin T\), found
+433,448 fixed-host singleton instances with equal colored deletion decks.  All
+433,448 were orbit-successful, and in fact all 433,448 had a direct card edge
+\[
+  (K-a,S\setminus\{a\},T)
+  \cong
+  (K-b,S\setminus\{b\},T).
+\]
+No no-direct closed-flow candidate occurred in this range.  This is stronger
+than needed for the inductive singleton package and is good evidence that
+detour selection, rather than neighborhood selection, is the core local
+obstruction.
+
+A later random stress test on larger hosts sampled 60 random eight-vertex
+colored hosts and 25 random nine-vertex colored hosts, grouping all
+second-color subsets by their fixed-host deletion deck and extracting the
+singleton pairs.  It found 1,024 equal-deck singleton pairs on eight vertices
+and 640 on nine vertices, again with no nondirect natural-shadow match.  This
+is only evidence, but it supports the stronger direct-shadow target rather
+than merely the orbit conclusion.
+\end{remark}
+
+\subsection{Attacking the fixed-host singleton switch}
+
+Write
+\[
+  U=T\cup\{a\},
+  \qquad
+  V=T\cup\{b\},
+  \qquad
+  a,b\notin T.
+\]
+The natural \(a\)-deleted fixed-host card is
+\[
+  H_a=(K-a,\ S\setminus\{a\},\ T),
+\]
+and the natural \(b\)-deleted card on the other side is
+\[
+  H_b=(K-b,\ S\setminus\{b\},\ T).
+\]
+If \(H_a\) appears on the \(V\)-side by deleting \(b\), we have a direct
+fixed-host card edge \(a\leadsto b\).  If it appears by deleting a vertex
+\(t\in T\), then the singleton switch has detoured through the common color:
+\[
+  (K-a,\ S\setminus\{a\},\ T)
+  \cong
+  (K-t,\ S\setminus\{t\},\ (T\setminus\{t\})\cup\{b\}).
+\]
+
+\begin{lemma}[Fixed-host natural shadow isolation]
+In the fixed-host singleton switch, suppose
+\[
+  (K-a,\ S\setminus\{a\},\ T)
+\]
+is not isomorphic to any detour card
+\[
+  (K-t,\ S\setminus\{t\},\ (T\setminus\{t\})\cup\{b\})
+  \qquad (t\in T).
+\]
+Then there is a direct fixed-host card edge
+\[
+  (K-a,\ S\setminus\{a\},\ T)
+  \cong
+  (K-b,\ S\setminus\{b\},\ T).
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The card \(H_a\) occurs in the \(U\)-deck.  By equality of fixed-host decks it
+must occur in the \(V\)-deck.  The deleted-colors lemma says that, on the
+\(V\)-side, a card matching \(H_a\) must delete a vertex of \(V=T\cup\{b\}\).
+By hypothesis it cannot delete a vertex of \(T\), so it must delete \(b\).
+\end{proof}
+
+Thus the singleton switch again splits into detour selection and neighborhood
+selection.  A direct edge gives an isomorphism
+\[
+  \eta:(K-a,S\setminus\{a\},T)
+  \cong
+  (K-b,S\setminus\{b\},T).
+\]
+Extending \(\eta\) by \(a\mapsto b\) gives a bijection preserving \(S\) and
+preserving \(T\cup\{a\}\) as \(T\cup\{b\}\).  If its star error is empty, this
+is the desired automorphism.  If its star error has size \(2\), it is again a
+single edge-slide at the moved vertex.  So the exact two-error obstruction in
+the original graph has reproduced itself as a fixed-host singleton switch.
+
+There is also a profile-pressure formulation.  For a two-colored pattern
+\(P\), let
+\[
+  m_P(x)=\pi_P(T\cup\{x\})-\pi_P(T)
+\]
+inside the fixed colored host \((K,S)\).  This counts the contribution to
+\(P\)-occurrences caused by changing the second-color status of \(x\), with
+the common background \((K,S,T)\) subtracted away.  It is best thought of as a
+finite-difference invariant: for some patterns it is a direct contribution,
+and for others it is a signed net contribution because occurrences containing
+\(x\) may change type when \(x\) becomes second-colored.
+
+\begin{lemma}[Moving-vertex profile balance]
+Under fixed-host singleton deck equality,
+\[
+  m_P(a)=m_P(b)
+\]
+for every two-colored pattern \(P\) with fewer vertices than \(K\).
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Proper pattern sums are deck-controlled, so
+\[
+  \pi_P(T\cup\{a\})=\pi_P(T\cup\{b\})
+\]
+for every proper pattern \(P\).  The term \(\pi_P(T)\) depends only on the
+fixed background \((K,S,T)\), so subtracting it from both sides gives the
+displayed equality.
+\end{proof}
+
+Write
+\[
+  \deg_R(x)=|N_K(x)\cap R|
+\]
+for \(R\subseteq V(K)\).  The first consequences of moving-vertex profile
+balance are already strong.
+
+\begin{lemma}[Low-order singleton balances]
+Under fixed-host singleton deck equality,
+\[
+  a\in S \Longleftrightarrow b\in S,
+\]
+and
+\[
+  \deg_T(a)=\deg_T(b),
+  \qquad
+  \deg_{K\setminus T}(a)=\deg_{K\setminus T}(b),
+  \qquad
+  \deg_K(a)=\deg_K(b).
+\]
+More generally, for each of the four background classes
+\[
+  S\cap T,\quad T\setminus S,\quad S\setminus T,\quad
+  K\setminus(S\cup T),
+\]
+the number of neighbors of \(a\) in that class equals the number of neighbors
+of \(b\) in that class.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The first-color membership of the moving vertex is detected by the
+one-vertex pattern whose unique vertex is second-colored and first-colored:
+its finite difference is
+\[
+  \one_{x\in S}.
+\]
+
+For the degree statements, use two-vertex edge patterns and read them as
+finite differences.  The pattern in which both vertices are second-colored
+has finite difference
+\[
+  \deg_T(x).
+\]
+The pattern in which exactly one vertex is second-colored has finite
+difference
+\[
+  \deg_{K\setminus T}(x)-\deg_T(x),
+\]
+because edges from \(x\) to \(T\) were counted before \(x\) was
+second-colored and cease to have exactly one second-colored endpoint after
+\(x\) is added.  Since the previous pattern already gives
+\(\deg_T(a)=\deg_T(b)\), equality of the exactly-one-second-colored finite
+difference gives
+\[
+  \deg_{K\setminus T}(a)=\deg_{K\setminus T}(b).
+\]
+Adding the two equalities gives \(\deg_K(a)=\deg_K(b)\).
+
+Refining the same two-vertex edge patterns by first-color status gives a
+triangular system whose entries are the neighbor counts in
+\[
+  S\cap T,\quad T\setminus S,\quad S\setminus T,\quad
+  K\setminus(S\cup T).
+\]
+The entries involving \(T\) are read from the both-second-colored patterns,
+and the entries outside \(T\) are then read from the exactly-one-second
+patterns after subtracting the known \(T\)-entries.  All of these are proper
+pattern counts unless the host has at most two vertices, in which case the
+singleton statement is checked directly from the one-vertex cards.
+\end{proof}
+
+Now suppose the natural \(a\)-shadow is absorbed by a detour vertex
+\(t\in T\):
+\[
+  (K-a,\ S\setminus\{a\},\ T)
+  \cong
+  (K-t,\ S\setminus\{t\},\ (T\setminus\{t\})\cup\{b\}).
+\]
+
+\begin{lemma}[Fixed-host absorber constraints]
+Any such absorber \(t\in T\) satisfies
+\[
+  t\in S \Longleftrightarrow a\in S \Longleftrightarrow b\in S,
+\]
+and
+\[
+  \deg_K(t)=\deg_K(a)=\deg_K(b).
+\]
+Moreover, the second-color induced edge count gives
+\[
+  \deg_T(t)=\deg_T(b)-\one_{tb\in E(K)}.
+\]
+If the common first-color status is \(1\), then the first-color induced edge
+count also gives
+\[
+  \deg_S(t)=\deg_S(a).
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The deleted-colors lemma applied to the match \(a\leadsto t\) gives
+\[
+  a\in S \Longleftrightarrow t\in S,
+\]
+and comparing the size of the intersection of the two color classes in the
+deleted cards gives
+\[
+  t\in S \Longleftrightarrow b\in S.
+\]
+The uncolored edge counts of \(K-a\) and \(K-t\) give
+\[
+  \deg_K(a)=\deg_K(t),
+\]
+and the low-order singleton balance gives \(\deg_K(a)=\deg_K(b)\).
+
+For the second-color edge equation, the left deleted card has second-color
+edge count \(|E(K[T])|\).  The right deleted card has second color
+\((T\setminus\{t\})\cup\{b\}\), so its induced edge count is
+\[
+  |E(K[T])|-\deg_T(t)+\deg_{T\setminus\{t\}}(b).
+\]
+Equating these and using
+\[
+  \deg_{T\setminus\{t\}}(b)=\deg_T(b)-\one_{tb\in E(K)}
+\]
+gives the displayed formula.  Finally, if \(a,t\in S\), the first-color
+induced edge counts of \(S\setminus\{a\}\) and \(S\setminus\{t\}\) give
+\(\deg_S(a)=\deg_S(t)\).
+\end{proof}
+
+Combining the absorber equation with \(\deg_T(a)=\deg_T(b)\), an absorber
+must satisfy
+\[
+  \deg_T(t)=\deg_T(a)-\one_{tb\in E(K)}.
+\]
+So an absorber either has the same \(T\)-degree as \(a\), if it is not
+adjacent to \(b\), or exactly one less, if it is adjacent to \(b\).  This is a
+real restriction: detours can only pass through vertices of the same
+first-color status and nearly the same background degree profile as the moved
+vertex.
+
+\begin{corollary}[Degree-profile isolation]
+If no vertex \(t\in T\) satisfies the absorber constraints above, then the
+fixed-host singleton switch has a direct card edge \(a\leadsto b\).
+\end{corollary}
+
+\begin{proof}[Proof sketch]
+If the direct edge were absent, the natural shadow isolation lemma would force
+the natural \(a\)-deleted card to be absorbed by some \(t\in T\).  Such a
+vertex must satisfy the absorber constraints, contradicting the hypothesis.
+\end{proof}
+
+There is a dual set of constraints for absorbers of the natural \(b\)-shadow
+on the other side.  Thus a non-direct singleton counterexample would require
+two closed flows through \(T\): one absorbing the \(a\)-deleted shadow and one
+absorbing the \(b\)-deleted shadow, both restricted to the same first-color
+class and to the same narrow degree-profile layer.
+
+\subsection{Fixed-host detour cycles}
+
+The trade-cycle language applies verbatim to the fixed-host singleton switch.
+Choose a fixed-host trade, so for each \(z\in V(K)\) there is a matched
+deleted-card isomorphism
+\[
+  (K-z,S\setminus\{z\},U\setminus\{z\})
+  \cong
+  (K-\tau(z),S\setminus\{\tau(z)\},V\setminus\{\tau(z)\}).
+\]
+The deleted-colors lemma gives
+\[
+  \tau(S)=S,
+  \qquad
+  \tau(U)=V.
+\]
+In the singleton case \(U=T\cup\{a\}\) and \(V=T\cup\{b\}\), the edge-count
+cycle-balance therefore puts \(a\) and \(b\) on the same \(\tau\)-cycle.
+More explicitly, along the directed arc
+\[
+  a=x_0\to x_1\to\cdots\to x_k=b
+\]
+from \(a\) to \(b\), every internal vertex lies in \(T\), provided the arc is
+chosen with no intermediate occurrence of \(a\) or \(b\).
+
+\begin{lemma}[Fixed-host detour arcs are profile-flat]
+Let
+\[
+  a=x_0\to x_1\to\cdots\to x_k=b
+\]
+be the \(a\)-to-\(b\) arc of a fixed-host singleton trade, with internal
+vertices in \(T\).  Then every vertex on the arc has the same first-color
+status and the same total degree in \(K\):
+\[
+  x_i\in S \Longleftrightarrow a\in S,
+  \qquad
+  \deg_K(x_i)=\deg_K(a)
+  \qquad (0\leq i\leq k).
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+For each trade edge \(x_i\leadsto x_{i+1}\), the deleted first-color sizes
+give
+\[
+  x_i\in S \Longleftrightarrow x_{i+1}\in S.
+\]
+The uncolored edge counts of the matched deleted hosts give
+\[
+  |E(K)|-\deg_K(x_i)=|E(K)|-\deg_K(x_{i+1}),
+\]
+so \(\deg_K(x_i)=\deg_K(x_{i+1})\).  Iterating along the arc gives the claim.
+\end{proof}
+
+The absorber constraints sharpen this flatness at the first step: if
+\(x_1=t\in T\), then
+\[
+  \deg_T(t)=\deg_T(a)-\one_{tb\in E(K)}.
+\]
+The dual constraints sharpen the final step into \(b\).  Thus a closed detour
+cycle is a string of vertices in \(T\) that are globally degree-flat and
+locally almost \(T\)-degree-flat, while also transporting the full deleted
+colored-card type.  This is the object the no-closed-flow conjecture must
+rule out.
+
+\subsection{Absorber exchange maps}
+
+A detour absorber has more structure than just its deleted vertex.  Suppose
+\[
+  \eta:
+  (K-a,S\setminus\{a\},T)
+  \cong
+  (K-t,S\setminus\{t\},(T\setminus\{t\})\cup\{b\})
+\]
+with \(t\in T\).  Since \(\eta\) maps the second color \(T\) bijectively onto
+\((T\setminus\{t\})\cup\{b\}\), there is a unique vertex
+\[
+  y_\eta\in T
+\]
+such that
+\[
+  \eta(y_\eta)=b.
+\]
+Call \(t\) the entry vertex of the absorber and \(y_\eta\) its exit vertex.
+
+Extending \(\eta\) by \(a\mapsto t\), the second-color transport has the form
+\[
+  a\mapsto t,\qquad y_\eta\mapsto b,
+\]
+with the remaining vertices of \(T\setminus\{y_\eta\}\) mapped into
+\(T\setminus\{t\}\).  Thus a detour does not simply hide \(a\) in \(T\).  It
+injects \(a\) at the entry \(t\), ejects the exit \(y_\eta\) to \(b\), and
+permutes the rest of the common second color.
+
+\begin{definition}[Absorber exchange digraph]
+For a fixed-host singleton state, define the \(a\)-absorber exchange digraph
+on \(T\) by drawing an edge
+\[
+  t\longrightarrow y
+\]
+whenever there is an absorber isomorphism with entry \(t\) and exit \(y\).
+Define the \(b\)-absorber exchange digraph dually.
+\end{definition}
+
+In this language, a no-direct closed flow is not just a set of absorbers; it
+is a circulation in these exchange digraphs.  The entry vertex records where
+the outside color is inserted into \(T\), and the exit vertex records where a
+vertex of \(T\) leaves to become the outside color on the other side.
+
+\begin{conjecture}[No closed absorber circulation]
+In a fixed-host singleton state with equal colored deletion decks, the
+absorber exchange digraphs cannot support a closed circulation avoiding the
+direct edge \(a\leadsto b\).
+\end{conjecture}
+
+This is a more combinatorial version of no closed fixed-host singleton flow.
+It suggests a possible proof strategy: assign a potential to vertices of
+\(T\), built from their rooted profiles relative to \((K,S,T,a,b)\), and show
+that every absorber exchange edge strictly changes that potential in one
+direction unless a direct edge exists.  The low-order absorber equations give
+the first coordinates of such a potential; the witness-charge equations give
+the next signed coordinates.
+
+\begin{lemma}[Exit constraints]
+Let \(t\to y\) be an absorber exchange edge, arising from
+\[
+  \eta:
+  (K-a,S\setminus\{a\},T)
+  \cong
+  (K-t,S\setminus\{t\},(T\setminus\{t\})\cup\{b\})
+\]
+with \(\eta(y)=b\).  Then
+\[
+  y\in S \Longleftrightarrow b\in S,
+\]
+\[
+  \deg_K(y)-\one_{ay\in E(K)}
+  =
+  \deg_K(b)-\one_{tb\in E(K)},
+\]
+and
+\[
+  \deg_T(y)=\deg_T(b)-\one_{tb\in E(K)}.
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The first statement follows because \(\eta\) preserves the first color and
+\(\eta(y)=b\).  The second statement compares the uncolored degrees of \(y\)
+in the deleted host \(K-a\) and \(b\) in the deleted host \(K-t\).  The third
+compares the degrees of \(y\) and \(b\) inside the second-colored induced
+subgraphs of the two deleted colored cards.  On the left this degree is
+\(\deg_T(y)\); on the right it is
+\[
+  \deg_{T\setminus\{t\}}(b)=\deg_T(b)-\one_{tb\in E(K)}.
+\]
+\end{proof}
+
+\begin{corollary}[Closed exchanges avoid witness exits]
+Suppose an absorber exchange edge \(t\to y\) lies in a closed circulation, so
+that \(y\) is also usable as an absorber entry.  Then
+\[
+  \one_{ay\in E(K)}=\one_{by\in E(K)}.
+\]
+In particular, \(y\notin X^-\cup X^+\).
+\end{corollary}
+
+\begin{proof}[Proof sketch]
+Since \(y\) is also an absorber entry, the entry constraints give
+\[
+  \deg_K(y)=\deg_K(a)=\deg_K(b)
+\]
+and
+\[
+  \deg_T(y)=\deg_T(a)-\one_{yb\in E(K)}.
+\]
+The exit constraints and the low-order balance
+\(\deg_T(a)=\deg_T(b)\) give
+\[
+  \one_{ay\in E(K)}=\one_{tb\in E(K)}
+  \quad\text{and}\quad
+  \one_{yb\in E(K)}=\one_{tb\in E(K)}.
+\]
+Thus \(ay\) and \(by\) have the same adjacency status.
+\end{proof}
+
+This is encouraging.  The signed witnesses \(X^-\cup X^+\) are exactly the
+vertices that the two-step charge needs in order to balance a non-twin
+singleton switch, but a closed absorber circulation cannot use such vertices
+as exits.  Therefore a nonterminal witness cycle would have to carry its
+witness charges on vertices that are not the exchange exits, while the
+exchange exits themselves are \(a/b\)-neutral.  That separation is a promising
+place to force a contradiction.
+
+\begin{conjecture}[Fixed-host exchange-chain shortening]
+In a minimal no-direct fixed-host singleton state, the absorber exchange
+digraph has a closed circulation.  Equivalently, if an absorber has an exit
+vertex \(y\in T\) that is not usable as a further absorber entry, then one can
+modify the deck matching to obtain either a direct edge \(a\leadsto b\) or a
+strictly shorter detour chain.
+\end{conjecture}
+
+This is the precise point where the proof could break.  The exit constraints
+are strong only once exits close up into entries.  If the deck can keep
+throwing exits into vertices that are not themselves absorbers, then the
+exchange-potential argument has no cycle to contradict.  Thus the fixed-host
+detour campaign has two tasks: first prove exchange-chain shortening, then
+rule out closed absorber circulations using the exit and witness-charge
+constraints.
+
+\subsection{Natural-shadow fibers in the fixed-host singleton}
+
+There is also a multiplicity formulation, parallel to the earlier
+shadow-type flow.  Let
+\[
+  H_a=(K-a,S\setminus\{a\},T)
+\]
+be the natural \(a\)-deleted card type.  Define
+\[
+  L(H_a)=
+  \{z\in V(K):
+    (K-z,S\setminus\{z\},(T\cup\{a\})\setminus\{z\})\cong H_a
+  \}
+\]
+and
+\[
+  R(H_a)=
+  \{z\in V(K):
+    (K-z,S\setminus\{z\},(T\cup\{b\})\setminus\{z\})\cong H_a
+  \}.
+\]
+Deck equality gives
+\[
+  |L(H_a)|=|R(H_a)|.
+\]
+The vertex \(a\) always lies in \(L(H_a)\).  The vertex \(b\) lies in
+\(R(H_a)\) exactly when the direct natural shadow exists.
+
+Since every card of type \(H_a\) has second-color size \(|T|\), color-size
+comparison gives
+\[
+  L(H_a)\subseteq T\cup\{a\},
+  \qquad
+  R(H_a)\subseteq T\cup\{b\}.
+\]
+Thus, if the direct edge is absent,
+\[
+  R(H_a)\subseteq T
+\]
+and multiplicity balance becomes
+\[
+  |R(H_a)\cap T|
+  =
+  1+|L(H_a)\cap T|.
+\]
+So a no-direct state has strictly more \(a\)-absorbers than \(a\)-suppliers.
+The dual natural shadow \(H_b\) gives the opposite-looking condition for the
+\(b\)-flow.  A closed no-direct counterexample must reconcile these two
+imbalances inside the same finite set \(T\).
+
+The supplier constraints mirror the absorber constraints.  A vertex
+\(u\in T\) is an \(a\)-supplier for \(H_a\) if
+\[
+  (K-u,S\setminus\{u\},(T\setminus\{u\})\cup\{a\})
+  \cong
+  (K-a,S\setminus\{a\},T).
+\]
+Then the same color-size and edge-count comparisons give
+\[
+  u\in S \Longleftrightarrow a\in S,
+  \qquad
+  \deg_K(u)=\deg_K(a),
+\]
+and
+\[
+  \deg_T(u)=\deg_T(a)-\one_{ua\in E(K)}.
+\]
+Compare this with the absorber condition
+\[
+  \deg_T(t)=\deg_T(a)-\one_{tb\in E(K)}.
+\]
+Thus a vertex \(z\in T\) that is neutral with respect to \(a\) and \(b\),
+meaning
+\[
+  \one_{za\in E(K)}=\one_{zb\in E(K)},
+\]
+passes the low-order \(T\)-degree test for being a supplier exactly when it
+passes the corresponding test for being an absorber.  Only witnesses inside
+\(T\) can contribute to a low-order supplier--absorber imbalance.
+
+\begin{lemma}[Low-order imbalance is witness-supported]
+Ignoring higher colored-card structure, the difference between the low-order
+candidate set for \(a\)-absorbers and the low-order candidate set for
+\(a\)-suppliers is supported on
+\[
+  T\cap (X^-\cup X^+).
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The first-color and total-degree tests are the same for suppliers and
+absorbers.  The only displayed low-order test that differs is the
+\(T\)-degree equation, and that equation differs only by replacing
+\(\one_{za\in E(K)}\) with \(\one_{zb\in E(K)}\).  These indicators differ
+exactly on \(X^-\cup X^+\).
+\end{proof}
+
+This fits the exit constraint above: closed exchanges cannot use witnesses as
+exits, but the supplier--absorber imbalance can only be generated by
+witnesses.  Therefore a closed no-direct flow would have to create its
+cardinality imbalance at witness entries while routing its exits through
+neutral vertices.  That asymmetry is the current best candidate for a
+contradiction.
+
+\begin{conjecture}[Neutral absorber reversibility]
+Let \(t\in T\) be an \(a\)-absorber entry, and suppose \(t\) is neutral with
+respect to \(a,b\):
+\[
+  \one_{ta\in E(K)}=\one_{tb\in E(K)}.
+\]
+Then either \(t\) is also an \(a\)-supplier for the natural shadow \(H_a\), or
+there is a shorter detour chain, or there is a direct edge \(a\leadsto b\).
+\end{conjecture}
+
+This is a very small local reversibility statement.  The absorber card
+replaces \(t\) by \(b\) in the second color.  The supplier card replaces \(t\)
+by \(a\).  If \(t\) sees \(a\) and \(b\) in the same way, then the only reason
+absorption need not reverse to supply is a higher-order difference between
+the roles of \(a\) and \(b\) in the deleted card \(K-t\).  But such a
+difference should be visible in the proper moving-vertex profile unless it
+can be pushed further down the detour chain.
+
+\begin{conjecture}[No witness tail into a neutral circulation]
+In a minimal no-direct fixed-host singleton state, an absorber exchange path
+cannot start at a witness entry
+\[
+  t\in T\cap(X^-\cup X^+)
+\]
+and then feed into a closed circulation all of whose vertices are
+\(a/b\)-neutral.
+\end{conjecture}
+
+This is the refined obstruction.  A closed neutral circulation by itself is
+not enough for a contradiction, because an excess absorber could appear as a
+tail leading into that circulation.  The multiplicity imbalance has to be
+carried by witness entries, while the closed part of the exchange graph is
+neutral and reversible.  Therefore the possible surviving shape is a
+witness-to-neutral tail.
+
+\begin{proposition}[Exchange reduction for direct shadow]
+Assume fixed-host exchange-chain shortening, neutral absorber reversibility,
+and no witness tail into a neutral circulation.  Then the fixed-host
+direct-shadow theorem holds.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+Suppose the direct shadow fails in a minimal counterexample.  By natural
+shadow isolation, the \(a\)-natural shadow is absorbed in \(T\).  Repeatedly
+follow absorber exchange exits.  Exchange-chain shortening says that, unless
+a direct edge or a shorter detour appears, the path can be continued until it
+enters a closed circulation.  Minimality excludes directness and shortening.
+On the closed part, the exit constraints force every vertex to be
+\(a/b\)-neutral; neutral reversibility makes the closed part contribute no
+net supplier--absorber imbalance.
+
+The direct-shadow failure requires
+\[
+  |R(H_a)\cap T|=1+|L(H_a)\cap T|,
+\]
+so some imbalance must be supplied outside the neutral reversible part.  The
+low-order imbalance lemma says such imbalance is supported on witnesses.
+Thus the remaining obstruction is exactly a witness entry feeding into a
+neutral closed circulation, contradicting the no-witness-tail assumption.
+\end{proof}
+
+This proposition isolates the current proof burden into three very local
+claims.  Exchange-chain shortening is combinatorial: exits of absorbers must
+either close or shorten.  Neutral reversibility is structural: an absorber at
+an \(a/b\)-neutral entry should be invertible as a supplier unless some
+smaller obstruction appears.  The witness-tail lemma is the bridge between
+the two: it must show that a signed witness charge cannot disappear into a
+neutral reversible cycle.
+
+\begin{conjecture}[No supplier-absorber imbalance]
+In a fixed-host singleton state with equal colored deletion decks, the two
+natural-shadow fiber balances cannot both avoid their direct vertices.  More
+concretely, it is impossible to have
+\[
+  b\notin R(H_a)
+  \qquad\text{and}\qquad
+  a\notin L(H_b).
+\]
+\end{conjecture}
+
+This is another equivalent-looking form of the direct-shadow theorem.  It may
+be more attackable because it isolates a signed cardinality imbalance:
+the \(a\)-flow needs one extra absorber in \(T\), while the \(b\)-flow needs
+one extra absorber in the opposite direction.  Any proof by exchange
+circulation should explain why these two imbalances cannot coexist.
+
+\subsection{The singleton type-flow graph}
+
+There is an even cleaner way to package the same multiplicity bookkeeping.
+For each \(t\in T\), define the two card types
+\[
+  A_t=(K-t,S\setminus\{t\},(T\setminus\{t\})\cup\{a\}),
+\]
+\[
+  B_t=(K-t,S\setminus\{t\},(T\setminus\{t\})\cup\{b\}).
+\]
+The second-color-size-\(|T|\) part of the deck equality says
+\[
+  \{\!\{H_a\}\!\}+\{\!\{A_t:t\in T\}\!\}
+  =
+  \{\!\{H_b\}\!\}+\{\!\{B_t:t\in T\}\!\}.
+\]
+Build a directed multigraph whose vertices are isomorphism classes of
+two-colored cards of this size, with one directed edge
+\[
+  B_t\longrightarrow A_t
+\]
+for each \(t\in T\), and one extra artificial edge
+\[
+  H_b\longrightarrow H_a.
+\]
+
+\begin{lemma}[Type-flow decomposition]
+The singleton type-flow graph is balanced: every card type has equal indegree
+and outdegree.  Consequently every edge lies in a directed cycle.  In
+particular, if \(H_a\neq H_b\), removing the artificial edge leaves a directed
+path
+\[
+  H_a\leadsto H_b
+\]
+using only edges \(B_t\to A_t\) with \(t\in T\).
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+For a card type \(Y\), its indegree in the graph is
+\[
+  |\{t:A_t\cong Y\}|+\one_{H_a\cong Y},
+\]
+and its outdegree is
+\[
+  |\{t:B_t\cong Y\}|+\one_{H_b\cong Y}.
+\]
+These are equal exactly by the displayed multiset equality.  A finite
+balanced directed multigraph decomposes into directed cycles.  The artificial
+edge \(H_b\to H_a\) is in one such cycle; deleting it leaves a directed path
+from \(H_a\) to \(H_b\).
+\end{proof}
+
+This path is a canonical form of a no-direct detour.  Its first edge is an
+absorber of \(H_a\), because \(H_a\cong B_t\) for the first \(t\).  Its final
+edge is a supplier into \(H_b\), because \(A_t\cong H_b\) for the last \(t\).
+Intermediate edges are switches inside deleted \(T\)-cards:
+\[
+  (K-t,S\setminus\{t\},(T\setminus\{t\})\cup\{b\})
+  \leadsto
+  (K-t,S\setminus\{t\},(T\setminus\{t\})\cup\{a\}).
+\]
+Thus the no-direct problem is equivalent to ruling out nontrivial type-flow
+paths from the natural \(a\)-shadow to the natural \(b\)-shadow.
+
+\begin{conjecture}[No nontrivial singleton type-flow path]
+In a fixed-host singleton state with equal colored deletion decks, the
+type-flow path from \(H_a\) to \(H_b\) must have length zero; equivalently,
+\[
+  H_a\cong H_b.
+\]
+\end{conjecture}
+
+This is just the fixed-host direct-shadow theorem in flow language, but it
+has two advantages.  First, it is purely a finite directed multigraph
+statement attached to the equality of the second-color-size-\(|T|\) deck
+slice.  Second, it gives a canonical shortest-path parameter.  A minimal
+counterexample can be chosen with the shortest possible nontrivial path
+\[
+  H_a=Y_0\to Y_1\to\cdots\to Y_r=H_b.
+\]
+Any repeated card type on this path can be removed, so the intermediate
+types are distinct.  The next proof attempt should show that a shortest path
+of positive length can be spliced or shortened using the absorber-exchange
+constraints above.
+
+\subsection{The complementary type-flow graph}
+
+The deck equality also has a second slice, obtained by deleting vertices that
+are not second-colored.  Put
+\[
+  O=V(K)\setminus(T\cup\{a,b\}).
+\]
+On the \(a\)-side, the vertices whose deletion leaves second-color size
+\(|T|+1\) are \(O\cup\{b\}\); on the \(b\)-side they are \(O\cup\{a\}\).
+Thus deck equality also gives
+\[
+  \{\!\{C_b^a\}\!\}+\{\!\{C_o^a:o\in O\}\!\}
+  =
+  \{\!\{C_a^b\}\!\}+\{\!\{C_o^b:o\in O\}\!\},
+\]
+where
+\[
+  C_z^a=(K-z,S\setminus\{z\},T\cup\{a\}),
+  \qquad
+  C_z^b=(K-z,S\setminus\{z\},T\cup\{b\}).
+\]
+As before, this defines a balanced directed type-flow graph, now with edges
+\[
+  C_o^b\longrightarrow C_o^a
+  \qquad(o\in O)
+\]
+and an artificial edge
+\[
+  C_a^b\longrightarrow C_b^a.
+\]
+
+\begin{lemma}[Complementary type-flow decomposition]
+The complementary type-flow graph is balanced.  Hence, if
+\[
+  C_b^a\not\cong C_a^b,
+\]
+then there is a directed path from \(C_b^a\) to \(C_a^b\) using only vertices
+deleted from \(O\).
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The proof is the same indegree-outdegree count as for the singleton
+type-flow graph, applied to the second-color-size-\(|T|+1\) deck slice.
+\end{proof}
+
+The endpoint cancellation
+\[
+  C_b^a\cong C_a^b
+\]
+is also a direct recentering.  It matches the card obtained from
+\((K,S,T\cup\{a\})\) by deleting the uncolored vertex \(b\) with the card
+obtained from \((K,S,T\cup\{b\})\) by deleting the uncolored vertex \(a\).
+The re-added vertex has the same color data on both sides: it has the same
+first-color status by low-order singleton balance, and it is not
+second-colored on either side.
+
+\begin{lemma}[Complementary direct cancellation is a size drop]
+Assume the colored centered extension theorem for centers with fewer than
+\(|V(K)|\) vertices.  If
+\[
+  C_b^a\cong C_a^b,
+\]
+then the fixed-host singleton switch is solved.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Identify the two complementary endpoint cards with a common colored host
+\(L\).  Recenter the two colored full hosts by re-adding \(b\) on the
+\(a\)-side and \(a\) on the \(b\)-side.  Since the matched card has one fewer
+vertex, the colored centered induction hypothesis applies to the resulting
+equal punctured decks over \(L\).  Transporting the resulting isomorphism
+back gives a color-preserving isomorphism
+\[
+  (K,S,T\cup\{a\})\cong (K,S,T\cup\{b\}).
+\]
+\end{proof}
+
+The low slice routes through \(T\); the high slice routes through \(O\).  A
+genuine no-direct singleton obstruction must make both slices balance.  This
+is important because the witness set
+\[
+  X^-\cup X^+
+\]
+is split between \(T\) and \(O\).  The low-slice supplier--absorber imbalance
+can only be generated by witnesses in \(T\), while the complementary slice has
+the analogous imbalance supported on witnesses in \(O\).  Thus the two slices
+should not be studied separately: a counterexample would need compatible
+type-flow paths through both sides of the partition.
+
+\begin{conjecture}[Two-slice incompatibility]
+There is no fixed-host singleton counterexample in which both the low
+type-flow path through \(T\) and the complementary type-flow path through
+\(O\) are nontrivial and shortest.  At least one slice must admit a path
+shortening, a direct cancellation, or a size-drop recentering.
+\end{conjecture}
+
+\begin{conjecture}[Two-slice direct cancellation]
+In a fixed-host singleton state with equal colored deletion decks, at least
+one of the two endpoint cancellations holds:
+\[
+  H_a\cong H_b
+  \qquad\text{or}\qquad
+  C_b^a\cong C_a^b.
+\]
+\end{conjecture}
+
+This would be enough for the fixed-host singleton theorem by the two
+size-drop lemmas.  The computational evidence actually supports the stronger
+first alternative \(H_a\cong H_b\) in all cases checked, but the two-slice
+statement may be easier to prove because it allows either color-size slice to
+provide the direct recentering.
+
+This is another way the proof might close.  The low slice says excess
+absorber mass is supported by witnesses in \(T\); the high slice says the
+complementary excess is supported by witnesses in \(O\).  Since the total
+witness charge is globally balanced, these two flows should constrain each
+other.  A future proof should make this precise by applying the two-step
+charge \(Q\) simultaneously to both color-size slices.
+
+\subsection{Two-slice charge balance}
+
+Define the signed witness charge
+\[
+  \delta(z)=\one_{bz\in E(K)}-\one_{az\in E(K)}
+  \qquad (z\notin\{a,b\}).
+\]
+Thus \(\delta=-1\) on \(X^-\), \(\delta=+1\) on \(X^+\), and
+\(\delta=0\) elsewhere.  Degree balance gives the global cancellation
+\[
+  \sum_{z\notin\{a,b\}}\delta(z)=0.
+\]
+Equivalently,
+\[
+  \sum_{t\in T}\delta(t)
+  =
+  -\sum_{o\in O}\delta(o).
+\]
+
+The same charge is visible directly on type-flow paths.  For a low-slice card
+type \(Y\) with second color of size \(|T|\), let
+\[
+  q(Y)=\sum_{x\in\text{second color of }Y}\deg_Y(x).
+\]
+This is the second-color two-step invariant of that card.
+
+\begin{lemma}[Low path charge formula]
+Let
+\[
+  H_a=Y_0\to Y_1\to\cdots\to Y_r=H_b
+\]
+be a low-slice type-flow path, where the edge \(Y_{i-1}\to Y_i\) is indexed
+by \(t_i\in T\).  Then
+\[
+  q(Y_i)-q(Y_{i-1})=\delta(t_i),
+\]
+and therefore
+\[
+  \sum_{i=1}^r \delta(t_i)
+  =
+  q(H_b)-q(H_a)
+  =
+  \sum_{t\in T}\delta(t).
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The edge indexed by \(t\) compares
+\[
+  B_t=(K-t,S\setminus\{t\},(T\setminus\{t\})\cup\{b\})
+\]
+with
+\[
+  A_t=(K-t,S\setminus\{t\},(T\setminus\{t\})\cup\{a\}).
+\]
+The difference of the second-color two-step invariant between these two cards
+is exactly
+\[
+  \deg_{K-t}(a)-\deg_{K-t}(b)
+  =
+  \one_{bt\in E(K)}-\one_{at\in E(K)}
+  =
+  \delta(t),
+\]
+using \(\deg_K(a)=\deg_K(b)\).  Summing along the path telescopes.  Finally,
+\[
+  q(H_b)-q(H_a)
+  =
+  \sum_{t\in T}\bigl(\deg_{K-b}(t)-\deg_{K-a}(t)\bigr)
+  =
+  \sum_{t\in T}\delta(t).
+\]
+\end{proof}
+
+There is an analogous formula for the complementary path through \(O\), and
+its total charge is
+\[
+  \sum_{o\in O}\delta(o)
+  =
+  -\sum_{t\in T}\delta(t).
+\]
+Thus the two type-flow paths carry opposite total two-step charge.
+
+\begin{conjecture}[No opposite shortest charge paths]
+In a fixed-host singleton counterexample, one cannot have simultaneously a
+shortest positive low-slice path carrying charge
+\[
+  \sum_{t\in T}\delta(t)
+\]
+and a shortest positive complementary path carrying the opposite charge.  At
+least one of the paths can be shortened or converted into a direct
+cancellation.
+\end{conjecture}
+
+This conjecture is a charged version of two-slice incompatibility.  If the
+charge on one slice is nonzero, then any path in that slice must pass through
+signed witnesses.  The other slice must carry exactly the opposite signed
+charge.  If both paths were shortest and nontrivial, the two paths would give
+two incompatible ways of transporting the same global witness imbalance.  If
+the slice charge is zero, then \(q\) alone cannot see the obstruction and one
+must repeat the same argument with higher finite-difference pattern
+invariants.
+
+\subsection{The rectangular second boundary}
+
+The two-slice picture has a more exact form.  The low slice deletes either
+the moving vertex or a vertex of \(T\).  The complementary slice deletes
+either the other moving vertex or a vertex of
+\[
+  O=V(K)\setminus(T\cup\{a,b\}).
+\]
+If we then delete one more vertex from the opposite side of the partition,
+both slices see the same two-hole cards.
+
+For \(t\in T\) and \(o\in O\), define
+\[
+  D_{t,o}^a
+  =
+  (K-\{t,o\},S\setminus\{t,o\},(T\setminus\{t\})\cup\{a\}),
+\]
+\[
+  D_{t,o}^b
+  =
+  (K-\{t,o\},S\setminus\{t,o\},(T\setminus\{t\})\cup\{b\}).
+\]
+Then the elementary square identities are
+\[
+  A_t-o=C_o^a-t=D_{t,o}^a,
+  \qquad
+  B_t-o=C_o^b-t=D_{t,o}^b.
+\]
+
+Let \(\partial_R\) denote the fixed-host partial deletion operator that
+deletes only vertices in \(R\) from the displayed representatives, and then
+passes to colored isomorphism classes.  This operator is not an invariant of
+an abstract card type unless \(R\) has been named in the ambient host.  That
+is fine here: the following identity is a fixed-host identity before taking
+isomorphism classes.
+
+\begin{lemma}[Rectangular second-boundary identity]
+In a fixed-host singleton state with equal colored deletion decks,
+\[
+  \partial_O([H_b]-[H_a])
+  =
+  \partial_T([C_a^b]-[C_b^a])
+\]
+and both sides are equal to the rectangular chain
+\[
+  \sum_{t\in T}\sum_{o\in O}
+    \bigl([D_{t,o}^a]-[D_{t,o}^b]\bigr).
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The low slice gives
+\[
+  [H_b]-[H_a]=\sum_{t\in T}([A_t]-[B_t]).
+\]
+Deleting the vertices of \(O\) from this identity gives
+\[
+  \partial_O([H_b]-[H_a])
+  =
+  \sum_{t\in T}\sum_{o\in O}
+    \bigl([A_t-o]-[B_t-o]\bigr)
+  =
+  \sum_{t\in T}\sum_{o\in O}
+    \bigl([D_{t,o}^a]-[D_{t,o}^b]\bigr).
+\]
+The complementary slice gives
+\[
+  [C_a^b]-[C_b^a]=\sum_{o\in O}([C_o^a]-[C_o^b]).
+\]
+Deleting the vertices of \(T\) from this identity gives the same double sum,
+using \(C_o^a-t=D_{t,o}^a\) and \(C_o^b-t=D_{t,o}^b\).
+\end{proof}
+
+This is stronger than the scalar charge balance.  The two-step charge \(q\)
+is obtained by applying one numerical functional to the rectangular chain.
+Higher finite-difference pattern invariants are obtained by applying other
+colored subgraph-count functionals to the same chain.  Thus the right object
+is not a single charge but the whole rectangular boundary on \(T\times O\).
+
+\begin{conjecture}[No nonzero rectangular kernel]
+Let \(X_a=(K,S,T\cup\{a\})\) and \(X_b=(K,S,T\cup\{b\})\) be a fixed-host
+singleton pair with equal colored deletion decks.  If both endpoint
+differences
+\[
+  [H_b]-[H_a],
+  \qquad
+  [C_a^b]-[C_b^a]
+\]
+are nonzero, then their rectangular second boundary cannot agree as in the
+previous lemma.  Equivalently, the rectangular identity forces at least one
+of
+\[
+  H_a\cong H_b,
+  \qquad
+  C_b^a\cong C_a^b.
+\]
+\end{conjecture}
+
+This is the cleanest current form of the two-slice direct-cancellation
+campaign.  A counterexample would be a nonzero rectangular kernel element:
+two different endpoint defects whose named second deletions across the
+opposite side of the partition are indistinguishable.  That is a much more
+specific obstruction than an arbitrary homology class of the deletion
+complex.
+
+The important nuance is that the rectangular chain is the common image of two
+endpoint defects, not the defect itself.  A moment of the \(D_{t,o}^\ast\)
+cards only studies this common image.  To kill the kernel, one has to show
+that a nonzero endpoint defect cannot be invisible to its named partial
+boundary.
+
+\begin{conjecture}[Full-support rectangular squeeze]
+Work in a minimal fixed-host singleton counterexample, minimizing first
+\(|V(K)|\) and then the total length of the low and complementary type-flow
+paths.  Assume both endpoint cancellations fail.  Let \(P\) be a smallest
+colored pattern that distinguishes the two low endpoints \(H_a\) and
+\(H_b\).  If a copy of \(P\) responsible for the difference misses some
+vertex of \(O\), then the matching term in
+\(\partial_T([C_a^b]-[C_b^a])\) produces either a smaller fixed-host
+singleton obstruction, a path shortening, or a direct cancellation.  Hence,
+in a minimal unresolved counterexample, every such low separator must use all
+vertices of \(O\).  Dually, every complementary separator must use all
+vertices of \(T\).  These two full-support requirements are incompatible with
+the original one-vertex deck equality.
+\end{conjecture}
+
+This is now the best candidate for the ``make or break'' lemma.  If it is
+true, the fixed-host singleton theorem follows by the two size-drop lemmas.
+If it is false, the strategy has not merely failed to find the right charge:
+there is a genuine finite rectangular kernel, and the centered-extension
+campaign needs a new ingredient that is not just another Kelly-style moment.
+
+The intuition is simple.  The partial boundary \(\partial_O([H_b]-[H_a])\)
+detects every low-endpoint discrepancy that survives after deleting at least
+one vertex of \(O\).  Such a visible discrepancy is not automatically a
+contradiction, because the rectangular identity says that it is matched by
+the complementary partial boundary.  But that match is a two-hole card
+isomorphism, and therefore should be exactly the kind of smaller detour from
+which we can extract a path shortening or a size drop.  If no such extraction
+is possible, the first visible difference must be supported on all of
+\(O\).  The dual argument forces the complementary first difference to be
+supported on all of \(T\).  A genuine kernel would have to place the first
+visible difference simultaneously on both full supports.  That is a very
+small corner of the search space, and it is the corner to attack next.
+
+\begin{remark}[Candidate proof of the squeeze]
+Assume a minimal counterexample to the fixed-host singleton theorem in which
+both endpoint cancellations fail.
+
+\begin{enumerate}[leftmargin=2em]
+  \item By the smaller colored centered theorem, the nonisomorphic low
+  endpoints \(H_a,H_b\) cannot have identical colored decks.  Choose a
+  deleted low-endpoint card type \(Z\) whose multiplicity differs, minimizing
+  the size of a colored pattern detecting the difference.
+
+  \item If \(Z\) arises by deleting a vertex of \(O\), then \(Z\) appears in
+  \(\partial_O([H_b]-[H_a])\).  The rectangular identity matches this
+  occurrence inside \(\partial_T([C_a^b]-[C_b^a])\).  Unwinding the matched
+  two-hole card gives a smaller fixed-host singleton state over
+  \(K-\{t,o\}\), or else an isomorphism that splices one of the two type-flow
+  paths.  Minimality rules this out unless it is already a direct
+  cancellation.
+
+  \item Therefore every first low deck discrepancy must come from deleting a
+  vertex of \(T\).  Symmetrically, every first complementary deck discrepancy
+  must come from deleting a vertex of \(O\).
+
+  \item Repeat the argument one level down.  A low discrepancy obtained by
+  deleting \(t\in T\) is a singleton difference inside the smaller host
+  \(K-t\).  If any detecting copy misses a vertex of \(O\), the same
+  rectangular matching produces a smaller obstruction or a path shortening.
+  Hence the detecting copy must use all of \(O\).
+
+  \item The dual argument forces the complementary detecting copy to use all
+  of \(T\).  These two full-support detectors together determine a proper
+  colored pattern in the original full hosts \(X_a,X_b\), contradicting their
+  equal deck-reconstructed proper pattern counts.
+\end{enumerate}
+
+The fragile step is the second one: a matched two-hole card must really
+produce a smaller singleton obstruction or a valid splice.  This is the exact
+place where the approach can break.  The good news is that it is now a
+finite, local statement about two deleted vertices, not a global statement
+about arbitrary graph reconstruction.
+\end{remark}
+
+\subsection{The two-hole splice lemma}
+
+We now isolate the local statement hidden in the previous paragraph.  A
+rectangular cancellation pairs a positive two-hole card with a negative
+two-hole card.  Thus its basic datum is
+\[
+  t,t'\in T,\qquad o,o'\in O,\qquad
+  \theta:D_{t,o}^a\cong D_{t',o'}^b.
+\]
+Unpacked, \(\theta\) is a color-preserving isomorphism
+\[
+  (K-\{t,o\},S\setminus\{t,o\},(T\setminus\{t\})\cup\{a\})
+  \cong
+  (K-\{t',o'\},S\setminus\{t',o'\},(T\setminus\{t'\})\cup\{b\}).
+\]
+
+\begin{definition}[Two-hole ports]
+For such a two-hole match \(\theta\), define its low ports by looking at the
+second color:
+\[
+  \theta(a)\in (T\setminus\{t'\})\cup\{b\},
+  \qquad
+  \theta^{-1}(b)\in (T\setminus\{t\})\cup\{a\}.
+\]
+If \(\theta(a)\neq b\), call \(\theta(a)\) the low exit.  If
+\(\theta^{-1}(b)\neq a\), call \(\theta^{-1}(b)\) the low entry.
+
+Define its complementary ports by looking at the vertices that are not
+second-colored:
+\[
+  \theta(b)\in (O\setminus\{o'\})\cup\{a\},
+  \qquad
+  \theta^{-1}(a)\in (O\setminus\{o\})\cup\{b\}.
+\]
+If \(\theta(b)\neq a\), call \(\theta(b)\) the complementary exit.  If
+\(\theta^{-1}(a)\neq b\), call \(\theta^{-1}(a)\) the complementary entry.
+\end{definition}
+
+\begin{lemma}[Two-hole color bookkeeping]
+Every two-hole match has exactly the four alternatives described above:
+the image of \(a\) is either the moved second-colored vertex \(b\) or a
+vertex of \(T\setminus\{t'\}\); the preimage of \(b\) is either \(a\) or a
+vertex of \(T\setminus\{t\}\); the image of \(b\) is either \(a\) or a
+vertex of \(O\setminus\{o'\}\); and the preimage of \(a\) is either \(b\) or
+a vertex of \(O\setminus\{o\}\).
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The first two statements are exactly preservation of the second color.  The
+last two use preservation of the complement of the second color, together
+with the fact that \(a,b\notin T\) and \(o,o'\in O\).
+\end{proof}
+
+The productive cases are the ones where a two-hole match identifies an
+endpoint with its counterpart, or gives a chord in one of the type-flow
+paths.  For example, if \(\theta(a)=b\), then the match respects the moved
+second-colored vertex.  If also \(\theta(b)=a\), then it respects the moved
+uncolored vertex as well; the only remaining ambiguity is how to reinsert
+the two deleted holes \(t,o\) and \(t',o'\).  This is a two-star error, hence
+a smaller centered problem over the common two-hole card.  If one of the
+low ports lies in \(T\), then the match says that the low type-flow path can
+enter or leave the same card type through an internal \(T\)-vertex; in a
+shortest path, this should create a chord.  The complementary ports do the
+same for the high path through \(O\).
+
+\begin{conjecture}[Two-hole splice lemma]
+Work in a minimal fixed-host singleton counterexample, minimizing
+\(|V(K)|\) and then the total length of the chosen low and complementary
+type-flow paths.  Let
+\[
+  \theta:D_{t,o}^a\cong D_{t',o'}^b
+\]
+be a two-hole match appearing in a balanced residual rectangular matching.
+Then at least one of the following holds.
+
+\begin{enumerate}[leftmargin=2em]
+  \item The match is endpoint-compatible:
+  \[
+    \theta(a)=b,\qquad \theta(b)=a.
+  \]
+  Re-inserting the two deleted holes either gives a direct endpoint
+  cancellation or a smaller colored centered state over the two-hole card.
+
+  \item The low ports define a chord in the low type-flow path, so the path
+  from \(H_a\) to \(H_b\) can be shortened.
+
+  \item The complementary ports define a chord in the complementary type-flow
+  path, so the path from \(C_b^a\) to \(C_a^b\) can be shortened.
+
+  \item The match exposes a smaller fixed-host singleton obstruction inside
+  one of the deleted-hole cards, contradicting minimality of \(|V(K)|\).
+\end{enumerate}
+\end{conjecture}
+
+Equivalently, a minimal unresolved counterexample would have to make the
+remaining residual matches \emph{essentially locked}: neither moved vertex
+maps to its counterpart, all four ports are internal, and the induced low and
+complementary port relations give no chord in either shortest path.
+
+\begin{conjecture}[No essential locked two-hole match]
+There is no essential locked two-hole match in a minimal fixed-host singleton
+counterexample, after all direct cancellations, smaller-obstruction moves,
+path-splicing chords, and exposed unbalanced rectangular terms have been
+removed.
+\end{conjecture}
+
+This is the most concrete local obstruction currently visible.  A locked
+match would have data
+\[
+  \theta(a)=x_T\in T\setminus\{t'\},
+  \qquad
+  \theta^{-1}(b)=y_T\in T\setminus\{t\},
+\]
+\[
+  \theta(b)=x_O\in O\setminus\{o'\},
+  \qquad
+  \theta^{-1}(a)=y_O\in O\setminus\{o\},
+\]
+with no shortening relation among the corresponding low and complementary
+flow vertices.  The color bookkeeping already forces
+\[
+  a\in S \Longleftrightarrow x_T\in S
+  \Longleftrightarrow y_T\in S
+  \Longleftrightarrow b\in S
+\]
+and
+\[
+  b\in S \Longleftrightarrow x_O\in S
+  \Longleftrightarrow y_O\in S
+  \Longleftrightarrow a\in S.
+\]
+Degree and two-step balance should add the same equal-degree and witness
+neutrality constraints as in the absorber analysis.  Thus a locked match is
+not an arbitrary two-hole isomorphism; it is a highly constrained
+four-port near-automorphism of the host with two stars removed.
+
+\begin{remark}[Locked maps are not forbidden absolutely]
+The adjective ``essential'' matters.  Locked two-hole isomorphisms can occur
+in already solved states.  For example, in the empty six-vertex graph with
+\(S=\emptyset\), \(T=\{0,1\}\), \(a=2\), \(b=3\), and \(t=t'=0\),
+\(o=o'=4\), the two-hole cards are just colored empty graphs.  A
+color-preserving bijection can send \(a\) to the remaining \(T\)-vertex and
+\(b\) to an \(O\)-vertex, making all ports internal.  But the singleton
+switch is trivially solved by a direct automorphism.  Therefore the target is
+not to prohibit locked local maps; it is to show that no locked map can be
+the last surviving term in a minimal unresolved rectangular kernel.
+
+The same warning applies even after extension errors are included.  A random
+seven-vertex solved singleton instance produced a locked two-hole map with
+nonzero low and high extension errors, but with the low ports equal and the
+complementary ports equal.  Such a map is not essential: the port loops are
+exactly the local splice signal.  This reinforces the intended target.  The
+forbidden object is a locked map with nonzero unresolved errors and no
+port-loop, no path chord, no direct cancellation, and no smaller obstruction.
+\end{remark}
+
+\begin{lemma}[First-order equations for a locked match]
+Let \(\theta:D_{t,o}^a\cong D_{t',o'}^b\) be locked, with ports
+\[
+  \theta(a)=x_T,\qquad \theta(y_T)=b,
+  \qquad
+  \theta(b)=x_O,\qquad \theta(y_O)=a.
+\]
+Then the following total-degree equations hold:
+\[
+  \deg_K(a)-\one_{at}-\one_{ao}
+  =
+  \deg_K(x_T)-\one_{x_Tt'}-\one_{x_To'},
+\]
+\[
+  \deg_K(y_T)-\one_{y_Tt}-\one_{y_To}
+  =
+  \deg_K(b)-\one_{bt'}-\one_{bo'},
+\]
+\[
+  \deg_K(b)-\one_{bt}-\one_{bo}
+  =
+  \deg_K(x_O)-\one_{x_Ot'}-\one_{x_Oo'},
+\]
+\[
+  \deg_K(y_O)-\one_{y_Ot}-\one_{y_Oo}
+  =
+  \deg_K(a)-\one_{at'}-\one_{ao'}.
+\]
+The second-color degree equations are
+\[
+  \deg_T(a)-\one_{at}
+  =
+  \deg_T(x_T)-\one_{x_Tt'}+\one_{x_Tb},
+\]
+\[
+  \deg_T(y_T)-\one_{y_Tt}+\one_{y_Ta}
+  =
+  \deg_T(b)-\one_{bt'},
+\]
+\[
+  \deg_T(b)-\one_{bt}+\one_{ba}
+  =
+  \deg_T(x_O)-\one_{x_Ot'}+\one_{x_Ob},
+\]
+and
+\[
+  \deg_T(y_O)-\one_{y_Ot}+\one_{y_Oa}
+  =
+  \deg_T(a)-\one_{at'}+\one_{ab}.
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The total-degree equations are obtained by comparing degrees in the deleted
+uncolored hosts \(K-\{t,o\}\) and \(K-\{t',o'\}\).  The second-color
+equations compare the number of neighbors of the given vertex inside the
+second-color class.  On the domain side the second color is
+\((T\setminus\{t\})\cup\{a\}\); on the codomain side it is
+\((T\setminus\{t'\})\cup\{b\}\).  Substituting the four port images gives the
+four displayed formulas.
+\end{proof}
+
+These equations are deliberately elementary.  They are the first Lean-facing
+normal form for the locked case: all terms are degrees in \(K\) plus
+adjacency indicators among the ten named vertices
+\[
+  a,b,t,t',o,o',x_T,y_T,x_O,y_O,
+\]
+with possible coincidences among the ports.  The low-order singleton balance
+can then replace \(\deg_K(a)\) by \(\deg_K(b)\) and
+\(\deg_T(a)\) by \(\deg_T(b)\).  What remains is a finite system of
+\(\{0,1\}\)-corrections.  A locked match is essential only if this system is
+compatible while still producing no port equality, no chord, and no smaller
+singleton state.
+
+\begin{definition}[Two-hole extension errors]
+Let \(\theta:D_{t,o}^a\cong D_{t',o'}^b\).  The low extension error is
+\[
+  \Err_O(\theta)
+  =
+  \theta\bigl(N_K(o)\setminus\{t,o\}\bigr)
+  \triangle
+  \bigl(N_K(o')\setminus\{t',o'\}\bigr),
+\]
+viewed as a subset of \(V(K)\setminus\{t',o'\}\).  The high extension error
+is
+\[
+  \Err_T(\theta)
+  =
+  \theta\bigl(N_K(t)\setminus\{t,o\}\bigr)
+  \triangle
+  \bigl(N_K(t')\setminus\{t',o'\}\bigr).
+\]
+\end{definition}
+
+The notation reflects which deleted hole is being reinserted.  The low error
+measures whether \(\theta\) extends after re-inserting the two \(O\)-holes
+\(o,o'\), hence whether it gives an isomorphism between the low one-hole
+cards \(A_t\) and \(B_{t'}\).  The high error measures whether \(\theta\)
+extends after re-inserting the two \(T\)-holes \(t,t'\), hence whether it
+gives an isomorphism between the complementary one-hole cards \(C_o^a\) and
+\(C_{o'}^b\).
+
+It is useful to keep signs, not just supports.  For
+\(z\in V(K)\setminus\{t,o\}\), define
+\[
+  \sigma_O^\theta(z)
+  =
+  \one_{oz\in E(K)}-\one_{o'\theta(z)\in E(K)},
+\]
+and
+\[
+  \sigma_T^\theta(z)
+  =
+  \one_{tz\in E(K)}-\one_{t'\theta(z)\in E(K)}.
+\]
+Then
+\[
+  |\Err_O(\theta)|=\sum_z |\sigma_O^\theta(z)|,
+  \qquad
+  |\Err_T(\theta)|=\sum_z |\sigma_T^\theta(z)|.
+\]
+The sign records whether the domain reinserted hole has an extra adjacency
+\((+1)\) or the codomain reinserted hole has an extra adjacency \((-1)\).
+
+\begin{lemma}[Zero extension error gives a chord]
+Let \(\theta:D_{t,o}^a\cong D_{t',o'}^b\).
+
+\begin{enumerate}[leftmargin=2em]
+  \item If \(o\in S\Longleftrightarrow o'\in S\) and
+  \(\Err_O(\theta)=\emptyset\), then \(\theta\) extends by \(o\mapsto o'\)
+  to a colored isomorphism
+  \[
+    A_t\cong B_{t'}.
+  \]
+  Thus, if \(A_t\) and \(B_{t'}\) occur as nonconsecutive vertices of the
+  chosen low type-flow path, that path has a chord and can be shortened.
+
+  \item If \(t\in S\Longleftrightarrow t'\in S\) and
+  \(\Err_T(\theta)=\emptyset\), then \(\theta\) extends by \(t\mapsto t'\)
+  to a colored isomorphism
+  \[
+    C_o^a\cong C_{o'}^b.
+  \]
+  Thus, if \(C_o^a\) and \(C_{o'}^b\) occur as nonconsecutive vertices of the
+  chosen complementary type-flow path, that path has a chord and can be
+  shortened.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+For the first statement, the only graph adjacencies not already checked by
+\(\theta\) are the adjacencies incident to the reinserted \(O\)-hole.  These
+are exactly compared by \(\Err_O(\theta)\).  The condition
+\(o\in S\Longleftrightarrow o'\in S\) says that the reinserted vertices have
+the same first-color status; both are outside the second color.  The second
+statement is identical, with \(t,t'\) reinserted instead.  In that case both
+reinserted vertices are second-colored, so only first-color compatibility is
+additional.
+\end{proof}
+
+Therefore an essential locked match must satisfy four negative conditions:
+the two endpoint maps \(a\mapsto b\) and \(b\mapsto a\) fail, the low
+extension either has nonzero error or wrong first-color status at \(o,o'\),
+and the high extension either has nonzero error or wrong first-color status
+at \(t,t'\).  The locked case is not just a four-port condition; it is a
+simultaneous pair of nonzero one-star extension errors over the same
+two-hole card.
+
+\begin{lemma}[Extension-error size tests]
+For a two-hole match \(\theta:D_{t,o}^a\cong D_{t',o'}^b\), put
+\[
+  A_O=N_K(o)\setminus\{t,o\},
+  \qquad
+  B_O=N_K(o')\setminus\{t',o'\},
+\]
+and
+\[
+  A_T=N_K(t)\setminus\{t,o\},
+  \qquad
+  B_T=N_K(t')\setminus\{t',o'\}.
+\]
+Then
+\[
+  |\theta(A_O)|-|B_O|
+  =
+  \deg_K(o)-\one_{ot\in E(K)}
+  -
+  \deg_K(o')+\one_{o't'\in E(K)},
+\]
+and
+\[
+  |\theta(A_T)|-|B_T|
+  =
+  \deg_K(t)-\one_{to\in E(K)}
+  -
+  \deg_K(t')+\one_{t'o'\in E(K)}.
+\]
+In particular, if the corresponding reinserted one-hole cards have the same
+edge count, then the relevant extension error has even cardinality.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The first two displayed identities just count the attachment sets of the
+reinserted vertices into the common two-hole card.  The difference between
+the edge counts of the low one-hole cards \(A_t\) and \(B_{t'}\) is exactly
+the first displayed quantity; the difference between the edge counts of the
+complementary one-hole cards \(C_o^a\) and \(C_{o'}^b\) is exactly the
+second.  If the two attachment sets have the same cardinality, then
+\[
+  |A\triangle B|=2|A\setminus B|
+\]
+after transporting one set by \(\theta\), so the extension error is even.
+\end{proof}
+
+Thus a one-edge locked error is immediately visible as an edge-count
+imbalance between the corresponding one-hole cards.  In a shortest type-flow
+obstruction, such an imbalance must be compensated elsewhere along the same
+path.  This suggests a second potential: sum the sizes of the low and high
+extension errors over a rectangular matching.  Any productive splice reduces
+this potential to zero on one rectangle; an essential locked matching would
+have to keep the potential positive while maintaining all edge-count
+telescoping identities.
+
+\begin{definition}[Balanced residual rectangular potential]
+The rectangular chain
+\[
+  R_{T,O}
+  =
+  \sum_{t\in T}\sum_{o\in O}
+    \bigl([D_{t,o}^a]-[D_{t,o}^b]\bigr)
+\]
+need not be the zero chain.  Its nonzero coefficients are exposed
+rectangular boundary terms.  After removing all exposed terms that can be
+used for a full-support squeeze or a smaller obstruction, a remaining
+balanced residual subchain has, for each isomorphism class of two-hole cards,
+equally many positive and negative occurrences.
+
+On such a balanced residual subchain, choose a bijective matching between
+the positive occurrences \(D_{t,o}^a\) and the negative occurrences
+\(D_{t',o'}^b\), together with a specific isomorphism \(\theta\) for each
+matched pair.  Define
+\[
+  \Phi
+  =
+  \sum_{\theta}
+    \bigl(|\Err_O(\theta)|+|\Err_T(\theta)|\bigr).
+\]
+Among all such residual rectangular matchings, choose one minimizing
+\(\Phi\).  Subject to that, minimize the number of essential locked matches.
+\end{definition}
+
+\begin{remark}[Rigidified vector form]
+Fix an isomorphism class \(\mathcal D\) of two-hole cards, and choose a
+representative colored card \(R\).  For every positive occurrence
+\[
+  D_{t,o}^a\cong R,
+\]
+choose one identification \(\iota:D_{t,o}^a\cong R\).  This occurrence then
+determines two attachment vectors on \(V(R)\):
+\[
+  u_O(z)=\one_{o\,\iota^{-1}(z)\in E(K)},
+  \qquad
+  u_T(z)=\one_{t\,\iota^{-1}(z)\in E(K)}.
+\]
+Similarly every negative occurrence \(D_{t',o'}^b\cong R\) determines two
+attachment vectors
+\[
+  v_O(z)=\one_{o'\,\iota^{-1}(z)\in E(K)},
+  \qquad
+  v_T(z)=\one_{t'\,\iota^{-1}(z)\in E(K)}.
+\]
+After this rigidification, choosing an isomorphism
+\(\theta:D_{t,o}^a\cong D_{t',o'}^b\) is the same as choosing compatible
+identifications with \(R\), and its contribution to \(\Phi\) is the Hamming
+transport cost
+\[
+  d(u_O,v_O)+d(u_T,v_T).
+\]
+Zero cost in the \(O\)-coordinate means the low one-hole cards match.  Zero
+cost in the \(T\)-coordinate means the complementary one-hole cards match.
+\end{remark}
+
+This vector form clarifies the nature of the remaining problem.  The
+rectangular boundary does not merely say that two multisets of card types are
+equal.  For each two-hole card type \(R\), it gives two finite multisets of
+pairs of binary attachment vectors
+\[
+  (u_O,u_T)
+  \qquad\text{and}\qquad
+  (v_O,v_T).
+\]
+The direct-cancellation campaign first has to deal with exposed unbalanced
+two-hole terms.  Only after those terms are removed or converted into smaller
+obstructions does one get a balanced residual transport problem.  In that
+residual problem, an essential locked rectangular kernel is an optimal
+transport plan in which every matched pair differs in both coordinates and
+none of those differences gives a path chord.
+
+\begin{remark}[The transport statement is not abstractly true]
+The last sentence is not a theorem about arbitrary multisets of binary-vector
+pairs.  Abstractly, one can have a positive multiset containing a single pair
+\((u_O,u_T)\) and a negative multiset containing a single pair
+\((v_O,v_T)\) with \(u_O\neq v_O\) and \(u_T\neq v_T\); then every matching
+has positive cost in both coordinates.  Therefore the missing argument must
+use the extra structure: these vectors arise as the two deleted-hole
+attachment vectors inside one fixed graph, they sit in the low and
+complementary type-flow paths, and their aggregate comes from equality of an
+actual one-vertex deletion deck.  This is a useful guardrail for the Lean
+formalization: the minimum-error lemma cannot be stated as a standalone
+transport theorem, and it only applies after the exposed rectangular boundary
+terms have been handled.
+\end{remark}
+
+\begin{definition}[Active rectangle of two shortest paths]
+Fix a shortest positive low type-flow path
+\[
+  H_a=Y_0\to Y_1\to\cdots\to Y_r=H_b,
+\]
+where the edge \(Y_{i-1}\to Y_i\) is indexed by \(t_i\in T\).  Also fix a
+shortest positive complementary type-flow path
+\[
+  C_b^a=Z_0\to Z_1\to\cdots\to Z_s=C_a^b,
+\]
+where the edge \(Z_{j-1}\to Z_j\) is indexed by \(o_j\in O\).  The active
+rectangle is the multiset of pairs
+\[
+  \{1,\ldots,r\}\times\{1,\ldots,s\},
+\]
+whose \((i,j)\)-entry is the two-hole pair
+\[
+  D_{t_i,o_j}^a,\qquad D_{t_i,o_j}^b.
+\]
+\end{definition}
+
+\begin{lemma}[Active rectangular identity]
+For the two chosen paths,
+\[
+  \sum_{i=1}^r\sum_{j=1}^s
+    \bigl([D_{t_i,o_j}^a]-[D_{t_i,o_j}^b]\bigr)
+\]
+is obtained both by deleting the complementary path holes \(o_j\) from the
+low path telescoping identity and by deleting the low path holes \(t_i\) from
+the complementary path telescoping identity.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The low path gives the chain identity
+\[
+  [H_b]-[H_a]=\sum_{i=1}^r([A_{t_i}]-[B_{t_i}]).
+\]
+Deleting each \(o_j\) and summing over \(j\) gives the displayed double sum.
+The complementary path gives
+\[
+  [C_a^b]-[C_b^a]=\sum_{j=1}^s([C_{o_j}^a]-[C_{o_j}^b]).
+\]
+Deleting each \(t_i\) and summing over \(i\) gives the same double sum, since
+\[
+  A_{t_i}-o_j=C_{o_j}^a-t_i=D_{t_i,o_j}^a,
+  \qquad
+  B_{t_i}-o_j=C_{o_j}^b-t_i=D_{t_i,o_j}^b.
+\]
+\end{proof}
+
+This active rectangle is the right object for the splice lemma, but it has
+the same caveat as the full rectangle: it need not be balanced as a
+positive-negative chain.  If it has an exposed unbalanced two-hole type, that
+type is already a candidate separator.  If an active balanced residual
+remains, then a zero \(O\)-extension error in a matched entry gives an
+isomorphism
+\[
+  A_{t_i}\cong B_{t_{i'}}
+\]
+for some active \(i,i'\), hence a chord or endpoint cancellation in the low
+path.  A zero \(T\)-extension error similarly gives a chord or endpoint
+cancellation in the complementary path.  Rectangular matches outside the
+active rectangle may be harmless side cycles; they should not be part of the
+minimum-error obstruction.
+
+\begin{conjecture}[Minimum-error residual matching has no essential lock]
+In a minimal fixed-host singleton counterexample, after all exposed
+rectangular boundary terms have been converted into full-support squeezes or
+smaller obstructions, a minimum-error matching of the balanced residual
+rectangular chain contains no essential locked two-hole match.
+\end{conjecture}
+
+This is a more operational version of the two-hole splice lemma.  If a
+locked match has nonzero low or high extension error, then some adjacency
+incident to one of the deleted holes is mismatched.  In the balanced residual
+chain, the same mismatched adjacency should be corrected by another occurrence
+of the same two-hole card type.  Swapping the partners along the resulting
+alternating correction cycle should either reduce \(\Phi\), create a
+zero-error extension in one direction, or expose a smaller singleton
+obstruction.  In a \(\Phi\)-minimal residual matching, none of these can
+happen, so an essential locked match should be impossible.
+
+\begin{conjecture}[Locked correction cycle]
+Let a minimum-error matching of the balanced residual rectangular chain
+contain an essential locked match \(\theta\).  Choose a signed low or high
+error, say
+\(\sigma_O^\theta(z)=+1\).  Then the rectangular balance supplies a finite
+alternating sequence of matched two-hole cards carrying the same named
+adjacency discrepancy with signs alternating \(+1,-1,+1,\ldots,-1\).  Swapping
+partners around this correction cycle strictly decreases
+\[
+  \sum_\theta\sum_z
+    \bigl(|\sigma_O^\theta(z)|+|\sigma_T^\theta(z)|\bigr),
+\]
+unless one of the swaps creates a zero-extension chord or a smaller
+singleton obstruction.
+\end{conjecture}
+
+This conjecture is the combinatorial heart of the minimum-error approach.
+It is the rectangular analogue of cancelling opposite signs in an optimal
+matching problem.  The nontrivial point is that the signs are attached to
+named adjacencies involving the deleted holes, while the two-hole cards are
+unlabelled up to isomorphism.  The two-hole isomorphisms must transport the
+names coherently enough for the alternating cycle to be defined.
+
+\begin{remark}[Why this is Lean-shaped]
+The potential \(\Phi\) is finite and purely combinatorial.  A Lean proof would
+not need to reason about arbitrary choices forever: choose a minimizing
+residual rectangular matching by finite well-ordering, then prove that any locked
+match admits a local partner-swap decreasing the lexicographic potential
+\[
+  (\Phi,\ \#\text{essential locks}).
+\]
+This is exactly the same architecture as the earlier minimal-defect strategy,
+but now the moving part is a finite matching of two-hole cards rather than an
+unrooted deck matching.
+\end{remark}
+
+\begin{remark}[Next local attack]
+The immediate task is now to prove that locked matches cannot exist.  The
+first pass should use only first-order data: first-color status, total
+degree, degree into \(T\), degree into \(O\), and the signed witness charge
+\(\delta\).  If these invariants force
+\[
+  x_T=y_T
+  \qquad\text{or}\qquad
+  x_O=y_O,
+\]
+then the corresponding port relation is a loop or a chord, hence a splice.
+If they do not, the locked case becomes a finite four-port configuration
+whose second-order boundary can be searched directly.
+\end{remark}
+
+\begin{remark}[Lean readiness of the fixed-host block]
+The following parts of the fixed-host singleton campaign are now
+formalization-ready definitions or straightforward lemmas.
+
+\begin{enumerate}[leftmargin=2em]
+  \item The fixed-host colored deletion deck \(\Deck_{K,S}(U)\).
+  \item The low and complementary type-flow decompositions.
+  \item The rectangular second-boundary identity.
+  \item Two-hole ports and the color-bookkeeping lemma.
+  \item The first-order locked-match equations.
+  \item The extension-error sets \(\Err_O,\Err_T\), their signed versions
+  \(\sigma_O,\sigma_T\), and the zero-extension-error chord lemma.
+  \item The rigidified vector form for each two-hole card type, and the
+  finite potential \(\Phi\) for a rectangular matching.
+\end{enumerate}
+
+The part that is not yet Lean-ready as a proof is the correction-cycle
+descent: from an essential locked match in a \(\Phi\)-minimal rectangular
+matching, construct a partner swap that reduces
+\((\Phi,\#\text{essential locks})\), or else extract a smaller singleton
+obstruction.  Once that local descent is proved in English, the fixed-host
+singleton theorem has a plausible Lean route.
+\end{remark}
+
+\begin{proposition}[Rectangular kernel exclusion solves singleton]
+Assume the colored centered extension theorem for colored centers with fewer
+than \(|V(K)|\) vertices.  Assume also the no nonzero rectangular kernel
+statement for the fixed-host singleton state \((K,S,T,a,b)\).  Then the
+fixed-host singleton switch is solved.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+The rectangular second-boundary identity holds for every equal-deck
+singleton state.  By no nonzero rectangular kernel, at least one endpoint
+cancellation holds:
+\[
+  H_a\cong H_b
+  \qquad\text{or}\qquad
+  C_b^a\cong C_a^b.
+\]
+In the first case, the direct-edge size-drop lemma applies.  In the second
+case, the complementary direct-cancellation size-drop lemma applies.  Either
+way, the problem recenters over a host with one fewer vertex, and the colored
+centered induction hypothesis gives the required color-preserving
+automorphism of \(K\) carrying \(T\cup\{a\}\) to \(T\cup\{b\}\).
+\end{proof}
+
+So the fixed-host singleton problem can now be attacked without mentioning
+type-flow paths at all.  Type flows remain useful for finding a minimal
+obstruction, but the rectangular kernel is the algebraic object that must be
+proved empty.  This is a meaningful simplification: instead of showing that
+no routing through \(T\) and no routing through \(O\) can coexist, it is
+enough to show that the common \(T\times O\) two-hole boundary separates one
+of the two endpoint differences.
+
+\subsection{The second-order boundary issue}
+
+There is a tempting but invalid shortcut.  Each type-flow edge
+\[
+  B_t\to A_t
+\]
+compares two singleton colorings of the smaller fixed host \(K-t\):
+\[
+  B_t=(K-t,S\setminus\{t\},(T\setminus\{t\})\cup\{b\}),
+\]
+\[
+  A_t=(K-t,S\setminus\{t\},(T\setminus\{t\})\cup\{a\}).
+\]
+If these two smaller colorings had equal fixed-host decks, the induction
+hypothesis would solve the edge.  But original deck equality does not give
+that equality edge-by-edge.  It gives only the aggregate balance of all such
+edges, plus the two endpoint shadows \(H_a,H_b\).
+
+Thus a proof cannot simply apply induction to every type-flow edge.  The
+failure of a single edge to have equal smaller decks is a second-order
+boundary.  When one deletes another vertex \(w\neq t\), the discrepancy
+between \(A_t-w\) and \(B_t-w\) must be compensated elsewhere in the global
+second-deletion data.
+
+This suggests a hierarchy.  Let \(\mathcal G_m\) be the free abelian group on
+isomorphism classes of finite colored graphs with \(m\) vertices, and define
+the deletion boundary
+\[
+  \partial[X]=\sum_{v\in V(X)}[X-v].
+\]
+The fixed-host singleton equality says that, for the two colored full hosts
+\[
+  X_a=(K,S,T\cup\{a\}),
+  \qquad
+  X_b=(K,S,T\cup\{b\}),
+\]
+we have
+\[
+  \partial[X_a]=\partial[X_b].
+\]
+Equivalently,
+\[
+  \partial([X_a]-[X_b])=0.
+\]
+The direct-shadow theorem asks for one specific cancellation inside this
+boundary: the term obtained by deleting \(a\) on the left should match the
+term obtained by deleting \(b\) on the right.
+
+\begin{remark}[Why this is not a free lunch]
+For arbitrary colored graphs, injectivity of \(\partial\) is just the colored
+reconstruction problem.  So the boundary language does not by itself prove
+anything.  Its value here is that \([X_a]-[X_b]\) is a very special
+one-vertex color difference inside a fixed host.  The hope is to prove
+acyclicity for this special class of chains, not for all graph chains at
+once.
+\end{remark}
+
+\begin{conjecture}[Singleton boundary acyclicity]
+Let \(X_a=(K,S,T\cup\{a\})\) and \(X_b=(K,S,T\cup\{b\})\) be a fixed-host
+singleton pair.  If
+\[
+  \partial([X_a]-[X_b])=0,
+\]
+then the natural boundary terms cancel:
+\[
+  [K-a,S\setminus\{a\},T]
+  =
+  [K-b,S\setminus\{b\},T].
+\]
+\end{conjecture}
+
+This is exactly the fixed-host direct-shadow theorem, rewritten as a special
+acyclicity statement.  A shortest positive type-flow path is a candidate
+nontrivial cycle in this singleton boundary complex.  The absorber exchange,
+witness-charge, and neutral-reversibility constraints are attempts to prove
+that such a special cycle cannot exist.
+
+\begin{conjecture}[Higher-order path shortening]
+If a shortest positive singleton type-flow path exists, then examining its
+second-order boundary either produces a shorter positive type-flow path or a
+direct natural-shadow match \(H_a\cong H_b\).
+\end{conjecture}
+
+This is the broader version of exchange-chain shortening.  It says that
+second-deletion discrepancies cannot merely circulate at the next level; they
+must expose a shorter obstruction.  If this higher-order shortening fails,
+then the approach has likely run into genuine homology of the colored
+deletion complex, which would explain why the current strategy cannot close
+the theorem without a new idea.
+
+\begin{conjecture}[No closed fixed-host singleton flow]
+In the fixed-host singleton switch, the two natural shadow types
+\[
+  H_a=(K-a,S\setminus\{a\},T),
+  \qquad
+  H_b=(K-b,S\setminus\{b\},T)
+\]
+cannot both be routed entirely through detours in \(T\), avoiding the direct
+positions \(b\) and \(a\), respectively.
+\end{conjecture}
+
+The computational evidence suggests a still stronger and cleaner statement.
+
+\begin{conjecture}[Fixed-host direct-shadow theorem]
+In every fixed-host singleton switch with equal colored deletion decks,
+\[
+  (K-a,S\setminus\{a\},T)
+  \cong
+  (K-b,S\setminus\{b\},T).
+\]
+Equivalently, the natural shadow of the moved vertex on one side always
+matches the natural shadow of the moved vertex on the other side.
+\end{conjecture}
+
+The direct-shadow theorem immediately implies no closed singleton flow.  It
+is stronger than what the induction needs, but it may be the right local
+lemma: the deck appears unable to route the natural singleton shadow through
+the common second color at all.
+
+This is now the most local detour-selection target.  A counterexample would
+not merely need deletion-similar vertices in \(T\); it would need a balanced
+population of absorbers in the same color and degree-profile layer, with all
+proper moving-vertex profiles still agreeing.  The next invariant to try is a
+two-step count relative to \(T\): vertices adjacent to exactly one of \(a,b\)
+should create signed shifts in these detour cards, just as the witness sets
+\(W^-\) and \(W^+\) did in the original single-switch analysis.
+
+\subsection{Witness charges in the fixed-host singleton switch}
+
+Define the second-color two-step shadow
+\[
+  Q_z(U)=\sum_{x\in U\setminus\{z\}}\deg_{K-z}(x).
+\]
+Equivalently, \(Q_z(U)\) counts oriented length-two walks in the deleted
+colored host \(K-z\) whose first vertex lies in the second color
+\(U\setminus\{z\}\).  This is a numerical invariant of the deleted
+two-colored card.
+
+\begin{lemma}[Fixed-host two-step defect]
+In the singleton setting \(U=T\cup\{a\}\), \(V=T\cup\{b\}\), we have
+\[
+  Q_a(U)-Q_a(V)=-\deg_{K-a}(b),
+\]
+\[
+  Q_b(U)-Q_b(V)=\deg_{K-b}(a),
+\]
+and for every \(z\notin\{a,b\}\),
+\[
+  Q_z(U)-Q_z(V)=\one_{bz\in E(K)}-\one_{az\in E(K)}.
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+For \(z\notin\{a,b\}\), the common contribution of the vertices in
+\(T\setminus\{z\}\) cancels.  The remaining difference is
+\[
+  \deg_{K-z}(a)-\deg_{K-z}(b)
+  =
+  \deg_K(a)-\deg_K(b)-\one_{az\in E(K)}+\one_{bz\in E(K)}.
+\]
+The low-order singleton balance gives \(\deg_K(a)=\deg_K(b)\), leaving the
+displayed formula.  The cases \(z=a\) and \(z=b\) are the same computation
+with one of the moving vertices absent from one side's second color.
+\end{proof}
+
+Define the fixed-host witness sets
+\[
+  X^-=\{z\notin\{a,b\}:az\in E(K),\; bz\notin E(K)\},
+\]
+\[
+  X^+=\{z\notin\{a,b\}:bz\in E(K),\; az\notin E(K)\}.
+\]
+Then degree balance gives
+\[
+  |X^-|=|X^+|,
+\]
+and the two-step defect formula says
+\[
+  Q_z(U)-Q_z(V)=
+  \begin{cases}
+    -1, & z\in X^-,\\
+    +1, & z\in X^+,\\
+    0, & \text{otherwise}
+  \end{cases}
+\]
+for \(z\notin\{a,b\}\).
+
+Thus the fixed-host singleton switch has the same signed witness geometry as
+the original single-switch problem.  If \(a\) and \(b\) are twins relative to
+the whole host, then the transposition \(a\leftrightarrow b\) preserves \(K\);
+because \(a\in S\) if and only if \(b\in S\), and because both are outside
+\(T\), it also preserves \(S\) and carries \(T\cup\{a\}\) to
+\(T\cup\{b\}\).  So any counterexample must have nonempty balanced witness
+sets \(X^-\) and \(X^+\).
+
+After choosing a fixed-host trade, the same telescoping argument as cycle
+balance applies to \(Q\).  On every cycle of the trade permutation, the
+aligned \(Q\)-defects must sum to zero.  Hence witnesses cannot be hidden
+independently: every cycle that carries a positive witness charge must also
+carry a compensating negative charge, with the special vertices \(a\) and
+\(b\) contributing the larger endpoint charges
+\[
+  -\deg_{K-a}(b),
+  \qquad
+  +\deg_{K-b}(a).
+\]
+
+\begin{conjecture}[No nonterminal fixed-host witness cycle]
+In a fixed-host singleton counterexample, there is no trade cycle that
+balances the endpoint charges and the witness charges while routing both
+natural shadows through \(T\) and avoiding a zero-star-error direct edge.
+\end{conjecture}
+
+This is the fixed-host version of the edge-slide obstruction.  The smallest
+non-twin case has
+\[
+  |X^-|=|X^+|=1.
+\]
+Then any nonterminal trade cycle has essentially one lost neighbor and one
+gained non-neighbor to account for.  The expected contradiction is that
+deleting those witnesses exposes the slide unless the direct \(a\leadsto b\)
+edge already has a zero-error representative.
+
+\subsection{Direct edges as a size drop}
+
+The direct-edge case has an important extra feature: even if the direct
+isomorphism does not have zero star error, it lowers the size of the centered
+problem.
+
+Suppose we have a direct fixed-host card edge
+\[
+  \eta:(K-a,S\setminus\{a\},T)
+  \cong
+  (K-b,S\setminus\{b\},T).
+\]
+Identify these two colored cards with a common colored host
+\[
+  (L,S_L,T_L).
+\]
+The two full colored hosts
+\[
+  (K,S,T\cup\{a\}),
+  \qquad
+  (K,S,T\cup\{b\})
+\]
+are now two one-vertex extensions of \(L\).  The re-added vertex has the same
+first-color status on both sides and is second-colored on both sides.  Its
+two attachment sets are
+\[
+  A_\eta=N_K(a)\setminus\{a\},
+  \qquad
+  B_\eta=\eta^{-1}(N_K(b)\setminus\{b\}),
+\]
+viewed as subsets of \(V(L)\).  Their symmetric difference is exactly the
+direct star error of \(\eta\).
+
+\begin{lemma}[Direct recentering drops the host size]
+Under fixed-host singleton deck equality, a direct card edge produces a
+colored centered state over \(L\), with
+\[
+  |V(L)|=|V(K)|-1,
+\]
+and
+\[
+  \PDeck_L(A_\eta)=\PDeck_L(B_\eta)
+\]
+in the colored sense, where the common colors \(S_L,T_L\) are part of the
+card data.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The two colored full hosts have equal vertex decks by hypothesis.  The direct
+card edge identifies one card on each side with the same colored host
+\((L,S_L,T_L)\).  Cancelling this matched card from the two colored decks
+leaves equality of the punctured colored extension decks over \(L\).  The
+center has one fewer vertex because \(L\cong K-a\cong K-b\).
+\end{proof}
+
+\begin{conjecture}[Colored centered extension theorem]
+Fix a finite graph \(L\) together with any finite list of vertex colors
+\(\mathcal C\).  For attachment sets \(A,B\subseteq V(L)\), form the
+one-vertex extensions in which the new vertex has the same prescribed color
+data on both sides.  If the punctured decks of these colored extensions agree
+as colored cards, then the two colored full extensions are isomorphic.
+\end{conjecture}
+
+This is not meant as a fundamentally new conjecture.  A finite list of colors
+can be encoded by adjoining a bounded amount of rooted gadget data, or treated
+directly in a Lean formalization as extra predicates on vertices.  The point
+of naming it is bookkeeping: direct recentering from a fixed-host singleton
+switch lands in the same centered problem, but with passive colors carried
+along.
+
+\begin{remark}[Simultaneous colored induction]
+The proof should not appeal to the colored centered theorem as an external
+black box.  Instead, run the whole centered-extension induction
+simultaneously for finite colored centers.  The induction statement at size
+\(n\) is:
+
+for every finite graph \(C\) with any fixed finite list of vertex colors, and
+for attachment sets \(A,B\subseteq V(C)\), if the colored punctured extension
+decks agree and the added root has the same color data on both sides, then
+the two colored extensions are isomorphic.
+
+The uncolored centered theorem is the special case with no colors.  All
+moving-hole, star-error, cycle-balance, and detour arguments are unchanged:
+card isomorphisms are simply required to preserve the passive colors.  The
+direct-edge size-drop step is then a legitimate appeal to the induction
+hypothesis at size \(n-1\), not a circular appeal to a stronger theorem at
+the same size.
+\end{remark}
+
+\begin{proposition}[Direct edge plus smaller colored centered theorem]
+Assume the colored centered extension theorem is known for colored centers
+with fewer than \(|V(K)|\) vertices.  Then any fixed-host singleton switch
+with a direct card edge is solved: there is an automorphism of \(K\) preserving
+\(S\) and carrying \(T\cup\{a\}\) to \(T\cup\{b\}\).
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+Choose a direct card edge and form the smaller colored centered state over
+\((L,S_L,T_L)\).  If the direct star error is empty, the extended direct
+isomorphism is already the desired automorphism.  Otherwise the smaller
+colored centered theorem applies to the equal punctured decks over \(L\), so
+the two one-vertex colored extensions over \(L\) are isomorphic.  Transporting
+this isomorphism back through the direct recentering gives a color-preserving
+isomorphism
+\[
+  (K,S,T\cup\{a\})\cong (K,S,T\cup\{b\}),
+\]
+which is exactly an element of \(\Aut(K,S)\) carrying \(T\cup\{a\}\) to
+\(T\cup\{b\}\).
+\end{proof}
+
+Thus the fixed-host singleton problem splits cleanly.  Direct edges are
+inductive size-drop moves.  The same-size obstruction is detour selection:
+show that the natural shadows cannot both be hidden inside \(T\) forever.  In
+this sense, the closed-flow conjecture is the real fixed-host singleton
+heart; neighborhood selection after a direct edge can be delegated to the
+smaller centered theorem.
+
+\begin{proposition}[Inductive singleton package]
+Assume the following two statements.
+
+\begin{enumerate}[leftmargin=2em]
+  \item The colored centered extension theorem holds for colored centers with
+  fewer than \(|V(K)|\) vertices.
+
+  \item The no closed fixed-host singleton flow conjecture holds for the
+  fixed background \((K,S,T)\).
+\end{enumerate}
+
+Then the fixed-host singleton switch over \((K,S,T)\) is solved.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+If there is a direct card edge \(a\leadsto b\), the direct-edge size-drop
+proposition applies and gives the desired color-preserving automorphism.
+Suppose no direct card edge exists.  By natural shadow isolation, the natural
+\(a\)-shadow must be routed through some detour vertex of \(T\).  Applying the
+same argument with \(a\) and \(b\) interchanged, the natural \(b\)-shadow must
+also be routed through \(T\).  This is exactly the closed singleton flow
+forbidden by the second assumption.  Hence the no-direct case is impossible,
+and the direct case has already been handled.
+\end{proof}
+
+This is a useful strategic compression.  We no longer need to prove
+fixed-host singleton rigidity in one breath.  It is enough to prove the
+same-size detour-selection statement; all direct failures are passed down to a
+smaller centered problem.  This is the first place where a genuine induction
+on the number of vertices looks structurally plausible.
+
+Consequently, if no automorphism of the background \((K,S,T)\) sends \(a\) to
+\(b\), then any rooted separator between \(a\) and \(b\) must use the whole
+host.  The singleton obstruction is therefore a full-size pseudo-similarity:
+all proper moving-vertex profiles agree, and the only possible distinction is
+the full colored orbit.  This is precisely the boundary where the detour-flow
+and star-error arguments have to enter.
+
+\begin{proposition}[Fixed-host reconstruction implies neighborhood selection]
+The equal-size fixed-host subset reconstruction conjecture implies the
+neighborhood selection conjecture.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+After choosing a direct card isomorphism and transporting to
+\[
+  K=C-p,
+\]
+neighborhood selection asks whether
+\[
+  U=N_C(p)\setminus\{p\}
+  \quad\text{and}\quad
+  V=\psi^{-1}(N_C(q)\setminus\{q\})
+\]
+are in the same \(\Aut(K,S)\)-orbit.  Direct recentering gives an anchored
+state with equal punctured decks.  Once the distinguished first root is kept
+as part of the anchored data, the subdeck obtained by deleting ordinary
+vertices of \(K\) is precisely the fixed-host deletion deck, so we get
+\[
+  \Deck_{K,S}(U)=\Deck_{K,S}(V).
+\]
+The two subsets have equal size because \(\deg_C(p)=\deg_C(q)\).  Fixed-host
+subset reconstruction therefore gives the desired orbit equality.
+\end{proof}
+
+\subsection{Pattern-sum invariants}
+
+Let \(P\) be a finite graph whose vertices carry two colors: the first color
+corresponds to membership in \(S\), and the second color corresponds to
+membership in \(U\).  Define the pattern-sum invariant
+\[
+  \pi_P(U)
+\]
+to be the number of induced subsets \(R\subseteq V(K)\) such that the
+two-colored induced structure
+\[
+  (K[R],S\cap R,U\cap R)
+\]
+is isomorphic to \(P\).
+
+The full list of pattern-sum invariants determines the
+\(\Aut(K,S)\)-orbit of \(U\): in particular, the full-size pattern
+\[
+  (K,S,U)
+\]
+separates \(U\) from any subset not in its orbit.  The fixed-host deck and
+anchored Kelly pressure explain which of these invariants are already forced.
+
+\begin{lemma}[Proper pattern sums are deck-controlled]
+Under the hypotheses of equal-size fixed-host deck equality,
+\[
+  \Deck_{K,S}(U)=\Deck_{K,S}(V),
+  \qquad
+  |U|=|V|,
+\]
+we have
+\[
+  \pi_P(U)=\pi_P(V)
+\]
+for every two-colored pattern \(P\) with fewer vertices than \(K\).
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The invariant \(\pi_P(U)\) is exactly a proper colored induced-pattern count
+in the fixed host.  Anchored Kelly pressure reconstructs this count from the
+fixed-host deletion deck.  Equal decks therefore give equal proper pattern
+sums.
+\end{proof}
+
+Thus a fixed-host counterexample is exactly a pair of equal-size subsets
+\(U,V\) that agree on every proper pattern-sum invariant but disagree on their
+full orbit.  This is an invariant-theoretic restatement of the full-size
+colored hypomorphism obstruction.
+
+\begin{conjecture}[No full-degree-only subset obstruction]
+For every finite colored host \((K,S)\), equal-size subsets \(U,V\) that agree
+on all proper pattern-sum invariants are in the same \(\Aut(K,S)\)-orbit.
+\end{conjecture}
+
+This conjecture is equivalent in spirit to fixed-host subset reconstruction,
+but it removes the card language.  It says that equal-size subsets of a fixed
+colored host have no orbit distinction visible only at full degree.  If
+false, a counterexample would be a very explicit finite pattern-counting
+phenomenon: two nonconjugate subsets with identical proper colored induced
+substructure statistics.
+
+\subsection{Recursive view of neighborhood selection}
+
+Fix a direct card isomorphism
+\[
+  \psi:C-p\cong C-q,\qquad \psi(S)=S,
+\]
+and transport the \(q\)-side back to
+\[
+  K=C-p.
+\]
+Inside \(K\), define two neighborhood attachment sets
+\[
+  U=N_C(p)\setminus\{p\},
+  \qquad
+  V=\psi^{-1}(N_C(q)\setminus\{q\}).
+\]
+The direct card isomorphism extends over \(p\mapsto q\) exactly when
+\[
+  U=V.
+\]
+If \(U\neq V\), then the direct recentering produces a new centered state
+whose defect is
+\[
+  U\triangle V.
+\]
+In fact the new center is
+\[
+  D=\Ext(K,S),
+\]
+and the two re-added vertices are attached to
+\[
+  U\cup\{\ast\}
+  \qquad\text{and}\qquad
+  V\cup\{\ast\},
+\]
+where \(\ast\) is the root of \(\Ext(K,S)\).  The root belongs to both
+attachment sets, so the new defect is still \(U\triangle V\).
+
+Thus neighborhood selection is exactly the assertion that the direct
+recentered state is terminal.  If it is not terminal, the star error
+\[
+  |U\triangle V|
+\]
+is the new defect.  In the single-switch base case, parity forces this new
+defect to be either \(0\) or at least \(2\).  Exact two-error is precisely the
+case in which \(U\triangle V=\{a,b\}\), giving the slide from the switched
+pair \((p,q)\) to the witness pair \((a,b)\).
+
+This recursive view explains the slide graph: it is the graph of repeated
+direct recenterings in the special situation where the defect remains \(2\).
+The zero-companion lemma says that this graph has no nonterminal vertices
+reachable from a genuine same-deck single switch.
+
+\subsection{Root-anchored centered states}
+
+The direct recentering produces a special kind of centered state.  The new
+center is
+\[
+  D=\Ext(K,S),
+\]
+with distinguished root \(\ast\), and both new attachment sets contain
+\(\ast\):
+\[
+  A'=U\cup\{\ast\},
+  \qquad
+  B'=V\cup\{\ast\}.
+\]
+Thus the defect avoids the distinguished root.  Moreover, automorphisms of
+\(D\) fixing \(\ast\) are exactly automorphisms of \(K\) preserving \(S\):
+\[
+  \Aut(D,\ast)\cong \Aut(K,S).
+\]
+So neighborhood selection is equivalent to saying that the root-anchored
+state \((D,A',B')\) is terminal by an automorphism fixing the distinguished
+root.
+
+\begin{lemma}[Direct recentering preserves punctured deck equality]
+In the single-switch setting, suppose a direct root-preserving card
+isomorphism identifies
+\[
+  \Ext(C-p,S)
+  \cong
+  \Ext(C-q,S)
+\]
+with a common center \(D=\Ext(K,S)\).  Let
+\[
+  A'=U\cup\{\ast\},
+  \qquad
+  B'=V\cup\{\ast\}
+\]
+be the two recentered attachment sets described above.  Then
+\[
+  \PDeck_D(A')=\PDeck_D(B').
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The recentered presentations describe the same two full graphs as before:
+\[
+  \Ext(C,S\cup\{p\})\cong \Ext(D,A'),
+  \qquad
+  \Ext(C,S\cup\{q\})\cong \Ext(D,B').
+\]
+The original graphs have equal full decks, and the direct card match
+identifies one occurrence of \(D\) on each side.  Cancelling that common card
+from the full decks gives equality of the punctured extension decks over
+\(D\).
+\end{proof}
+
+\begin{conjecture}[Root-anchored centered theorem]
+Let \(D\) be a centered graph with a distinguished vertex \(\ast\).  Suppose
+\[
+  A'=\{\ast\}\cup U,
+  \qquad
+  B'=\{\ast\}\cup V,
+\]
+and
+\[
+  \PDeck_D(A')=\PDeck_D(B').
+\]
+Then either \(U\) and \(V\) are in the same orbit under
+\(\Aut(D,\ast)\), or there is a recentering move that keeps the distinguished
+root in both attachment sets and strictly decreases \(|U\triangle V|\).
+\end{conjecture}
+
+If this anchored theorem holds, then neighborhood selection follows in the
+single-switch situation: the direct recentering gives a root-anchored state
+with equal punctured decks.  If it is terminal, the stabilizer-orbit lemma
+selects an extendable direct card isomorphism.  If it descends, then in the
+defect-\(2\) base case the only possible strict descent is defect \(0\), again
+giving the desired zero-error companion.
+
+This anchored version may be easier than the full centered theorem because
+the distinguished root is common to both attachment sets.  It removes one
+source of ambiguity: the defect lives entirely among old vertices of \(K\),
+while \(\ast\) records the original color set \(S\).
+
+\begin{proposition}[Detour selection plus anchored descent proves the base case]
+Assume the following two statements.
+
+\begin{enumerate}[leftmargin=2em]
+  \item In every single-switch state with equal punctured extension decks, the
+  rooted card-match graph contains the direct edge \(p\leadsto q\).
+
+  \item The root-anchored centered theorem holds for the direct recentered
+  state.
+\end{enumerate}
+
+Then the single-switch rigidity conjecture holds.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+By the first assumption, choose a direct root-preserving card isomorphism
+\[
+  \psi:C-p\cong C-q,\qquad \psi(S)=S.
+\]
+Direct recentering gives the root-anchored state
+\[
+  (D,A',B')
+  =
+  \bigl(\Ext(K,S),\, U\cup\{\ast\},\, V\cup\{\ast\}\bigr)
+\]
+with
+\[
+  \PDeck_D(A')=\PDeck_D(B').
+\]
+By the anchored theorem, either \(U\) and \(V\) are in the same
+\(\Aut(D,\ast)\)-orbit, or there is a strict anchored descent.  Iterating the
+anchored theorem must terminate because the anchored defect is finite.  At
+termination the two anchored full extensions are isomorphic, so the original
+single-switch full extensions are isomorphic as well.  If termination happens
+already at the first anchored state, the stabilizer-orbit formulation gives
+an extendable direct card isomorphism, hence an automorphism of \(C\) carrying
+\(S\cup\{p\}\) to \(S\cup\{q\}\).
+\end{proof}
+
+\subsection{Two-root interpretation}
+
+The root-anchored state can also be read as a graph with two adjacent special
+vertices.  Start with \(K=C-p\).  Add a first root \(r\) adjacent to \(S\).
+Then add a second root \(x\) adjacent to \(r\) and to \(U\).  The resulting
+graph is
+\[
+  \Ext(\Ext(K,S),U\cup\{r\}).
+\]
+The comparison state replaces \(U\) by \(V\):
+\[
+  \Ext(\Ext(K,S),V\cup\{r\}).
+\]
+Thus the neighborhood-selection problem is a two-color reconstruction
+problem on \(K\): the first color \(S\) is encoded by the neighbors of \(r\),
+and the second color \(U\) or \(V\) is encoded by the neighbors of \(x\).  The
+two roots are adjacent in both graphs.
+
+In this language, an automorphism fixing \(r\) and carrying \(U\) to \(V\) is
+exactly an isomorphism of the two-root structures that fixes the first root
+and sends the second root to the second root.  A failure of neighborhood
+selection would therefore be a pair of two-colorings \((S,U)\) and \((S,V)\)
+of the same graph \(K\) whose associated two-root graphs have the same deck,
+but whose second colors are not in the same \(\Aut(K,S)\)-orbit.
+
+This is a useful warning as well as a simplification.  General colored graph
+reconstruction is not obviously easier than graph reconstruction.  The hope
+is that the present two-root situation is special: the first root is common,
+the second root is adjacent to it on both sides, and the state arose from a
+single-switch comparison, so the second-color defect begins in the tightly
+controlled neighborhood set \(U\triangle V\).
+
+\subsection{Minimal bad form for the single-switch theorem}
+
+Putting the pieces together, a counterexample to the single-switch theorem
+would have to satisfy a rigid list of conditions.
+
+\begin{enumerate}[leftmargin=2em]
+  \item \(A=S\cup\{p\}\), \(B=S\cup\{q\}\), and
+  \(\PDeck_C(A)=\PDeck_C(B)\).
+
+  \item \(p\) and \(q\) are degree-balanced:
+  \[
+    \deg_C(p)=\deg_C(q).
+  \]
+
+  \item \(p\) and \(q\) are not twins outside \(\{p,q\}\), since otherwise
+  twin collapse gives the automorphism.
+
+  \item The witness sets
+  \[
+    W^-=\{w:pw\in E(C),\;qw\notin E(C)\},
+    \qquad
+    W^+=\{w:qw\in E(C),\;pw\notin E(C)\}
+  \]
+  have equal nonzero size.
+
+  \item The witnesses are balanced relative to the common color:
+  \[
+    \deg_S(p)=\deg_S(q).
+  \]
+
+  \item More generally, \(p\) and \(q\) have identical proper root-link
+  profiles: every proper induced pattern using the added root occurs equally
+  often in \(\Ext(C,S\cup\{p\})\) and \(\Ext(C,S\cup\{q\})\).
+
+  \item The rooted card-match graph admits perfect matchings, but no direct
+  edge \(p\leadsto q\) with zero star error.
+
+  \item If the natural shadow \(\Ext(C-p,S)\) is not isolated, every detour
+  absorbing it must pass through vertices of \(S\) with the same degree and
+  compatible rooted triangle/two-step profiles.
+
+  \item If a direct card edge \(p\leadsto q\) exists, every corresponding
+  \(S\)-preserving isomorphism \(C-p\cong C-q\) must fail neighborhood
+  selection, producing a nonempty even neighborhood defect.
+\end{enumerate}
+
+The computation through six vertices says this normal form is empty.  The
+proof campaign is now to show it is empty in general.  The two plausible
+routes are:
+\[
+  \text{detour selection/isolation}
+  \quad\text{or}\quad
+  \text{neighborhood selection}.
+\]
+Either one would prove the single-switch base case.
+
+This is a smaller target than the full single-switch rigidity conjecture.  It
+does not ask us to understand the whole deck at once; it only asks us to show
+that the deck equality forces one of the two defect-deleted shadows to match
+with no old-card neighborhood error.
+
+\subsection{Shape of an exact two-error}
+
+The first bad case to exclude is therefore very specific.  Suppose a
+root-preserving match based at \(p\) gives a bijection \(f=f_p\) with
+\[
+  f(A)=B
+\]
+and
+\[
+  |\Err_p(f)|=2.
+\]
+Let \(v=f(p)\).  Since the two compared neighborhoods have the same size,
+there are unique vertices \(a,b\in V(C)\setminus\{p\}\) such that, after
+transport by \(f\),
+\[
+  a\in N_C(p),
+  \qquad
+  f(a)\notin N_C(v),
+\]
+and
+\[
+  b\notin N_C(p),
+  \qquad
+  f(b)\in N_C(v).
+\]
+Every other adjacency from \(p\) is preserved by \(f\), and every adjacency
+not involving \(p\) is preserved by \(f\).  Thus \(f\) is an isomorphism from
+\(C\) to the graph obtained from \(C\) by deleting the edge \(pa\) and adding
+the edge \(pb\), after relabelling by \(f\).  In other words, the obstruction
+is a single edge-slide at the deleted vertex.
+
+This suggests a more concrete base-case attack.  A single-switch
+counterexample with no zero-error match would have to make every
+defect-deleted card look correct while hiding an edge-slide at the missing
+vertex.  But the two witnesses \(a\) and \(b\) reappear as actual deleted
+vertices in their own shadows.  Deleting \(a\) removes the lost-edge witness;
+deleting \(b\) removes the gained-edge witness.  The deck should have to
+match these two shadows in a way that is compatible with the same color
+transport, and that compatibility is where the contradiction ought to live.
+
+\begin{conjecture}[Edge-slide exposure]
+In the single-switch setting, an exact two-error match at \(p\) forces a
+distinguishable imbalance between the shadows obtained by deleting the lost
+neighbor \(a\) and the gained non-neighbor \(b\), unless a zero-error match
+already exists.
+\end{conjecture}
+
+\begin{conjecture}[Zero companion for edge-slides]
+In the single-switch setting, suppose a defect-rooted root-preserving card
+match has exact star error \(2\).  Then there is another defect-rooted
+root-preserving card match with star error \(0\).
+\end{conjecture}
+
+This is the sharpened base-case target suggested by computation.  Exact
+two-error matches are not themselves contradictory; they appear even in small
+examples where the switched colorings are globally isomorphic.  The claim is
+that an exact edge-slide cannot be isolated.  If the deck permits the hidden
+edge \(pa\) to slide to \(pb\), then the other shadows must also contain a
+companion alignment that repairs the slide completely.
+
+\begin{remark}[Fallback: edge-slide descent]
+The zero-error target may be stronger than necessary.  If a defect-\(2\)
+single-switch state admits an exact two-error recentering, then recentering
+does not decrease the raw defect; the new defect again has size \(2\).  But it
+changes the switched pair.  In the notation above, the new switched vertices
+are precisely the lost/gained witnesses \(a\) and \(b\) inside the punctured
+card.  Thus an exact two-error move is not noise: it moves the single switch
+from \((p,q)\) to the local edge-slide witness pair \((a,b)\).
+
+This suggests a secondary base-case potential.  For a switched pair \(p,q\),
+define
+\[
+  \omega_C(p,q)
+  =
+  \frac{1}{2}
+  \left|
+    \{w\notin\{p,q\} :
+      (pw\in E(C))\not\leftrightarrow(qw\in E(C))
+    \}
+  \right|,
+\]
+so the comparison ignores the possible edge \(pq\).  The twin case is
+\(\omega_C(p,q)=0\).  The smallest non-twin case is
+\(\omega_C(p,q)=1\), exactly one lost witness and one gained witness.  A
+weaker but perhaps more realistic base-case theorem would be: every exact
+two-error recentering either gives an isomorphism or moves to a new
+single-switch state with smaller value of some refinement of \(\omega\), for
+example the multiset of rooted profiles of the witness pair.  Then defect
+\(2\) would terminate by this secondary potential even without an immediate
+zero-error match.
+\end{remark}
+
+\subsection{The slide graph at defect two}
+
+The fallback can be organized as a finite directed graph.  A vertex of the
+slide graph is a defect-\(2\) centered state
+\[
+  (C,S,p,q),
+  \qquad
+  A=S\cup\{p\},\quad B=S\cup\{q\},
+\]
+with \(\PDeck_C(A)=\PDeck_C(B)\).  A terminal vertex is one admitting a
+zero-error defect-rooted match.  A directed edge is an exact two-error
+recenter:
+\[
+  (C,S,p,q)\longrightarrow (D,S',a,b),
+\]
+where \(a\) is the lost neighbor and \(b\) is the gained non-neighbor in the
+edge-slide description above.  Here \(D\) is the matched punctured card used
+as the new center, and the new attachment sets have the form
+\[
+  A'=S'\cup\{a\},
+  \qquad
+  B'=S'\cup\{b\}.
+\]
+
+The single-switch base case follows from either of the following statements.
+
+\begin{conjecture}[No nonterminal slide cycle]
+Every vertex in the defect-\(2\) slide graph reaches a terminal vertex.
+\end{conjecture}
+
+\begin{conjecture}[Slide potential]
+There is a finite-ranking potential \(\Omega(C,S,p,q)\), defined on
+defect-\(2\) states, such that every nonterminal exact two-error recentering
+strictly decreases \(\Omega\) after choosing the recentering appropriately.
+\end{conjecture}
+
+The witness sets give the first candidate for \(\Omega\).  For a switched
+pair \(p,q\), let
+\[
+  W^-=\{w: pw\in E(C),\;qw\notin E(C)\},
+  \qquad
+  W^+=\{w: qw\in E(C),\;pw\notin E(C)\},
+\]
+again outside \(\{p,q\}\).  The quantity
+\[
+  \omega_C(p,q)=|W^-|=|W^+|
+\]
+is the coarsest measure of non-twinness.  If \(\omega=0\), we are terminal by
+twin collapse.  If \(\omega=1\), every exact two-error slide uses the unique
+pair of witnesses.  If \(\omega>1\), one can hope to choose a witness pair
+whose recentering lowers \(\omega\), or at least lowers the signed multiset of
+rooted witness profiles.
+
+This reframes the base case as a small dynamical problem: a counterexample is
+not just a pair of switched vertices.  It is a closed slide system in which
+the deck keeps moving the switch from one witness pair to another without ever
+reaching twins or a zero-error card match.
+
+The most promising invariants for exposing the edge-slide are rooted
+two-step and triangle counts.  In a shadow \(\Ext(C-w,A\setminus\{w\})\),
+the number of triangles using the root is exactly
+\[
+  |E(C[A\setminus\{w\}])|.
+\]
+Similarly, the number of rooted length-two paths from the root through the
+card records
+\[
+  \sum_{x\in A\setminus\{w\}} \deg_{C-w}(x).
+\]
+For \(A=S\cup\{p\}\) and \(B=S\cup\{q\}\), these quantities change in
+controlled ways when \(w\) is one of \(p,q,a,b\).  The base-case proof should
+try to show that an edge-slide cannot preserve all of these rooted local
+profiles across the full punctured deck.
+
+Here are the aligned formulas.  Write
+\[
+  \deg_R(x)=|N_C(x)\cap R|
+\]
+for the number of neighbors of \(x\) in a set \(R\subseteq V(C)\).  Also write
+\[
+  T_w(A)=|E(C[A\setminus\{w\}])|
+\]
+for the number of root-using triangles in the \(w\)-deleted shadow, and
+\[
+  P_w(A)=\sum_{x\in A\setminus\{w\}}\deg_{C-w}(x)
+\]
+for the number of oriented root-using two-step walks whose first step leaves
+the root.  In the single-switch case \(A=S\cup\{p\}\) and
+\(B=S\cup\{q\}\), the aligned triangle differences are
+\[
+  T_p(A)-T_p(B)=-\deg_S(q),
+\]
+\[
+  T_q(A)-T_q(B)=\deg_S(p),
+\]
+and, for \(w\notin\{p,q\}\),
+\[
+  T_w(A)-T_w(B)
+  =
+  \deg_{S\setminus\{w\}}(p)
+  -
+  \deg_{S\setminus\{w\}}(q).
+\]
+The aligned two-step differences are
+\[
+  P_p(A)-P_p(B)=-\deg_{C-p}(q),
+\]
+\[
+  P_q(A)-P_q(B)=\deg_{C-q}(p),
+\]
+and, for \(w\notin\{p,q\}\),
+\[
+  P_w(A)-P_w(B)=\deg_{C-w}(p)-\deg_{C-w}(q).
+\]
+Using degree balance, this last formula becomes
+\[
+  P_w(A)-P_w(B)
+  =
+  \one_{qw\in E(C)}-\one_{pw\in E(C)}.
+\]
+Thus every vertex \(w\) that distinguishes \(p\) from \(q\) produces a
+visible \(\pm 1\) shift in the aligned rooted two-step count.
+
+Define the witness sets
+\[
+  W^- = \{w\notin\{p,q\}: pw\in E(C),\; qw\notin E(C)\},
+  \qquad
+  W^+ = \{w\notin\{p,q\}: qw\in E(C),\; pw\notin E(C)\}.
+\]
+Equivalently,
+\[
+  W^- = (N_C(p)\setminus N_C(q))\setminus\{q\},
+  \qquad
+  W^+ = (N_C(q)\setminus N_C(p))\setminus\{p\}.
+\]
+Degree balance gives
+\[
+  |W^-|=|W^+|.
+\]
+For \(w\notin\{p,q\}\), the two-step formula says
+\[
+  P_w(A)-P_w(B)=
+  \begin{cases}
+    -1, & w\in W^-,\\
+    +1, & w\in W^+,\\
+    0, & \text{otherwise.}
+  \end{cases}
+\]
+So a non-twin single-switch counterexample must hide a balanced collection of
+negative and positive witness shadows.  The smallest possible obstruction has
+\[
+  |W^-|=|W^+|=1,
+\]
+which is exactly the edge-slide picture above.
+
+After choosing a centered trade, the cycle-balance lemma below makes this
+stronger.  For the rooted two-step invariant \(P\), every cycle of the trade
+permutation must contain balanced \(P\)-defect.  Ignoring the special vertices
+\(p\) and \(q\), that means a cycle cannot contain a \(W^+\)-witness without
+also containing compensating \(W^-\)-defect, and conversely.  Thus the deck
+cannot hide witnesses independently; it must organize them into balanced
+cycles of the matching permutation.
+
+More explicitly, let
+\[
+  r=\deg_{C-p}(q)=\deg_{C-q}(p).
+\]
+Then the aligned \(P\)-defect is the signed charge distribution
+\[
+  \delta_P(p)=-r,\qquad \delta_P(q)=+r,
+\]
+\[
+  \delta_P(w)=-1\quad(w\in W^-),
+  \qquad
+  \delta_P(w)=+1\quad(w\in W^+),
+\]
+and \(\delta_P(w)=0\) for all remaining vertices.  Every cycle of any
+centered trade must have total charge zero.  Thus a minimal single-switch
+counterexample is not just balanced globally; its witness charges must be
+partitioned into zero-sum cycles compatible with the full rooted card types.
+For \(\omega_C(p,q)=1\), this leaves very few combinatorial possibilities.
+
+Deck equality says that the multiset of the full rooted profiles
+\[
+  \{\!\{\, (T_w(A),P_w(A),\ldots) : w\in V(C) \,\}\!\}
+\]
+equals the corresponding \(B\)-side multiset.  The aligned formulas show what
+has to be hidden by the matching.  In particular, if \(p\) and \(q\) have
+different adjacency profiles into \(S\), the rooted triangle shadows already
+force a nontrivial rematching pattern.  If all these first moments agree, then
+\(p\) and \(q\) are already very similar relative to \(S\), which is exactly
+the situation where a zero-error automorphism becomes more plausible.
+
+\begin{lemma}[Twin collapse]
+If \(p\) and \(q\) have the same neighbors outside \(\{p,q\}\), then the
+transposition swapping \(p\) and \(q\) and fixing all other vertices is an
+automorphism of \(C\).  Consequently it carries
+\[
+  S\cup\{p\}
+  \quad\text{to}\quad
+  S\cup\{q\},
+\]
+so the single-switch case is solved.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+All edges not incident to \(p\) or \(q\) are fixed.  For any
+\(x\notin\{p,q\}\), the edge \(px\) exists if and only if \(qx\) exists, so
+the transposition preserves the edges from the pair \(\{p,q\}\) to the rest
+of the graph.  The edge \(pq\), if present, is fixed as an unordered edge.
+\end{proof}
+
+Thus a single-switch counterexample must be non-twin: there is some witness
+vertex \(x\) adjacent to exactly one of \(p,q\).  The low rooted moments above
+measure such witnesses.  The remaining difficulty is that deck equality may
+permute the shadows, so the proof has to show that the witness cannot be
+hidden globally by a rematching of all cards.
+
+So the one-step descent conjecture has a concrete form: if the identity
+comparison between \(A\) and \(B\) has color error
+\[
+  A\triangle B,
+\]
+then some card match based at a defect vertex should give a color-preserving
+bijection with \(\widehat\psi(A)=B\) whose one-star graph error is smaller
+than that color error.  If the one-star error is empty, \(\widehat\psi\) is
+already the desired automorphism of \(C\).
+
+\begin{conjecture}[One-step defect descent]
+Suppose
+\[
+  \PDeck_C(A)=\PDeck_C(B)
+\]
+and \(A\) and \(B\) are not in the same \(\Aut(C)\)-orbit.  Then there exist
+\[
+  u\in A\triangle B,\qquad v\in V(C),
+\]
+and a root-preserving isomorphism
+\[
+  \theta:
+  \Ext(C-u,A\setminus\{u\})
+  \cong
+  \Ext(C-v,B\setminus\{v\})
+\]
+such that the recentered defect satisfies
+\[
+  |\Delta_\theta(u,v)| < |A\triangle B|.
+\]
+\end{conjecture}
+
+\begin{proposition}[Descent proves the centered theorem]
+The one-step defect descent conjecture implies the centered extension theorem,
+and hence the reconstruction conjecture.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+Assume the centered extension theorem fails, and choose a counterexample
+\((C,A,B)\) with \(|A\triangle B|\) minimal, so
+\[
+  \PDeck_C(A)=\PDeck_C(B)
+  \quad\text{but}\quad
+  \Ext(C,A)\not\cong\Ext(C,B).
+\]
+The defect is nonzero.  In particular \(A\) and \(B\) are not in the same
+\(\Aut(C)\)-orbit, so one-step descent applies.  Recenter through a
+root-preserving matched card to obtain a new centered presentation
+\[
+  (D,A',B')
+\]
+of the same two full extension graphs with
+\[
+  |A'\triangle B'| < |A\triangle B|.
+\]
+Because the full extension decks agree and the recentering identifies the
+chosen root-deleted cards, cancellation gives
+\[
+  \PDeck_D(A')=\PDeck_D(B').
+\]
+By minimality, \(A'\) and \(B'\) lie in the same \(\Aut(D)\)-orbit, so the two
+full extensions are isomorphic.  Transporting back through the recentering
+shows \(\Ext(C,A)\cong\Ext(C,B)\), contradicting that \((C,A,B)\) was a
+counterexample.  The centered reduction then gives reconstruction.
+\end{proof}
+
+\begin{remark}
+This proposition proves the centered extension theorem, not automatically the
+stronger root-preserving centered theorem.  After recentering, the original
+root is just a vertex of the new center \(D\); a terminal automorphism of
+\((D,A',B')\) may move it.  To prove the stronger theorem, one would need to
+carry an additional marked-root invariant through the state graph.  For the
+reconstruction conjecture itself, no such extra marking is needed.
+\end{remark}
+
+\subsection{The star-error campaign}
+
+The proof campaign is now sharply focused.  Suppose a positive-defect
+counterexample exists with
+\[
+  d=|A\triangle B|
+\]
+minimal.  A root-preserving centered trade supplies, for each deleted vertex
+that participates in the trade, a bijection
+\[
+  f_u:V(C)\to V(C)
+\]
+with three properties:
+\[
+  f_u(A)=B,
+\]
+\[
+  f_u \text{ preserves all adjacencies away from the star of } u,
+\]
+and
+\[
+  |\Err_u(f_u)|=|\Delta(u,f_u(u))|.
+\]
+Minimality says that no available \(f_u\), with \(u\in A\triangle B\), has
+\[
+  0<|\Err_u(f_u)|<d.
+\]
+Thus every useful one-star error is either zero, which proves the theorem, or
+has size at least \(d\).  This is an extremely rigid normal form.
+
+The next idea is to compare two such near-automorphisms.  If \(f_u\) and
+\(f_w\) are two root-preserving trade maps, set
+\[
+  \gamma_{u,w}=f_w^{-1}f_u.
+\]
+Then
+\[
+  \gamma_{u,w}(A)=A.
+\]
+Moreover, \(\gamma_{u,w}\) can fail to preserve the graph structure only near
+two stars:
+\[
+  \text{star}(u)
+  \quad\text{and}\quad
+  \text{star}\bigl(f_u^{-1}(f_w(w))\bigr).
+\]
+Indeed, \(f_u\) only creates errors at \(u\), and \(f_w^{-1}\) only creates
+errors at the preimage of the \(f_w\)-hole.
+
+\begin{conjecture}[Two-hole rigidity]
+In a minimal positive-defect centered trade, the transition maps
+\(\gamma_{u,w}\) cannot all be nontrivial two-star errors.  More precisely,
+some comparison of two trade maps either produces an automorphism preserving
+\(A\), or produces a one-star recentering move whose error is strictly smaller
+than \(d=|A\triangle B|\).
+\end{conjecture}
+
+This cannot be a statement about arbitrary two-star errors.  Any transposition
+of two same-colored vertices preserves the color set \(A\) and can only change
+edges incident to those two vertices.  Such maps are everywhere.  The useful
+rigidity has to use the whole deck-indexed family of one-star maps, together
+with the fact that each \(f_u\) comes from an actual rooted card isomorphism.
+So the object to rule out is not an isolated two-star near-automorphism, but a
+closed coherent system of them arising from a centered trade.
+
+This is the most plausible route to proving one-step descent.  The deck gives
+many one-star near-automorphisms from \((C,A)\) to \((C,B)\).  A genuine
+counterexample would force all of them to have large star error, but their
+pairwise transition maps are color-preserving near-automorphisms of
+\((C,A)\) with error supported on at most two stars.  The hope is that such a
+large family of low-support graph errors cannot close up unless it comes from
+actual automorphisms.
+
+\subsection{An averaging target}
+
+There is a slightly softer version of one-step descent that may be easier to
+prove.  For a chosen root-preserving trade, write \(f_u\) for the extended
+one-star map at \(u\), and define the defect-star energy
+\[
+  \mathcal E_D(f)
+  =
+  \sum_{u\in A\triangle B} |\Err_u(f_u)|.
+\]
+If one can choose the trade so that
+\[
+  \mathcal E_D(f) < |A\triangle B|^2,
+\]
+then some defect vertex \(u\) satisfies
+\[
+  |\Err_u(f_u)| < |A\triangle B|,
+\]
+which is exactly one-step descent.
+
+Thus a minimal counterexample must satisfy the opposite inequality for every
+available root-preserving trade:
+\[
+  \mathcal E_D(f) \geq |A\triangle B|^2.
+\]
+This is a useful target because \(\mathcal E_D\) is an honest sum of local
+adjacency errors.  It may be possible to compare it with the color transport
+cost of the same trade.  Since each \(f_u\) carries \(A\) to \(B\), the
+identity color defect \(A\triangle B\) is being paid for by moving colored
+vertices; the conjectural inequality says that the deck cannot force every
+such payment to reappear as at least the same amount of graph error at every
+defect vertex.
+
+\subsection{Case 2: the root does not map to the root}
+
+If \(\theta\) sends the root of the left extension to a non-root vertex on the
+right, then the shadow already exhibits root ambiguity.  This should be
+treated as a potential direct success: it may allow the root of
+\(\Ext(C,A)\) to be identified with an old vertex of \(\Ext(C,B)\), producing
+an isomorphism of the full extensions after one more extension step.
+
+\begin{conjecture}[Root-moving lemma]
+If some punctured-card isomorphism between
+\(\Ext(C-u,A\setminus\{u\})\) and
+\(\Ext(C-v,B\setminus\{v\})\) moves root to non-root, then either
+\(\Ext(C,A) \cong \Ext(C,B)\), or there is a centered presentation with
+strictly smaller defect.
+\end{conjecture}
+
+\begin{conjecture}[Root-preserving extraction]
+In a minimal centered counterexample, after applying all possible root-moving
+success or ambiguity-descent moves, there is a centered trade whose card
+isomorphisms are root-preserving.
+\end{conjecture}
+
+This conjecture is the gateway into the charge-cycle machinery.  The intended
+proof structure is:
+\[
+  \text{root-moving match}
+  \Rightarrow
+  \text{success or ambiguity descent},
+\]
+while
+\[
+  \text{no useful root-moving match}
+  \Rightarrow
+  \text{root-preserving trade}.
+\]
+Once the latter trade is chosen, the color-boundary and cycle-balance lemmas
+apply.
+
+\section{Root recognition and ambiguity}
+
+The root-moving case deserves its own invariant.  In a centered extension
+\(\Ext(C,A)\), the root is certainly a vertex whose deletion gives \(C\).
+But it need not be the only such vertex.  Define the root-ambiguous set
+\[
+  R_C(A)
+  =
+  \{u\in V(C) : \Ext(C-u,A\setminus\{u\}) \cong C\}.
+\]
+These are the old vertices whose deletion produces a card isomorphic to the
+root-deleted card.  Equivalently, they are the old vertices that can masquerade
+as the root from the point of view of the deck.
+
+A first necessary condition is obtained from edge counts.  If
+\(u\in R_C(A)\), then
+\[
+  |E(C)|
+  =
+  |E(C-u)| + |A|-\one_{u\in A},
+\]
+so
+\[
+  \deg_C(u)+\one_{u\in A}=|A|.
+\]
+Thus a root-ambiguous old vertex has the same degree in the full extension as
+the root.  Higher card invariants impose stronger versions of this condition.
+
+If \(R_C(A)=\varnothing\), then the root-deleted card \(C\) is unique in
+\(\Deck(\Ext(C,A))\).  In that case, every deck isomorphism must match root
+card to root card, and all remaining work is root-preserving.
+
+If \(R_C(A)\neq\varnothing\), then choosing \(u\in R_C(A)\) and recentering at
+the card \(\Ext(C,A)-u\cong C\) produces a new centered presentation of the
+same full graph in which an old vertex has become the root.  This is not a
+failure mode; it is a symmetry/ambiguity of the extension.  It suggests a
+second ranking parameter:
+\[
+  \rho(C,A,B)=|R_C(A)|+|R_C(B)|.
+\]
+
+\begin{conjecture}[Root-ambiguity descent]
+If a root-moving punctured-card isomorphism does not already extend to an
+isomorphism \(\Ext(C,A)\cong \Ext(C,B)\), then recentering through it decreases
+either the attachment defect or the root-ambiguity parameter \(\rho\).
+\end{conjecture}
+
+This would give a lexicographic potential of the form
+\[
+  \bigl(|A\triangle B|,\rho(C,A,B),\text{higher card-profile data}\bigr).
+\]
+The root-preserving case changes attachment defect into old-card neighborhood
+defect; the root-moving case should consume root ambiguity.
+
+\section{State graph and potential functions}
+
+It may be too optimistic to expect the raw defect size \(|A\triangle B|\) to
+decrease after every useful recentering.  The root-preserving formula shows why:
+after recentering at \(u\) and \(v\), the new defect is not directly the old
+attachment defect; it is the mismatch between the old-card neighborhoods of
+\(u\) and \(v\):
+\[
+  \bigl(N_C(u)\setminus\{u\}\bigr)
+  \triangle
+  \psi^{-1}\bigl(N_C(v)\setminus\{v\}\bigr).
+\]
+So a defect in the attachment set can be traded for a defect in the card
+structure.
+
+This suggests replacing the one-shot descent lemma by a finite state graph.
+A state is a centered presentation
+\[
+  (C,A,B)
+\]
+of the same two full graphs \(G\) and \(H\).  A move chooses an old vertex
+\(u\in V(C)\), matches the punctured card
+\(\Ext(C-u,A\setminus\{u\})\) to some punctured card
+\(\Ext(C-v,B\setminus\{v\})\), and recenters through a chosen isomorphism.
+
+The centered theorem is equivalent to saying that every state with
+\(\PDeck_C(A)=\PDeck_C(B)\) can reach a terminal state:
+\[
+  A=B
+  \quad\text{or, more generally,}\quad
+  A \text{ and } B \text{ are in the same } \Aut(C)\text{-orbit}.
+\]
+
+\begin{conjecture}[No positive-defect sink]
+In the recentering state graph, every nonterminal state has at least one
+outgoing move to a state with smaller value for some finite-ranking potential
+\(\Phi(C,A,B)\).
+\end{conjecture}
+
+Candidate potentials, in increasing order of sophistication, are:
+\[
+  \Phi_0(C,A,B)=|A\triangle B|,
+\]
+\[
+  \Phi_1(C,A,B)=
+  \left(
+    |A\triangle B|,
+    \{\!\{\, \deg_C(w) : w\in A\triangle B \,\}\!\}
+  \right),
+\]
+with lexicographic order, and a more structural potential
+\[
+  \Phi_2(C,A,B)=
+  \{\!\{\, (C-w, A\setminus\{w\}, B\setminus\{w\}) :
+      w\in A\triangle B \,\}\!\},
+\]
+ordered by the multiset extension of a recursively defined card-complexity
+order.
+
+The advantage of the state-graph view is that a proof need not show raw defect
+always decreases.  It is enough to rule out a directed cycle of genuinely
+positive-defect states in which every recentering merely moves the defect
+around.  Such a positive cycle would be a ``balanced trade'' of attachment
+sets and old-card neighborhoods.  The proof should aim to show that balanced
+trades cannot exist.
+
+\section{Normal form for a hypothetical counterexample}
+
+Assume the centered extension theorem is false, and choose a counterexample
+\((C,A,B)\) minimizing the eventual potential \(\Phi\).  Thus
+\(\PDeck_C(A)=\PDeck_C(B)\), but
+\(\Ext(C,A)\not\cong\Ext(C,B)\).  Even before \(\Phi\) is finalized, a
+minimal counterexample should satisfy the following constraints.
+
+\begin{enumerate}[leftmargin=2em]
+  \item \(A\) and \(B\) are not in the same \(\Aut(C)\)-orbit.
+
+  \item The defect \(A\triangle B\) is nonempty, and \(|A|=|B|\).
+
+  \item For every \(u\in V(C)\), every matched punctured-card isomorphism
+  \[
+    \Ext(C-u,A\setminus\{u\})
+    \cong
+    \Ext(C-v,B\setminus\{v\})
+  \]
+  either fails to produce a smaller state, or it already preserves the
+  putative minimal potential.
+
+  \item In particular, if such an isomorphism is root-preserving, with
+  restriction \(\psi:C-u\cong C-v\), then the recentered defect
+  \[
+    \bigl(N_C(u)\setminus\{u\}\bigr)
+    \triangle
+    \psi^{-1}\bigl(N_C(v)\setminus\{v\}\bigr)
+  \]
+  is nonempty; otherwise the empty-defect extension lemma gives a full
+  isomorphism.
+
+  \item If a root-moving isomorphism exists, then root ambiguity is not
+  consumed by recentering.  Equivalently, root ambiguity must persist around a
+  directed cycle of centered presentations.
+\end{enumerate}
+
+Thus a counterexample cannot merely have an attachment defect.  It must have a
+self-sustaining trade in which attachment defects, old-card neighborhood
+defects, and root ambiguities continually transform into one another without
+ever vanishing.  The next proof task is to show that such a self-sustaining
+trade is impossible.
+
+\section{Trades}
+
+It is useful to name the object that a counterexample would have to supply.
+
+\begin{definition}[Rooted card-match graph]
+Given \(C,A,B\), define the rooted card-match graph
+\[
+  \mathcal M(C,A,B)
+\]
+to be the bipartite graph with left and right vertex sets both \(V(C)\), where
+there is an edge \(u\leadsto v\) if there exists a root-preserving
+isomorphism
+\[
+  \Ext(C-u,A\setminus\{u\})
+  \cong
+  \Ext(C-v,B\setminus\{v\}).
+\]
+Each edge \(u\leadsto v\) carries a set of possible star-error values, one
+for each such isomorphism.
+\end{definition}
+
+A root-preserving centered trade is exactly a perfect matching in
+\(\mathcal M(C,A,B)\), together with a choice of one isomorphism for every
+matched edge.  In this language, one-step descent asks for a defect-left
+vertex \(u\in A\triangle B\) and an incident edge \(u\leadsto v\) carrying a
+star error smaller than \(|A\triangle B|\).  The cycle-balance lemmas apply
+after choosing a perfect matching, but the existence of a good recentering is
+an edge-existence statement.
+
+\begin{definition}[Centered trade]
+A centered trade from \((C,A)\) to \((C,B)\) consists of a bijection
+\(\tau:V(C)\to V(C)\) and, for every \(u\in V(C)\), an isomorphism
+\[
+  \theta_u:
+  \Ext(C-u,A\setminus\{u\})
+  \cong
+  \Ext(C-\tau(u),B\setminus\{\tau(u)\}).
+\]
+It is root-preserving if every \(\theta_u\) sends root to root.
+\end{definition}
+
+Equality \(\PDeck_C(A)=\PDeck_C(B)\) is exactly the assertion that at least one
+centered trade exists.  The stronger root-preserving centered theorem would
+say that the existence of such a trade already forces a global automorphism of
+\(C\), after possibly choosing a better trade:
+\[
+  \exists \alpha\in\Aut(C),\quad \alpha(A)=B.
+\]
+
+For a root-preserving trade, each \(\theta_u\) restricts to a colored-card
+isomorphism
+\[
+  (C-u,A\setminus\{u\})
+  \cong
+  (C-\tau(u),B\setminus\{\tau(u)\}).
+\]
+Thus a root-preserving trade is precisely a hypomorphism between the two
+one-colored structures \((C,A)\) and \((C,B)\).  The remaining question is
+whether every such hypomorphism is induced by an actual colored isomorphism.
+
+\begin{lemma}[Root-preserving trades preserve the deleted color]
+If \((\tau,\theta_u)\) is a root-preserving centered trade, then
+\[
+  \tau(A)=B.
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The card isomorphism at \(u\) identifies the rooted degrees, so
+\[
+  |A|-\one_{u\in A}
+  =
+  |B|-\one_{\tau(u)\in B}.
+\]
+The full extensions have equal edge count, hence \(|A|=|B|\).  Therefore
+\[
+  u\in A
+  \quad\Longleftrightarrow\quad
+  \tau(u)\in B.
+\]
+Since \(\tau\) is a bijection, it carries \(A\) onto \(B\).
+\end{proof}
+
+\begin{lemma}[Cycle balance for rooted invariants]
+Let \(I\) be any numerical invariant of rooted cards, and write
+\[
+  I_A(u)=I\bigl(\Ext(C-u,A\setminus\{u\})\bigr),
+  \qquad
+  I_B(u)=I\bigl(\Ext(C-u,B\setminus\{u\})\bigr).
+\]
+Suppose \((\tau,\theta_u)\) is a centered trade.  Define the aligned defect
+\[
+  \delta_I(u)=I_A(u)-I_B(u).
+\]
+Then on every cycle \(\Gamma\) of the permutation \(\tau\),
+\[
+  \sum_{u\in\Gamma}\delta_I(u)=0.
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The trade gives
+\[
+  I_A(u)=I_B(\tau(u)).
+\]
+Thus
+\[
+  \delta_I(\tau(u))
+  =
+  I_A(\tau(u))-I_B(\tau(u))
+  =
+  I_A(\tau(u))-I_A(u).
+\]
+Summing this identity around a \(\tau\)-cycle telescopes.
+\end{proof}
+
+This lemma is small but important.  Equality of decks gives only a multiset
+equality until we choose a trade.  Once a trade is chosen, every scalar rooted
+card invariant becomes a discrete potential whose aligned defects must
+balance on each cycle of the trade permutation.  In the single-switch case,
+using rooted two-step counts, this forces the \(+1\) and \(-1\) witness
+signals to be paired cycle-by-cycle, not merely in aggregate.
+
+\begin{corollary}[Defect vertices lie in balanced trade cycles]
+For the edge-count invariant,
+\[
+  \delta_E(u)=\one_{u\in B}-\one_{u\in A}.
+\]
+Hence every cycle of a centered trade contains equally many vertices of
+\(A\setminus B\) and \(B\setminus A\).  In particular, in the single-switch
+case \(A=S\cup\{p\}\), \(B=S\cup\{q\}\), the vertices \(p\) and \(q\) lie in
+the same cycle of the trade permutation.
+\end{corollary}
+
+\begin{proof}[Proof sketch]
+The formula for \(\delta_E\) is exactly the aligned edge-count defect lemma.
+Apply cycle balance to the edge-count invariant.  In the single-switch case
+there is only one negative charge and one positive charge, so they must occur
+in the same cycle.
+\end{proof}
+
+\begin{lemma}[Color-boundary form of a root-preserving trade cycle]
+Assume the centered trade is root-preserving.  Let
+\[
+  x_0,x_1,\ldots,x_{m-1}
+\]
+be a cycle of \(\tau\), indexed so that \(\tau(x_i)=x_{i+1}\).  Put
+\[
+  b_i=\one_{x_i\in B}.
+\]
+Then
+\[
+  \one_{x_i\in A}=b_{i+1},
+\]
+and hence
+\[
+  x_i\in B\setminus A
+  \quad\Longleftrightarrow\quad
+  b_i=1,\ b_{i+1}=0,
+\]
+while
+\[
+  x_i\in A\setminus B
+  \quad\Longleftrightarrow\quad
+  b_i=0,\ b_{i+1}=1.
+\]
+Thus the defect vertices on a root-preserving trade cycle are exactly the
+boundaries between \(B\)-colored and \(B\)-uncolored arcs, and the two defect
+signs alternate around the cycle.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The root-preserving trade gives \(\tau(A)=B\), equivalently
+\[
+  x_i\in A
+  \quad\Longleftrightarrow\quad
+  \tau(x_i)=x_{i+1}\in B.
+\]
+The displayed boundary descriptions follow immediately.
+\end{proof}
+
+\subsection{Defect cycles}
+
+The preceding lemma suggests a more economical normal form for a minimal
+counterexample.  Once a root-preserving trade is chosen, each trade cycle is a
+cyclic word in two colors: vertices in \(B\) and vertices outside \(B\).  The
+defect vertices are exactly the color-boundaries of this cyclic word.  Thus
+the total defect splits into disjoint even blocks, one block for each trade
+cycle that changes color.
+
+\begin{definition}[Defect cycle]
+A defect cycle of a root-preserving trade is a cycle of \(\tau\) containing at
+least one vertex of \(A\triangle B\).
+\end{definition}
+
+\begin{conjecture}[Atomic trade reduction]
+If a centered counterexample exists, then there is one with a
+root-preserving centered trade having a single defect cycle.
+\end{conjecture}
+
+This is not yet proved, but it is a promising reduction target.  If a trade
+has several defect cycles, the edge-count charge already balances on each
+cycle separately.  One hopes to either recenter using a vertex on one cycle to
+obtain descent, or modify the trade to reduce the number of defect cycles.  In
+an atomic counterexample, all positive and negative defect vertices lie on one
+alternating trade cycle; the problem is then to show that at least one
+boundary vertex on that cycle has small star error.
+
+\begin{conjecture}[Cycle-local descent]
+Let \(\Gamma\) be a defect cycle, and let
+\[
+  d_\Gamma=|\Gamma\cap(A\triangle B)|.
+\]
+Unless the full extensions are already isomorphic, some boundary vertex
+\(u\in \Gamma\cap(A\triangle B)\) admits a root-preserving recentering whose
+star error is strictly smaller than \(d_\Gamma\).
+\end{conjecture}
+
+Cycle-local descent would imply one-step defect descent immediately, since
+\(d_\Gamma\leq |A\triangle B|\).  It also specializes to the single-switch
+base case: then the unique defect cycle has two boundary vertices, so strict
+cycle-local descent again means zero star error.
+
+\begin{conjecture}[No nontrivial centered trade]
+There is no centered trade \((C,A)\leadsto(C,B)\) with \(A\) and \(B\) in
+distinct \(\Aut(C)\)-orbits that is minimal under recentering.
+\end{conjecture}
+
+This is the clean obstruction.  The moving-hole machinery is an attempt to
+take a nontrivial trade and manufacture a smaller one by replacing the center
+with one of the traded cards.
+
+\section{Minimal-defect proof sketch}
+
+Assume for contradiction that the reconstruction conjecture fails.  Choose a
+counterexample \(G,H\) with the same deck and \(G \not\cong H\).  Among all
+choices of matched cards \(G-x \cong H-y\), and all identifications of the
+matched card with a graph \(C\), choose a centered presentation
+\[
+  G \cong \Ext(C,A),
+  \qquad
+  H \cong \Ext(C,B)
+\]
+with \(|A\triangle B|\) minimal.
+
+The defect is nonzero, because zero defect gives a root-preserving isomorphism.
+The needed local theorem is not that an arbitrary defect vertex works, but
+that some defect vertex admits a good match.  By the one-step defect descent
+lemma, choose
+\[
+  u\in A\triangle B,\qquad v\in V(C),
+\]
+and a matched punctured-card isomorphism
+\[
+  \Ext(C-u,A\setminus\{u\})
+  \cong
+  \Ext(C-v,B\setminus\{v\})
+\]
+whose recentering improves the chosen potential.
+
+Apply the moving-hole analysis to this good isomorphism.
+
+\begin{itemize}[leftmargin=2em]
+  \item If the isomorphism moves root to root, the star-error formula says
+  that the new defect is exactly the one-star graph error of the associated
+  bijection \(f_u\), with \(f_u(A)=B\).  The descent choice makes this smaller than the
+  original attachment defect, contradicting minimality.
+
+  \item If the isomorphism moves root to non-root, the root-moving success lemma
+  either gives a full isomorphism \(G \cong H\), contradiction, or decreases
+  the secondary root-ambiguity part of the potential.
+\end{itemize}
+
+Therefore no positive-defect counterexample exists.  Hence every same-deck
+pair is isomorphic.
+
+\section{Ehrenfeucht-Fraisse interpretation}
+
+The same idea can be read as an Ehrenfeucht-Fraisse strategy.  A card
+alignment is a partial isomorphism with one hidden hole.  Spoiler tries to
+pick a vertex in the defect set; Duplicator responds by moving the hole to a
+new matched card before the defect becomes fatal.  A defect-minimizing repair
+lemma would imply that Duplicator can maintain coherence through all \(n\)
+rounds.
+
+However, the direct centered-extension formulation seems cleaner for proof
+work.  For finite graphs, an \(n\)-round EF win is essentially equivalent to
+isomorphism, so the EF game does not reduce the difficulty; it organizes it.
+The core mathematical claim remains the centered trade theorem.
+
+\section{Lean-facing milestones}
+
+The following milestones are ordered so that failed attempts still produce
+useful formal infrastructure.
+
+\begin{enumerate}[leftmargin=2em]
+  \item Define \(\Ext(C,A)\) in Lean as a graph on \(V(C) \oplus \mathbf{1}\).
+
+  \item Define \(\PDeck_C(A)\) as the multiset of isomorphism classes of
+  \(\Ext(C-u,A\setminus\{u\})\).
+
+  \item Prove the centered reduction:
+  same deck plus one matched card gives equality of punctured extension decks.
+
+  \item Define defect \(A\triangle B\), positive defect \(A\setminus B\), and
+  negative defect \(B\setminus A\).
+
+  \item Prove the aligned edge-count defect lemma.
+
+  \item Generalize edge-count shadows to induced-subgraph-count shadows for
+  copies using the root.
+
+  \item Formalize moving-hole recentering: from an isomorphism of punctured
+  extensions, construct the new centered presentation.
+
+  \item Prove the star-error lemma: a root-preserving punctured-card
+  isomorphism extends to a color-preserving bijection whose only graph errors
+  are incident to the deleted vertex.
+
+  \item Prove the parity lemma for star error.
+
+  \item Formalize the single-switch base case infrastructure: degree balance,
+  rooted triangle counts \(T_w\), rooted two-step counts \(P_w\), witness sets
+  \(W^-\) and \(W^+\), and twin collapse.
+
+  \item Prove single-switch root-link profile balance by subtracting
+  root-avoiding subgraph counts in the common card \(C\) from deck-reconstructed
+  total subgraph counts.
+
+  \item Formalize absorbers, absorber constraints, and the natural shadow
+  isolation criterion.
+
+  \item Formalize the rooted card-match graph and the direct-edge selection
+  problem.
+
+  \item Formalize neighborhood selection as an \(\Aut(C-p,S)\)-orbit problem.
+
+  \item Define the fixed-host subset deck
+  \(\Deck_{K,S}(U)\), fixed-host trades, and the fixed-host star-error
+  lemma: every matched deleted colored card extends to a color-preserving
+  bijection whose graph error is concentrated in one star.
+
+  \item Prove the fixed-host rehosting lemma, converting a fixed-host orbit
+  failure into a centered attachment-defect problem over a smaller colored
+  card.
+
+  \item Formalize the fixed-host singleton switch: moving-vertex profile
+  balance, low-order singleton balances, absorber constraints, and the
+  second-color two-step witness charge formula.
+
+  \item Prove the direct-edge size-drop lemma for the fixed-host singleton
+  switch, and package it with no closed singleton flow into an induction step.
+
+  \item Formalize the two-slice type-flow decomposition and the rectangular
+  second-boundary identity
+  \[
+    \partial_O([H_b]-[H_a])
+    =
+    \partial_T([C_a^b]-[C_b^a]).
+  \]
+
+  \item Attack the no nonzero rectangular kernel lemma.  This is now the
+  most concrete fixed-host singleton target: a proof gives the direct
+  cancellation needed for the size-drop induction, while a counterexample
+  gives a precise obstruction to the current campaign.
+
+  \item Prove the two-hole splice lemma, or find a locked two-hole match.
+  This is the local step inside the rectangular kernel argument: every
+  matched two-hole card should either give a smaller obstruction, a direct
+  cancellation, or a chord shortening one of the two type-flow paths.
+
+  \item Define the balanced residual rectangular potential \(\Phi\), choose a
+  \(\Phi\)-minimal residual matching, and prove the minimum-error residual
+  matching lemma: no essential locked match survives after all exposed terms
+  and partner swaps that reduce \((\Phi,\#\text{locks})\).
+
+  \item Define the root-anchored centered subproblem and prove that direct
+  recentering preserves punctured deck equality.
+
+  \item Prove cycle balance for arbitrary rooted numerical invariants, with
+  edge-count balance and color-boundary trade cycles as the first corollaries.
+
+  \item Attack the single-switch theorem via detour selection/isolation plus
+  neighborhood selection.
+
+  \item Formalize transition maps between two star-error bijections, and prove
+  the two-hole error-support bound.
+
+  \item Attack one-step defect descent, with two-hole rigidity as the main
+  local obstruction.
+
+  \item Attack the root-moving success lemma as the secondary ambiguity case.
+\end{enumerate}
+
+\section{Current gap}
+
+The proof currently hinges on four increasingly local claims.
+
+\begin{enumerate}[leftmargin=2em]
+  \item Root-moving matches either give an isomorphism or decrease a
+  root-ambiguity potential, allowing us to extract a root-preserving trade in
+  a minimal counterexample.
+
+  \item In a root-preserving trade, defect lies on color-boundaries of trade
+  cycles.  The desired local theorem is cycle-local descent: some boundary
+  vertex on a defect cycle has star error smaller than the number of defect
+  vertices on that cycle.
+
+  \item The base case of cycle-local descent is the single-switch case.  The
+  target has split into direct-edge selection and neighborhood selection.
+
+  \item In the hard single-switch case, all proper root-link profiles agree.
+  A remaining counterexample must therefore be a full-size orbit failure in
+  the root-anchored two-color state.  The fixed-host trade analysis sharpens
+  this: such a failure is a coherent family of color-preserving one-star
+  near-automorphisms with no zero-error member.
+\end{enumerate}
+
+The next English task is to attack this sharpened fixed-host obstruction.  The
+most local target is the fixed-host singleton switch: prove that two
+pseudo-similar colored vertices relative to a fixed background \((K,S,T)\)
+must actually be related by an automorphism.  This has now split into two
+smaller claims: no closed fixed-host singleton flow through \(T\), and no
+nonterminal fixed-host witness cycle balancing the signed two-step charges.
+Direct singleton edges are now size-drop moves: after direct recentering, the
+remaining neighborhood-selection failure is a smaller colored centered
+problem.  The same-size detour obstruction has been sharpened further: prove
+that the singleton type-flow graph has no positive-length path from \(H_a\)
+to \(H_b\).  The complementary type-flow slice gives a second path through
+the non-\(T\) vertices; two-slice incompatibility is now another possible way
+to force shortening.  The exchange-chain, neutral-reversibility, and
+witness-tail claims are proposed tools for shortening such paths.  The
+higher-order boundary formulation has now been sharpened to a rectangular
+kernel problem:
+\[
+  \partial_O([H_b]-[H_a])
+  =
+  \partial_T([C_a^b]-[C_b^a]).
+\]
+If the rectangular boundary forces one endpoint difference to vanish, the
+fixed-host singleton theorem follows by size-drop induction.  If not, the
+approach has found its likely break point: a genuine nonzero rectangular
+kernel for the colored deletion operator, rather than merely a missing
+low-order invariant.  The rectangular kernel has itself been localized to
+the two-hole splice lemma, and then to the minimum-error rectangular matching
+lemma for the balanced residual chain.  A productive two-hole match gives a direct cancellation, a smaller
+fixed-host singleton state, or a chord in one of the two shortest type-flow
+paths.  Thus the immediate make-or-break target is the essential locked case:
+a two-hole match whose four ports stay internal to \(T\) and \(O\), whose low
+and high extension errors are nonzero or color-incompatible, and which
+survives after all exposed rectangular terms are handled and the residual
+matching minimizes
+\[
+  (\Phi,\#\text{essential locks}).
+\]
+
+\end{document}

@@ -2,6 +2,8 @@ import Reconstruction.ConnectedComponents
 import Reconstruction.KellyLemma
 import Reconstruction.Disconnected.ComponentCount
 
+set_option autoImplicit false
+
 /-!
 # Reconstruction Conjecture — Disconnected Graphs
 
@@ -12,12 +14,21 @@ disconnected and has the same deck as `H`, then `G ≅ H`.
 
 * `SimpleGraph.isoSigmaComponents` — every graph is isomorphic to the disjoint
   union of its connected components (via a Sigma type).
+* `SimpleGraph.componentSigmaGraphIsoOfComponentIso` — componentwise
+  isomorphisms assemble into an isomorphism between the Sigma component graphs.
+* `SimpleGraph.isoOfComponentIsoEquiv` — if the connected components of two
+  graphs are matched by isomorphism, then the graphs themselves are isomorphic.
+* `SimpleGraph.isoOfComponentCountEq` — if every component isomorphism class
+  occurs equally often in two graphs, then the graphs are isomorphic.
+* `SimpleGraph.SameDeck.componentCount_eq_components_of_not_connected` — the
+  triangular component-multiset recovery induction for same-deck disconnected
+  graphs.
 * `SimpleGraph.SameDeck.card_isolated_eq` — the number of isolated vertices
   (degree-0 vertices, equivalently the number of `K₁` components) is
   reconstructible. This is the base case of Kelly's 1942 multiset-recovery
   induction.
 * `SimpleGraph.SameDeck.iso_of_not_connected` — disconnected graphs are
-  reconstructible (**currently a `sorry`**, see below).
+  reconstructible.
 
 ## Proof outline for the main theorem
 
@@ -42,9 +53,10 @@ where `k ≥ 2`:
 ## Current status
 
 This file provides the `Sigma`-decomposition infrastructure
-(`componentSigmaGraph`, `isoSigmaComponents`) which is the "assembly" piece of
-Step 4. The multiset-reconstruction part of Steps 2–3 (which is the bulk of
-Kelly's 1942 argument) remains a `sorry` in `SameDeck.iso_of_not_connected`.
+(`componentSigmaGraph`, `isoSigmaComponents`), the componentwise assembly
+theorem `isoOfComponentIsoEquiv`, and the final packaging theorem
+`SameDeck.iso_of_not_connected`. The triangular multiset-reconstruction
+induction itself lives in `Reconstruction.Disconnected.ComponentCount`.
 
 ## References
 
@@ -137,7 +149,68 @@ def isoSigmaComponents (G : SimpleGraph V) :
     refine ⟨?_, hadj⟩
     exact ConnectedComponent.connectedComponentMk_eq_of_adj hadj
 
-/-! ### Main theorem (currently `sorry`) -/
+/-! ### Assembling componentwise isomorphisms -/
+
+/-- A matching of connected components, together with graph isomorphisms on
+each matched pair of component-induced subgraphs, induces an isomorphism
+between the Sigma presentations of the two graphs. -/
+noncomputable def componentSigmaGraphIsoOfComponentIso {G H : SimpleGraph V}
+    (e : G.ConnectedComponent ≃ H.ConnectedComponent)
+    (hiso : ∀ c : G.ConnectedComponent,
+      Nonempty (G.induce (c.supp : Set V) ≃g H.induce ((e c).supp : Set V))) :
+    componentSigmaGraph G ≃g componentSigmaGraph H where
+  toEquiv := Equiv.sigmaCongr e fun c => (hiso c).some.toEquiv
+  map_rel_iff' := by
+    intro p q
+    rcases p with ⟨c, v⟩
+    rcases q with ⟨d, w⟩
+    constructor
+    · rintro ⟨hcd, hadj⟩
+      have hcd' : c = d := e.injective hcd
+      subst hcd'
+      refine ⟨rfl, ?_⟩
+      exact ((hiso c).some.map_rel_iff (a := v) (b := w)).mp (by
+        simpa [Equiv.sigmaCongr] using hadj)
+    · rintro ⟨hcd, hadj⟩
+      subst hcd
+      refine ⟨rfl, ?_⟩
+      simpa [Equiv.sigmaCongr] using
+        ((hiso c).some.map_rel_iff (a := v) (b := w)).mpr hadj
+
+/-- If the connected components of `G` and `H` can be bijected so that matched
+component-induced subgraphs are isomorphic, then `G` and `H` are isomorphic.
+
+This is the formal assembly step in Kelly's disconnected-graph reconstruction
+argument: once the component multiset has been recovered, the global graph
+isomorphism follows by transporting through the Sigma component decompositions. -/
+theorem isoOfComponentIsoEquiv {G H : SimpleGraph V}
+    (e : G.ConnectedComponent ≃ H.ConnectedComponent)
+    (hiso : ∀ c : G.ConnectedComponent,
+      Nonempty (G.induce (c.supp : Set V) ≃g H.induce ((e c).supp : Set V))) :
+    Nonempty (G ≃g H) := by
+  exact ⟨(isoSigmaComponents G).trans
+    ((componentSigmaGraphIsoOfComponentIso e hiso).trans (isoSigmaComponents H).symm)⟩
+
+/-- If every connected-component isomorphism class has the same multiplicity
+in `G` and `H`, then `G` and `H` are isomorphic.
+
+This packages the final two steps of Kelly's disconnected-graph argument:
+component-count equality gives a component bijection preserving isomorphism
+classes (`componentEquivOfComponentCountEq`), and the Sigma decomposition then
+assembles those component isomorphisms into a global graph isomorphism. -/
+theorem isoOfComponentCountEq [Fintype V] {G H : SimpleGraph V}
+    (hGcount : ∀ c : G.ConnectedComponent,
+      (G.induce (c.supp : Set V)).componentCount G =
+        (G.induce (c.supp : Set V)).componentCount H)
+    (hHcount : ∀ d : H.ConnectedComponent,
+      (H.induce (d.supp : Set V)).componentCount G =
+        (H.induce (d.supp : Set V)).componentCount H) :
+    Nonempty (G ≃g H) := by
+  exact isoOfComponentIsoEquiv
+    (componentEquivOfComponentCountEq (G := G) (H := H) hGcount hHcount)
+    (componentEquivOfComponentCountEq_iso (G := G) (H := H) hGcount hHcount)
+
+/-! ### Main theorem -/
 
 variable [Fintype V] [DecidableEq V]
 variable {G H : SimpleGraph V} [DecidableRel G.Adj] [DecidableRel H.Adj]
@@ -175,25 +248,23 @@ theorem SameDeck.card_isolated_eq (h : G.SameDeck H) (hV : 3 ≤ Fintype.card V)
         (Finset.card_image_of_injective _ σ.injective).symm
     _ = (Finset.univ.filter (fun v : V => H.degree v = 0)).card := by rw [himg]
 
+omit [DecidableEq V] [DecidableRel G.Adj] [DecidableRel H.Adj] in
 /-- **Disconnected graphs are reconstructible** (Kelly 1942).
 
 If `G` is disconnected (not connected) and has the same deck as `H` on ≥ 3
 vertices, then `G ≅ H`.
 
-**Status**: not yet proved. The proof requires a non-trivial induction to
-recover the full component multiset from the subgraph counts given by
-Kelly's Lemma (`SameDeck.subgraphCount_eq`), after which the assembly step
-uses `isoSigmaComponents` above. -/
+The proof uses the triangular component-count induction from
+`SameDeck.componentCount_eq_components_of_not_connected`, then assembles the
+matched component multiset with `isoOfComponentCountEq`. -/
 theorem SameDeck.iso_of_not_connected (h : G.SameDeck H) (hV : 3 ≤ Fintype.card V)
     (hdisc : ¬G.Connected) : Nonempty (G ≃g H) := by
-  -- See the module docstring for the full proof outline.
-  -- The missing core: reconstruct, for every iso-class `[F]` of connected
-  -- graphs on `< |V|` vertices, the number of components of `G` iso to `F`.
-  -- Kelly's Lemma (`h.subgraphCount_eq`) gives equality of induced-subgraph
-  -- counts between `G` and `H`; the induction on component size turns these
-  -- into equal *component* counts. Having matched up components, the final
-  -- step is the assembly: `G ≃g Σ c, c.toSimpleGraph ≃g Σ d, d.toSimpleGraph ≃g H`
-  -- using `isoSigmaComponents`.
-  sorry
+  classical
+  have hHdisc : ¬ H.Connected := by
+    intro hHconn
+    exact hdisc ((SameDeck.symm h).connected hV hHconn)
+  obtain ⟨hGcount, hHcount⟩ :=
+    h.componentCount_eq_components_of_not_connected hdisc hHdisc
+  exact isoOfComponentCountEq hGcount hHcount
 
 end SimpleGraph

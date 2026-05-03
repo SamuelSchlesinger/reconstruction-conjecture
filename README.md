@@ -28,15 +28,33 @@ such that $G - v \cong H - \sigma(v)$ for all $v \in V$.
 | `SameDeck` is symmetric | [`Basic.lean`](Reconstruction/Basic.lean) |
 | `SameDeck` is transitive | [`Basic.lean`](Reconstruction/Basic.lean) |
 | $\|E(G-v)\| + \deg(v) = \|E(G)\|$ | [`EdgeCount.lean`](Reconstruction/EdgeCount.lean) |
+| $\deg(v) = \|E(G)\| - \|E(G-v)\|$ | [`EdgeCount.lean`](Reconstruction/EdgeCount.lean) |
+| $\sum_v \|E(G-v)\| = (|V|-2)\|E(G)\|$ | [`EdgeCount.lean`](Reconstruction/EdgeCount.lean) |
 | Edge count is reconstructible | [`EdgeCount.lean`](Reconstruction/EdgeCount.lean) |
 | Degree sequence is reconstructible | [`DegreeSequence.lean`](Reconstruction/DegreeSequence.lean) |
 | Kelly's counting identity: $(n-k) \cdot s(F,G) = \sum_v s(F, G-v)$ | [`KellyLemma.lean`](Reconstruction/KellyLemma.lean) |
 | Subgraph count is reconstructible (Kelly's Lemma) | [`KellyLemma.lean`](Reconstruction/KellyLemma.lean) |
+| Kocay-style finite-index cover counts, target cover numbers, product-count identity grouped by induced-subgraph isomorphism class, and reconstructible finite products of subgraph counts | [`Kocay.lean`](Reconstruction/Kocay.lean) |
+| Connectivity is reconstructible | [`ConnectedComponents.lean`](Reconstruction/ConnectedComponents.lean) |
+| Number of connected components is reconstructible | [`ConnectedComponents.lean`](Reconstruction/ConnectedComponents.lean) |
+| Component-count triangular identity: copies of connected $F$ are $F$-components plus copies inside larger components | [`Disconnected/ComponentCount.lean`](Reconstruction/Disconnected/ComponentCount.lean) |
+| Local component-multiset induction step: matched larger components recover the $F$-component count | [`Disconnected/ComponentCount.lean`](Reconstruction/Disconnected/ComponentCount.lean) |
+| Component iso-class matching: equal per-class component counts produce a component bijection preserving component isomorphism classes | [`Disconnected/ComponentCount.lean`](Reconstruction/Disconnected/ComponentCount.lean) |
+| Same-deck disconnected component counts agree by descending triangular induction | [`Disconnected/ComponentCount.lean`](Reconstruction/Disconnected/ComponentCount.lean) |
+| Componentwise assembly: matched connected components with per-component isomorphisms assemble to a global graph isomorphism | [`Disconnected.lean`](Reconstruction/Disconnected.lean) |
+| Component-count assembly: equal component multiplicities for every component type imply a global graph isomorphism | [`Disconnected.lean`](Reconstruction/Disconnected.lean) |
+| Disconnected graphs are reconstructible (Kelly 1942) | [`Disconnected.lean`](Reconstruction/Disconnected.lean) |
+| One-card extension API: adding a new vertex with chosen neighbors recovers the card after deleting the new vertex, and every same-deck reconstruction lies in this search space | [`Search.lean`](Reconstruction/Search.lean) |
 | Adjacency matrix of induced subgraph = principal submatrix | [`Spectral.lean`](Reconstruction/Spectral.lean) |
 | Isomorphic graphs have equal characteristic polynomials | [`Spectral.lean`](Reconstruction/Spectral.lean) |
 | $\varphi'(G) = \sum_v \varphi(G-v)$ (derivative formula) | [`Spectral.lean`](Reconstruction/Spectral.lean) |
 | Characteristic polynomial derivative is reconstructible | [`Spectral.lean`](Reconstruction/Spectral.lean) |
 | Non-constant char. poly. coefficients are reconstructible | [`Spectral.lean`](Reconstruction/Spectral.lean) |
+| Newton/Faddeev-LeVerrier trace identity | [`Newton.lean`](Reconstruction/Newton.lean) |
+| $\operatorname{tr}(A^k)$ is reconstructible for $k < |V|$ | [`TraceReconstruction.lean`](Reconstruction/TraceReconstruction.lean) |
+| Top-trace support split: closed walks are partitioned into proper-support and full-support pieces, with the proper part expanded as a sum over exact vertex supports | [`TopTrace.lean`](Reconstruction/TopTrace.lean) |
+| Conditional constant-term reduction: `c_0` follows from equality of $\operatorname{tr}(A^{|V|})$ | [`CharPolyFull.lean`](Reconstruction/CharPolyFull.lean) |
+| Conditional constant-term reduction from equality of the two top-trace support-count pieces | [`CharPolyFull.lean`](Reconstruction/CharPolyFull.lean) |
 
 ### Reconstructible Invariants
 
@@ -79,15 +97,18 @@ determination" is where the difficulty lies.
 Current open declarations (`sorry`) are:
 
 - [`reconstruction_conjecture`](Reconstruction/Basic.lean) (the main conjecture)
-- [`SameDeck.numComponents_eq`](Reconstruction/ConnectedComponents.lean)
-- [`SameDeck.iso_of_not_connected`](Reconstruction/Disconnected.lean)
-- [`SameDeck.trace_adjMatrix_pow_eq`](Reconstruction/TraceReconstruction.lean)
-- [`Matrix.newton_trace_charpoly`](Reconstruction/Newton.lean)
 - [`SameDeck.charPoly_coeff_zero_eq`](Reconstruction/CharPolyFull.lean)
 
 Core deck machinery (`SameDeck`, Kelly's lemma, edge count, degree sequence,
-and non-constant characteristic-polynomial coefficients) is proved. The open
-items are staged extensions toward stronger reconstruction results.
+connected-component count, the componentwise Sigma assembly theorem, Kelly's
+disconnected-graph reconstruction theorem, trace reconstruction below the
+vertex count, the top-trace support split, component iso-class matching from per-class counts,
+larger-component matching above a size threshold, and non-constant
+characteristic-polynomial coefficients) is proved. The remaining internal
+staged target is the constant-term characteristic-polynomial reconstruction;
+it is now reduced to proving equality of the top-length proper-support and
+full-support closed-walk counts.
+the full reconstruction conjecture itself remains open mathematics.
 
 ## File Structure
 
@@ -99,13 +120,16 @@ Reconstruction/
   DegreeSequence.lean  -- Degree multiset definition, degree sequence is reconstructible
   KellyLemma.lean      -- Kelly's Lemma: subgraph counting identity and reconstructibility
   KellyEdgeCount.lean  -- Alternate edge-count reconstruction via Kelly's Lemma
+  Kocay.lean           -- Kocay-style cover-counting identities
   Regular.lean         -- Regularity is reconstructible from degree sequence
-  ConnectedComponents.lean -- Component-count reconstructibility target (sorry)
-  Disconnected.lean    -- Disconnected-case reconstruction target (sorry)
+  ConnectedComponents.lean -- Number of connected components is reconstructible
+  Disconnected.lean    -- Disconnected-case reconstruction theorem
   Trees.lean           -- Tree-case consequences from component machinery
+  Search.lean          -- One-card extension search-space API
   Spectral.lean        -- Characteristic polynomial, derivative formula, spectral reconstructibility
-  TraceReconstruction.lean -- Trace(A^k) reconstructibility target (sorry)
-  Newton.lean          -- Newton/Faddeev-LeVerrier identity target (sorry)
+  TraceReconstruction.lean -- Trace(A^k) reconstructibility for k < |V|
+  TopTrace.lean        -- Top-trace support split and exact-support expansion
+  Newton.lean          -- Newton/Faddeev-LeVerrier trace identity
   CharPolyFull.lean    -- Constant-term + full charpoly reconstruction target (sorry)
 ```
 
@@ -120,5 +144,7 @@ lake build
 ## References
 
 - Kelly, P. J. (1942). "On isometric transformations". PhD thesis, University of Wisconsin.
+- Kocay, W. L. (1981). "Some new methods in reconstruction theory". Lecture Notes in Mathematics 884.
+- McKay, B. D. (1998). "Isomorph-free exhaustive generation". Journal of Algorithms 26.
 - Ulam, S. M. (1960). *A Collection of Mathematical Problems*. Interscience.
 - Bondy, J. A. (1991). "A graph reconstructor's manual". In *Surveys in Combinatorics*.

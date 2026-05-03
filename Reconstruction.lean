@@ -5,11 +5,15 @@ import Reconstruction.DegreeSequence
 import Reconstruction.Spectral
 import Reconstruction.KellyLemma
 import Reconstruction.KellyEdgeCount
+import Reconstruction.Kocay
 import Reconstruction.Regular
 import Reconstruction.ConnectedComponents
 import Reconstruction.Disconnected.ComponentCount
 import Reconstruction.Disconnected
 import Reconstruction.Trees
+import Reconstruction.Search
+import Reconstruction.FixedHost
 import Reconstruction.TraceReconstruction
+import Reconstruction.TopTrace
 import Reconstruction.Newton
 import Reconstruction.CharPolyFull
