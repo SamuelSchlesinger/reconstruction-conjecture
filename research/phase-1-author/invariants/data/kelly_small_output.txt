@@ -1,0 +1,5 @@
+n = 5
+graphs checked (labelled, redundant): 1024
+F = K_2  failures: 0
+F = P_3  failures: 0
+Kelly's Lemma holds for every tested (G, F).

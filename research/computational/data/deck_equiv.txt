@@ -1,0 +1,60 @@
+Sample output of deck_equiv.py for n = 3, 4, 5, 6.
+
+Obtained by running
+
+    for n in 3 4 5 6; do python3 deck_equiv.py $n; done
+
+in a Python 3.13 environment; no external dependencies beyond the
+standard library are required by the script as written (the docstring
+mentions networkx but the current implementation uses only itertools
+and plain dicts).
+
+=============================================================
+
+$ python3 deck_equiv.py 3
+Enumerating isomorphism classes on n = 3 vertices ...
+  found 4 isomorphism classes
+  (OEIS A000088 expects: 1, 1, 2, 4, 11, 34, 156, 1044, 12346 for n = 0..8)
+  distinct decks: 4
+  OK: every deck uniquely determines the graph on n = 3 vertices (no hypomorphic non-isomorphic pair).
+
+$ python3 deck_equiv.py 4
+Enumerating isomorphism classes on n = 4 vertices ...
+  found 11 isomorphism classes
+  (OEIS A000088 expects: 1, 1, 2, 4, 11, 34, 156, 1044, 12346 for n = 0..8)
+  distinct decks: 11
+  OK: every deck uniquely determines the graph on n = 4 vertices (no hypomorphic non-isomorphic pair).
+
+$ python3 deck_equiv.py 5
+Enumerating isomorphism classes on n = 5 vertices ...
+  found 34 isomorphism classes
+  (OEIS A000088 expects: 1, 1, 2, 4, 11, 34, 156, 1044, 12346 for n = 0..8)
+  distinct decks: 34
+  OK: every deck uniquely determines the graph on n = 5 vertices (no hypomorphic non-isomorphic pair).
+
+$ python3 deck_equiv.py 6
+Enumerating isomorphism classes on n = 6 vertices ...
+  found 156 isomorphism classes
+  (OEIS A000088 expects: 1, 1, 2, 4, 11, 34, 156, 1044, 12346 for n = 0..8)
+  distinct decks: 156
+  OK: every deck uniquely determines the graph on n = 6 vertices (no hypomorphic non-isomorphic pair).
+
+=============================================================
+
+Interpretation:
+
+- "isomorphism classes" matches A000088 exactly for n = 3, 4, 5, 6:
+  4, 11, 34, 156. This sanity-checks the enumeration and the canonical
+  labelling.
+- "distinct decks" equals the number of isomorphism classes, so the
+  deck is *injective* on isomorphism classes for these n. That is the
+  reconstruction conjecture at order n.
+
+For n = 2 the map is not injective (both graphs on 2 vertices have the
+deck { K_1, K_1 }), which is why the conjecture is stated for n >= 3;
+for n = 1 there is only one graph.
+
+For n = 7 (not run above due to the naive O(n!) canonical-labelling
+implementation) one should expect 1044 isomorphism classes and 1044
+distinct decks; a nauty-backed version of this script would do this in
+well under a second.

@@ -1,0 +1,6 @@
+n = 2:  checked 2 graphs (labelled),  failures = 0
+n = 3:  checked 8 graphs (labelled),  failures = 0
+n = 4:  checked 64 graphs (labelled),  failures = 0
+n = 5:  checked 1024 graphs (labelled),  failures = 0
+n = 6:  checked 32768 graphs (labelled),  failures = 0
+Derivative identity holds on all tested graphs.
