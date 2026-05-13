@@ -112,6 +112,58 @@ end TwoColorIso
 
 section FixedHost
 
+/-- The set of vertices on which two vertices `u` and `v` have different
+adjacency in `K`, excluding `u` and `v` themselves.  This is the
+neighborhood-symmetric-difference set.  When `u, v` are twins in `K`, this set
+is empty. -/
+def twinDifferenceSet (K : SimpleGraph V) (u v : V) : Set V :=
+  {w | w ≠ u ∧ w ≠ v ∧ (K.Adj u w ↔ ¬ K.Adj v w)}
+
+/-- Two vertices `u` and `v` are `K`-twins when they have the same neighbors
+among all other vertices. -/
+def AreTwins (K : SimpleGraph V) (u v : V) : Prop :=
+  ∀ w : V, w ≠ u → w ≠ v → (K.Adj u w ↔ K.Adj v w)
+
+/-- Twin equivalence: the twin-difference set is empty iff `u` and `v` are
+twins. -/
+theorem twinDifferenceSet_eq_empty_iff_areTwins
+    {K : SimpleGraph V} {u v : V} :
+    twinDifferenceSet K u v = ∅ ↔ AreTwins K u v := by
+  classical
+  constructor
+  · intro h w hu hv
+    by_contra hne
+    have hw : w ∈ twinDifferenceSet K u v := by
+      refine ⟨hu, hv, ?_⟩
+      tauto
+    rw [h] at hw
+    exact hw
+  · intro hTwin
+    ext w
+    simp only [twinDifferenceSet, Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false,
+      not_and]
+    intro hu hv
+    have := hTwin w hu hv
+    tauto
+
+/-- The twin-difference set is symmetric in its two arguments. -/
+theorem twinDifferenceSet_comm (K : SimpleGraph V) (u v : V) :
+    twinDifferenceSet K u v = twinDifferenceSet K v u := by
+  ext w
+  simp only [twinDifferenceSet, Set.mem_setOf_eq]
+  tauto
+
+/-- Twins is symmetric. -/
+theorem AreTwins.symm {K : SimpleGraph V} {u v : V} (h : AreTwins K u v) :
+    AreTwins K v u := by
+  intro w hv hu
+  exact (h w hu hv).symm
+
+/-- Twins is reflexive: every vertex is a twin of itself. -/
+theorem AreTwins.refl (K : SimpleGraph V) (u : V) : AreTwins K u u := by
+  intro w hu _
+  rfl
+
 /-- Delete a vertex from a vertex color. -/
 def deleteColor (A : Set V) (z : V) : Set {w : V // w ≠ z} :=
   {w | w.1 ∈ A}
