@@ -1,6 +1,7 @@
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Data.Fintype.Pigeonhole
 import Mathlib.Data.Nat.Find
+import Mathlib.Dynamics.PeriodicPts.Defs
 import Reconstruction.Defs
 
 /-!
@@ -2697,6 +2698,72 @@ theorem exists_moved_by_matching [Finite V]
   by_contra h
   push_neg at h
   exact C.matching_moves_consecutive_at hall 0 ⟨h 0, h 1⟩
+
+/-- The base of an active observer cycle has a positive minimal period under the
+observer map. -/
+theorem minimalPeriod_base_pos [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    {o : LowSlicePositiveMinimumObstruction K S T a b}
+    (C : ActiveObserverCycle o) :
+    0 < Function.minimalPeriod C.system.observerMap C.base := by
+  apply Function.IsPeriodicPt.minimalPeriod_pos (n := C.period)
+  · exact Nat.lt_of_lt_of_le Nat.zero_lt_one C.period_gt_one.le
+  · exact C.closes
+
+/-- The base of an active observer cycle has minimal period not equal to one —
+the observer map has no fixed points. -/
+theorem minimalPeriod_base_ne_one [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    {o : LowSlicePositiveMinimumObstruction K S T a b}
+    (C : ActiveObserverCycle o) :
+    Function.minimalPeriod C.system.observerMap C.base ≠ 1 := by
+  intro hone
+  have hper :
+      Function.IsPeriodicPt C.system.observerMap
+        (Function.minimalPeriod C.system.observerMap C.base) C.base :=
+    Function.isPeriodicPt_minimalPeriod _ _
+  rw [hone] at hper
+  have hfix : C.system.observerMap C.base = C.base := by
+    simpa [Function.IsPeriodicPt, Function.IsFixedPt] using hper
+  exact C.system.observerMap_ne_self C.base hfix
+
+/-- The base of an active observer cycle has minimal period strictly greater
+than one — the observer map has no fixed points, so cycles cannot collapse to a
+single vertex. -/
+theorem minimalPeriod_base_gt_one [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    {o : LowSlicePositiveMinimumObstruction K S T a b}
+    (C : ActiveObserverCycle o) :
+    1 < Function.minimalPeriod C.system.observerMap C.base := by
+  have hpos : 0 < Function.minimalPeriod C.system.observerMap C.base :=
+    C.minimalPeriod_base_pos
+  have hne : Function.minimalPeriod C.system.observerMap C.base ≠ 1 :=
+    C.minimalPeriod_base_ne_one
+  omega
+
+/-- A minimal-period active observer cycle: redefine the cycle to use the
+minimal period at the same base.  The iterates over `[0, period)` are then
+pairwise distinct. -/
+noncomputable def toMinimalPeriod [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    {o : LowSlicePositiveMinimumObstruction K S T a b}
+    (C : ActiveObserverCycle o) : ActiveObserverCycle o where
+  system := C.system
+  base := C.base
+  period := Function.minimalPeriod C.system.observerMap C.base
+  period_gt_one := C.minimalPeriod_base_gt_one
+  closes := Function.iterate_minimalPeriod
+
+/-- Iterates of the observer map below the minimal period are pairwise distinct
+at the base of the minimal-period cycle. -/
+theorem toMinimalPeriod_iterate_injOn [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    {o : LowSlicePositiveMinimumObstruction K S T a b}
+    (C : ActiveObserverCycle o) {m n : ℕ}
+    (hm : m < C.toMinimalPeriod.period) (hn : n < C.toMinimalPeriod.period) :
+    C.toMinimalPeriod.system.observerMap^[m] C.toMinimalPeriod.base =
+      C.toMinimalPeriod.system.observerMap^[n] C.toMinimalPeriod.base ↔ m = n := by
+  exact Function.iterate_eq_iterate_iff_of_lt_minimalPeriod hm hn
 
 end ActiveObserverCycle
 
