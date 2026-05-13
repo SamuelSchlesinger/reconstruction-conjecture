@@ -1447,6 +1447,30 @@ def recenteredTwoHoleIso [Finite V]
         (m.toIsoData.toEquiv x).1 E.target.1) := by
   simpa [source, target, LowSliceCardFirstError.imageZ] using E.error.twoHoleIso
 
+/-- The adjacency-mismatch lemma for an active first error: the host adjacency
+between the deleted base and the active source vertex disagrees with the host
+adjacency between the matched mate of the base and the matched mate of the
+observer successor.  This holds for both coherent and noncoherent active first
+errors and is the unified geometric content of the deleted-star error. -/
+theorem adjacency_mismatch [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    {m : LowSliceMinimumErrorMatching K S T a b}
+    {x : singletonLeft T a} (E : ActiveFirstError m x) :
+    ¬ (K.Adj x.1 E.source.1 ↔
+        K.Adj (m.toIsoData.toEquiv x).1 (m.toIsoData.toEquiv E.nextLeft).1) := by
+  have hmis : ¬ (K.Adj x.1 E.error.z.1 ↔
+      K.Adj (m.toIsoData.toEquiv x).1
+        ((m.toIsoData.cardIso x).cardIso.iso.toEquiv E.error.z).1) :=
+    E.error.mismatch
+  have hsrc_val : E.source.1 = E.error.z.1 := by
+    simp [source, LowSliceCardFirstError.sourceActiveVertex]
+  have hImage : ((m.toIsoData.cardIso x).cardIso.iso.toEquiv E.error.z).1 =
+      (m.toIsoData.toEquiv E.nextLeft).1 := by
+    simp [target, LowSliceCardFirstError.targetActiveVertex,
+      LowSliceCardFirstError.imageZ]
+  rw [hsrc_val, ← hImage]
+  exact hmis
+
 /-- In the coherent case, the recentered two-hole transport deletes a matched
 active pair on the right. -/
 def coherentTwoHoleIso [Finite V]
@@ -2635,29 +2659,11 @@ theorem adjacency_mismatch_at [Finite V]
     C.system.witness u with hE_def
   have hobs : C.system.observerMap u = E.nextLeft := rfl
   have hcoh : E.Coherent := hall n
-  rw [hobs]
   have hsrc : E.source = E.nextLeft := by
     unfold LowSliceMinimumErrorMatching.ActiveFirstError.Coherent at hcoh
     exact hcoh
-  rw [← hsrc]
-  have hmis : ¬ (K.Adj u.1 E.error.z.1 ↔
-      K.Adj (o.min.toIsoData.toEquiv u).1
-        ((o.min.toIsoData.cardIso u).cardIso.iso.toEquiv E.error.z).1) :=
-    E.error.mismatch
-  have hsrc_val : E.source.1 = E.error.z.1 := by
-    simp [LowSliceMinimumErrorMatching.ActiveFirstError.source,
-      LowSliceCardFirstError.sourceActiveVertex]
-  have htarget : E.target = o.min.toIsoData.toEquiv E.source :=
-    E.target_eq_toEquiv_source_of_coherent hcoh
-  have himg : ((o.min.toIsoData.cardIso u).cardIso.iso.toEquiv E.error.z).1 =
-      (o.min.toIsoData.toEquiv E.source).1 := by
-    have hh : E.target.1 = (o.min.toIsoData.toEquiv E.source).1 :=
-      congrArg Subtype.val htarget
-    simpa [LowSliceMinimumErrorMatching.ActiveFirstError.target,
-      LowSliceCardFirstError.targetActiveVertex,
-      LowSliceCardFirstError.imageZ] using hh
-  rw [hsrc_val, ← himg]
-  exact hmis
+  rw [hobs, ← hsrc]
+  simpa [hsrc] using E.adjacency_mismatch
 
 /-- On an all-coherent active observer cycle, the chosen matching cannot fix
 two consecutive cycle vertices pointwise: at every index, at least one of the
