@@ -2607,6 +2607,58 @@ def coherentMatchedTwoHoleIso_at [Finite V]
   rw [hnext]
   exact C.system.coherentMatchedTwoHoleIsoAt u (hall n)
 
+/-- On an all-coherent active observer cycle, the host adjacency between two
+consecutive cycle bases disagrees with the host adjacency between their matched
+mates under the chosen minimum matching.  This is the geometric content of the
+coherent active first error: the only "missing" adjacency information on each
+side is exactly the edge between the deleted base and the next cycle vertex,
+and that information disagrees. -/
+theorem adjacency_mismatch_at [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    {o : LowSlicePositiveMinimumObstruction K S T a b}
+    (C : ActiveObserverCycle o) (hall : C.AllCoherent) (n : ℕ) :
+    ¬ (K.Adj (C.system.observerMap^[n] C.base).1
+            (C.system.observerMap^[n + 1] C.base).1 ↔
+        K.Adj (o.min.toIsoData.toEquiv
+                  (C.system.observerMap^[n] C.base)).1
+              (o.min.toIsoData.toEquiv
+                  (C.system.observerMap^[n + 1] C.base)).1) := by
+  set u : singletonLeft T a := C.system.observerMap^[n] C.base with hu_def
+  have hnext :
+      C.system.observerMap^[n + 1] C.base =
+        C.system.observerMap u := by
+    rw [Nat.add_comm n 1]
+    simpa [hu_def] using
+      Function.iterate_add_apply C.system.observerMap 1 n C.base
+  rw [hnext]
+  set E : LowSliceMinimumErrorMatching.ActiveFirstError o.min u :=
+    C.system.witness u with hE_def
+  have hobs : C.system.observerMap u = E.nextLeft := rfl
+  have hcoh : E.Coherent := hall n
+  rw [hobs]
+  have hsrc : E.source = E.nextLeft := by
+    unfold LowSliceMinimumErrorMatching.ActiveFirstError.Coherent at hcoh
+    exact hcoh
+  rw [← hsrc]
+  have hmis : ¬ (K.Adj u.1 E.error.z.1 ↔
+      K.Adj (o.min.toIsoData.toEquiv u).1
+        ((o.min.toIsoData.cardIso u).cardIso.iso.toEquiv E.error.z).1) :=
+    E.error.mismatch
+  have hsrc_val : E.source.1 = E.error.z.1 := by
+    simp [LowSliceMinimumErrorMatching.ActiveFirstError.source,
+      LowSliceCardFirstError.sourceActiveVertex]
+  have htarget : E.target = o.min.toIsoData.toEquiv E.source :=
+    E.target_eq_toEquiv_source_of_coherent hcoh
+  have himg : ((o.min.toIsoData.cardIso u).cardIso.iso.toEquiv E.error.z).1 =
+      (o.min.toIsoData.toEquiv E.source).1 := by
+    have hh : E.target.1 = (o.min.toIsoData.toEquiv E.source).1 :=
+      congrArg Subtype.val htarget
+    simpa [LowSliceMinimumErrorMatching.ActiveFirstError.target,
+      LowSliceCardFirstError.targetActiveVertex,
+      LowSliceCardFirstError.imageZ] using hh
+  rw [hsrc_val, ← himg]
+  exact hmis
+
 end ActiveObserverCycle
 
 /-- The all-active branch yields a packaged active observer cycle. -/
