@@ -1165,6 +1165,138 @@ def print_min_error_probe_summary(
         print(f"    best_total={best_total}")
 
 
+def twin_gap(n: int, edges: EdgeSet, u: int, v: int) -> int:
+    """Number of w in V \\ {u, v} where K.Adj(u, w) differs from K.Adj(v, w)."""
+    if u == v:
+        return 0
+    return sum(
+        1
+        for w in range(n)
+        if w != u and w != v and (has_edge(edges, u, w) != has_edge(edges, v, w))
+    )
+
+
+def run_twin_gap_probe(
+    n: int,
+    max_states: int | None,
+    labelled: bool,
+    max_hosts: int | None,
+    random_hosts: int | None,
+    seed: int,
+    atlas: bool,
+    first_samples: int | None,
+) -> None:
+    """For each low-slice-equal state, compute twin-gap statistics across the
+    chosen minimum-error matching's matched right-side pairs."""
+    reps, host_label = select_host_reps(n, labelled, max_hosts, random_hosts, seed, atlas)
+    rng = random.Random(seed)
+    print(f"n={n}: {host_label}")
+    print("twin-gap probe: distribution of twin-gaps in minimum-error matchings")
+    counts = Counter()
+    twin_gap_hist: Counter = Counter()
+    twin_gap_hist_positive_state: Counter = Counter()
+    examples: list[tuple] = []
+
+    for gi, edges in enumerate(reps, start=1):
+        graph = nx_graph(n, edges)
+        if first_samples is None:
+            firsts = list(powerset(n))
+        else:
+            firsts = [
+                frozenset(v for v in range(n) if (mask >> v) & 1)
+                for mask in rng.sample(range(1 << n), min(first_samples, 1 << n))
+            ]
+        for first in firsts:
+            for T in powerset(n):
+                outside = [v for v in range(n) if v not in T]
+                for a in outside:
+                    left = T | {a}
+                    for b in outside:
+                        if a == b:
+                            continue
+                        if max_states is not None and counts["states"] >= max_states:
+                            print(f"stopped after --max-states={max_states}")
+                            print_twin_gap_probe_summary(
+                                counts, twin_gap_hist, twin_gap_hist_positive_state, examples
+                            )
+                            return
+                        counts["states"] += 1
+                        right = T | {b}
+                        if not nx_restricted_deck_equal(graph, first, left, left, right, right):
+                            continue
+                        counts["low_slice_equal"] += 1
+                        pair_data = {
+                            (x, y): nx_pair_min_error(edges, graph, first, left, x, right, y)
+                            for x in left
+                            for y in right
+                        }
+                        best_total, matchings = nx_minimum_error_matchings(
+                            left, right, pair_data
+                        )
+                        if best_total is None or not matchings:
+                            continue
+                        counts["minimum_matchings"] += len(matchings)
+                        positive_state = best_total > 0
+                        if positive_state:
+                            counts["min_total_positive_states"] += 1
+                        for matching in matchings:
+                            right_vertices = [y for _x, y, _data in matching]
+                            for i in range(len(right_vertices)):
+                                for j in range(i + 1, len(right_vertices)):
+                                    yi, yj = right_vertices[i], right_vertices[j]
+                                    gap = twin_gap(n, edges, yi, yj)
+                                    twin_gap_hist[gap] += 1
+                                    if positive_state:
+                                        twin_gap_hist_positive_state[gap] += 1
+                            if positive_state and len(examples) < 5:
+                                examples.append((edges, first, T, a, b, best_total,
+                                                matching))
+        if gi % 20 == 0 or gi == len(reps):
+            print(
+                f"  host reps processed: {gi}/{len(reps)}; "
+                f"low-slice equal states so far: {counts['low_slice_equal']}"
+            )
+
+    print_twin_gap_probe_summary(counts, twin_gap_hist, twin_gap_hist_positive_state, examples)
+
+
+def print_twin_gap_probe_summary(
+    counts: Counter,
+    twin_gap_hist: Counter,
+    twin_gap_hist_positive_state: Counter,
+    examples: list,
+) -> None:
+    print("\ntwin-gap probe summary")
+    for key in [
+        "states",
+        "low_slice_equal",
+        "minimum_matchings",
+        "min_total_positive_states",
+    ]:
+        print(f"  {key}: {counts[key]}")
+    total_pairs = sum(twin_gap_hist.values())
+    twin_pairs = twin_gap_hist.get(0, 0)
+    print(f"  total right-side pairs counted: {total_pairs}")
+    print(f"  twin pairs (gap = 0): {twin_pairs}"
+          f" ({twin_pairs / total_pairs * 100:.1f}%)" if total_pairs else
+          "  twin pairs (gap = 0): 0")
+    if total_pairs:
+        print("  twin-gap distribution:")
+        for gap in sorted(twin_gap_hist.keys()):
+            print(f"    gap={gap}: {twin_gap_hist[gap]}")
+    if twin_gap_hist_positive_state:
+        print("  twin-gap distribution (positive-min-error states only):")
+        for gap in sorted(twin_gap_hist_positive_state.keys()):
+            print(f"    gap={gap}: {twin_gap_hist_positive_state[gap]}")
+    if examples:
+        print("  positive-state examples:")
+        for ex in examples:
+            edges, first, T, a, b, total, matching = ex
+            print(f"    edges={sorted(edges)} first={sorted(first)} "
+                  f"T={sorted(T)} a={a} b={b} total={total} "
+                  f"matching={[(x, y, d.error) for x, y, d in matching]}")
+
+
 def run_c3_counterexample() -> None:
     """Print the connected 9-vertex cyclic example where orbit success does
     not imply low direct endpoint cancellation."""
@@ -1254,6 +1386,11 @@ def main() -> None:
         help="classify first errors in minimum-error active matchings",
     )
     parser.add_argument(
+        "--twin-gap-probe",
+        action="store_true",
+        help="distribution of twin-gaps among matched right-side pairs",
+    )
+    parser.add_argument(
         "--first-samples",
         type=int,
         default=None,
@@ -1304,6 +1441,18 @@ def main() -> None:
         return
     if args.min_error_probe:
         run_min_error_probe(
+            args.n,
+            args.max_states,
+            args.labelled,
+            args.max_hosts,
+            args.random_hosts,
+            args.seed,
+            args.atlas,
+            args.first_samples,
+        )
+        return
+    if args.twin_gap_probe:
+        run_twin_gap_probe(
             args.n,
             args.max_states,
             args.labelled,

@@ -431,3 +431,42 @@ minimum-error summary
   inactive_only_edges: 0
   both_branch_edges: 0
   unclassified_positive_edges: 0
+
+n=5 exhaustive graph-atlas twin-gap probe:
+command:
+  python3 research/computational/data/fixed_host_singleton_search.py 5 --atlas --twin-gap-probe
+
+twin-gap probe summary
+  states: 174080
+  low_slice_equal: 24832
+  minimum_matchings: 40376
+  min_total_positive_states: 0
+  total right-side pairs counted: 119376
+  twin pairs (gap = 0): 70656 (59.2%)
+  twin-gap distribution:
+    gap=0: 70656
+    gap=1: 14720
+    gap=2: 20208
+    gap=3: 13792
+
+n=6 graph-atlas bounded twin-gap probe:
+command:
+  python3 research/computational/data/fixed_host_singleton_search.py 6 --atlas --twin-gap-probe --max-states 100000
+
+twin-gap probe summary
+  states: 100000
+  low_slice_equal: 27922
+  minimum_matchings: 96546
+  min_total_positive_states: 0
+  total right-side pairs counted: 547766
+  twin pairs (gap = 0): 483456 (88.3%)
+  twin-gap distribution:
+    gap=0: 483456
+    gap=1: 55216
+    gap=2: 9094
+
+Note: no positive-min-error states found at n=5 (exhaustive) or n=6
+(bounded), so no positive-state twin-gap distribution recorded.  The
+all-states distribution shows that matched right-side pairs are very
+often twins (59% at n=5, 88% at n=6), and the long tail of non-twin
+pairs has only small twin-gap values (typically 1-3).
