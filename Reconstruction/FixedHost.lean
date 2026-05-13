@@ -1,8 +1,12 @@
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Combinatorics.SimpleGraph.DegreeSum
+import Mathlib.Combinatorics.SimpleGraph.Finite
 import Mathlib.Data.Fintype.Pigeonhole
 import Mathlib.Data.Nat.Find
 import Mathlib.Dynamics.PeriodicPts.Defs
 import Reconstruction.Defs
+import Reconstruction.EdgeCount
+import Reconstruction.DegreeSequence
 
 /-!
 # Fixed-Host Colored Deletion Decks
@@ -464,6 +468,91 @@ theorem starErrorCount_pos_iff [Finite V]
     (e : FixedHostCardIsoData K S U U' x y) :
     0 < e.starErrorCount ↔ ¬ e.ZeroStarError := by
   rw [← e.starErrorCount_eq_zero_iff, Nat.pos_iff_ne_zero]
+
+/-- The star-error count of a chosen card isomorphism is even.
+
+This is the deleted-star parity lemma: the chosen card isomorphism gives an
+isomorphism between the two deleted-vertex graphs, hence the deleted vertices
+have equal degree.  The star-error count is the size of the symmetric
+difference of the two neighborhoods (as transported through the card iso),
+which has the same parity as the sum of the degrees, which is even since the
+degrees agree. -/
+theorem starErrorCount_even [Finite V]
+    {K : SimpleGraph V}
+    {S U U' : Set V} {x y : V}
+    (e : FixedHostCardIsoData K S U U' x y) :
+    Even e.starErrorCount := by
+  classical
+  letI := Fintype.ofFinite V
+  set A : Finset {w : V // w ≠ x} :=
+    Finset.univ.filter (fun z => K.Adj x z.1) with hA_def
+  set B : Finset {w : V // w ≠ x} :=
+    Finset.univ.filter (fun z => K.Adj y (e.cardIso.iso.toEquiv z).1) with hB_def
+  have hdisj : Disjoint (A \ B) (B \ A) := by
+    rw [Finset.disjoint_left]
+    intro z hzA hzB
+    rw [Finset.mem_sdiff] at hzA hzB
+    exact hzA.2 hzB.1
+  have hcount : e.starErrorCount = (A \ B).card + (B \ A).card := by
+    dsimp [starErrorCount]
+    rw [Fintype.subtype_card]
+    rw [← Finset.card_union_of_disjoint hdisj]
+    congr 1
+    ext z
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and,
+      Finset.mem_union, Finset.mem_sdiff, hA_def, hB_def]
+    unfold StarMismatch
+    tauto
+  have hA_eq : A.card = K.degree x := by
+    rw [hA_def]
+    rw [← SimpleGraph.card_neighborFinset_eq_degree]
+    apply Finset.card_bij (fun (z : {w : V // w ≠ x}) _ => z.1) ?_ ?_ ?_
+    · intro z hz
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hz
+      simpa [SimpleGraph.mem_neighborFinset] using hz
+    · intro z₁ _ z₂ _ h
+      exact Subtype.ext h
+    · intro w hw
+      simp only [SimpleGraph.mem_neighborFinset] at hw
+      have hne : w ≠ x := SimpleGraph.Adj.ne' hw
+      refine ⟨⟨w, hne⟩, ?_, rfl⟩
+      simp [Finset.mem_filter, hw]
+  have hB_eq : B.card = K.degree y := by
+    rw [hB_def]
+    rw [← SimpleGraph.card_neighborFinset_eq_degree]
+    apply Finset.card_bij (fun (z : {w : V // w ≠ x}) _ =>
+      (e.cardIso.iso.toEquiv z).1) ?_ ?_ ?_
+    · intro z hz
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hz
+      simpa [SimpleGraph.mem_neighborFinset] using hz
+    · intro z₁ _ z₂ _ h
+      have : e.cardIso.iso.toEquiv z₁ = e.cardIso.iso.toEquiv z₂ := Subtype.ext h
+      exact e.cardIso.iso.toEquiv.injective this
+    · intro w hw
+      simp only [SimpleGraph.mem_neighborFinset] at hw
+      have hne : w ≠ y := SimpleGraph.Adj.ne' hw
+      refine ⟨e.cardIso.iso.toEquiv.symm ⟨w, hne⟩, ?_, ?_⟩
+      · simp only [Finset.mem_filter, Finset.mem_univ, true_and, Equiv.apply_symm_apply]
+        exact hw
+      · simp
+  have hdeg : K.degree x = K.degree y :=
+    degree_eq_of_card_edgeFinset_eq_of_deleteVert_iso rfl e.cardIso.iso
+  have hAB : A.card = B.card := by rw [hA_eq, hB_eq, hdeg]
+  -- |A \ B| = |B \ A| from |A| = |B|
+  have hsdiff : (A \ B).card = (B \ A).card := by
+    have h1 := Finset.card_sdiff_add_card_eq_card (s := A ∩ B) (t := A)
+      (Finset.inter_subset_left)
+    have h2 := Finset.card_sdiff_add_card_eq_card (s := A ∩ B) (t := B)
+      (Finset.inter_subset_right)
+    have hAB1 : A \ (A ∩ B) = A \ B := by
+      ext z; simp [Finset.mem_sdiff]
+    have hBA1 : B \ (A ∩ B) = B \ A := by
+      ext z; simp [Finset.mem_sdiff]
+    rw [hAB1] at h1
+    rw [hBA1] at h2
+    omega
+  rw [hcount, hsdiff]
+  exact ⟨(B \ A).card, by omega⟩
 
 /-- If the deleted vertex is first-colored, then the first-colored part of the
 deleted card is strictly smaller than the full first color. -/
