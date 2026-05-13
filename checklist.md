@@ -1,8 +1,209 @@
 # Reconstruction Formalization Checklist
 
-This checklist tracks the Lean work suggested by the deck-accounting and
-optimization viewpoint. Items are checked only when the Lean code builds and
-the corresponding theorem or API is actually in place.
+This checklist tracks the Lean work suggested by the deck-accounting,
+optimization, and fixed-host singleton viewpoints. Items are checked only when
+the Lean code builds and the corresponding theorem, API, computation, or
+writeup is actually in place.
+
+## Current Campaign: Fixed-Host Singleton / Local Obstruction
+
+Target theorem:
+
+```lean
+def LowSliceZeroStarPairConjecture (K : SimpleGraph V) (S T : Set V) (a b : V) : Prop :=
+  LowSliceSameDeck K S T a b → LowSliceZeroStarPair K S T a b
+```
+
+Equivalent target:
+
+```lean
+LowSliceSameDeck K S T a b → FixedHostSingletonSolved K S T a b
+```
+
+Current proof posture: refute the local obstruction.  We have already shown
+that the failure of an active zero-star pair is exactly a family of local
+first-error witnesses over two-hole colored cards.  The next autonomous work is
+to make the deck-counting and descent consequences of that obstruction precise.
+
+### A. Baseline And Hygiene
+
+- [x] Verify `lake build Reconstruction.FixedHost`.
+- [x] Verify full `lake build`.
+- [x] Keep `proof_sketch.tex` compiling with `pdflatex`.
+- [x] Remove generated TeX/cache artifacts after verification.
+- [x] Re-run `lake build Reconstruction.FixedHost` after every Lean batch.
+- [x] Re-run `pdflatex -interaction=nonstopmode proof_sketch.tex` after every
+      proof-sketch batch.
+- [x] Keep `Reconstruction/FixedHost.lean` under the line-length/style gate for
+      newly edited lines.
+
+### B. Active Zero-Star Pair Package
+
+- [x] Define chosen card isomorphisms as `FixedHostCardIsoData`.
+- [x] Define deleted-star error and concrete star mismatches.
+- [x] Prove zero star error is equivalent to absence of star mismatches.
+- [x] Prove a zero-star active card match extends to a full fixed-host
+      singleton solution.
+- [x] Prove any full solution restricts to an active zero-star pair.
+- [x] Prove
+      `LowSliceZeroStarPair K S T a b ↔ FixedHostSingletonSolved K S T a b`.
+- [x] Define perfect zero-star matchings and prove they are equivalent to the
+      one-pair formulation.
+
+### C. Formal Local Obstruction
+
+- [x] Define `LowSliceCardFirstError` as a first mismatch plus its two-hole
+      restriction.
+- [x] Define `LowSliceLocalObstruction`.
+- [x] Prove
+      `LowSliceLocalObstruction K S T a b ↔ ¬ LowSliceZeroStarPair K S T a b`.
+- [x] Prove first-error witnesses preserve passive first color.
+- [x] Prove first-error witnesses preserve active/inactive status.
+- [x] Prove every first error is either active-active or inactive-inactive.
+- [x] Define named predicates for active first errors and inactive first errors.
+- [x] Prove the active/inactive case split for `LowSliceLocalObstruction` in a
+      reusable theorem form.
+- [x] Record the same case split in `proof_sketch.tex`.
+
+### D. Make Card-Visible Status Explicit
+
+- [x] Prove finite cardinality lemmas for deleted colors:
+      `Fintype.card {w // w ≠ x ∧ w ∈ S}` differs from `Fintype.card S` exactly
+      according to whether `x ∈ S`.
+- [x] Prove first-color deleted status is visible from a first-color-preserving
+      card isomorphism: in finite hosts, a `FixedHostCardIsoData` forces
+      `x ∈ S ↔ y ∈ S`.
+- [x] Use that lemma to remove the explicit `hFirst` burden from low-slice
+      obstruction statements whenever `[Finite V]`.
+- [x] Add a short English explanation that the passive color status is visible
+      and the deleted star is the only hidden datum.
+
+### E. Low-Slice Equality To Obstruction Data
+
+- [x] Define a chosen low-slice matching with automatically visible first
+      status in finite hosts.
+- [x] From `LowSliceSameDeck`, extract a `LowSliceIsoData` or equivalent
+      chosen matching.
+- [x] Under the no-pair assumption, convert every edge of that chosen matching
+      to a `LowSliceCardFirstError`.
+- [x] Define the total star-error count of a chosen low-slice matching.
+- [x] Define a minimum-error low-slice matching for finite hosts.
+- [x] Prove a minimum-error matching has no zero-error edge exactly under the
+      no-pair assumption.
+
+### F. Descent/Contradiction Campaign
+
+- [x] Split minimum-error obstruction into active-active first errors and
+      inactive-inactive first errors.
+- [ ] Active-active branch:
+      - [x] Formalize the transport/recentering operation that follows an
+            active first error.
+      - [x] Define the active exchange successor and the coherent/noncoherent
+            split for active first errors.
+      - [x] Prove coherent active steps rewrite as two-hole transports deleting
+            matched active pairs.
+      - [x] Define the active exchange relation and its noncoherent subrelation.
+      - [x] Define the active observer-successor relation.
+      - [x] Prove noncoherent active exchange edges are loop-free.
+      - [x] Prove active first-error sources and targets are genuinely distinct
+            from their deleted bases.
+      - [x] Prove every noncoherent active step is a three-distinct-vertex
+            configuration.
+      - [x] Formalize chosen active observer systems.
+      - [x] Prove an all-active obstruction yields a nontrivial finite observer
+            cycle.
+      - [x] Package active observer cycles and prove their consecutive vertices
+            are observer-relation edges.
+      - [x] Split packaged active observer cycles into all-coherent or
+            has-noncoherent-index cases.
+      - [x] Prove a noncoherent index gives a noncoherent correction edge.
+      - [x] Prove the active observer-cycle fork reduces to all-coherent and
+            noncoherent-cycle subforks.
+      - [x] Prove coherent selected active edges carry matched two-hole
+            transports to their observer successors.
+      - [x] Prove all-coherent active cycles carry matched two-hole transports
+            along every cycle edge.
+      - [ ] Prove coherent active steps are removable side-cycle matches, unless
+            they expose a smaller fixed-host obstruction.
+      - [ ] Prove noncoherent active steps assemble into a lowering exchange
+            path or a closed active correction cycle.
+      - [ ] Prove recentering either produces a zero-star pair or strictly
+            lowers total error.
+      - [ ] If lowering fails, extract a closed active first-error cycle.
+      - [ ] Prove a closed active cycle composes to a zero-star pair or a
+            smaller obstruction.
+- [ ] Inactive-inactive branch:
+      - [x] Formalize the complementary two-hole witness produced by an
+            inactive first error.
+      - [x] Split inactive first errors into endpoint-exposing and outer-core
+            residual cases.
+      - [x] Prove non-endpoint-exposing inactive errors are exactly outer-core
+            residuals.
+      - [x] Formalize chosen inactive observer systems and the endpoint/outer
+            fork.
+      - [x] Prove the inactive endpoint/outer fork reduces to all-endpoint and
+            outer-residual subforks.
+      - [ ] Prove restricted Kelly counts see the inactive residual.
+      - [ ] Show a purely inactive residual cannot support a minimum-error
+            obstruction, or isolate the exact counterexample pattern.
+- [ ] Mixed/choice branch:
+      - [x] Prove every positive obstruction is all-active, all-inactive, or
+            genuinely mixed.
+      - [x] Package the strategic fork: active observer cycle, all-inactive
+            endpoint/outer split, or mixed branches.
+      - [x] Prove no-positive-obstruction follows from ruling out the three
+            strategic forks.
+      - [x] Prove no-positive-obstruction follows from ruling out the refined
+            five subforks.
+      - [ ] Show the choice of first mismatch can be made consistently enough
+            for descent.
+      - [ ] If not, formulate the finite selection obstruction explicitly and
+            test it computationally.
+
+### G. Computational Checks
+
+- [x] Implement active zero-star pair search in
+      `research/computational/data/fixed_host_singleton_search.py`.
+- [x] Record `n=5` exhaustive and sampled higher-order evidence in
+      `fixed_host_singleton_n5.txt`.
+- [x] Add a probe that classifies first errors as active-active or
+      inactive-inactive for all minimum-error matches.
+- [x] Search for a no-descent minimum-error obstruction in small finite hosts.
+- [x] If a candidate obstruction appears, dump it as a reproducible fixture.
+      - No positive minimum-error candidate appeared in the exhaustive n=5 atlas
+        run, so there is currently no fixture to dump.
+- [x] If no candidate appears, record the counts and refine the English descent
+      conjecture.
+
+### H. Proof Sketch Maintenance
+
+- [x] Record the active zero-star pair target.
+- [x] Record the first-error localization lemma.
+- [x] Record the formal local obstruction proposition.
+- [x] Add a precise “status visibility” lemma.
+- [x] Add a precise “minimum-error obstruction” definition matching the Lean
+      structure.
+- [x] Prove no-positive-minimum-obstruction is equivalent to the
+      minimum-error-zero route.
+- [x] Add the active-active and inactive-inactive branch lemmas as conjectural
+      waypoints.
+- [ ] When a branch fails, record the exact obstruction and change direction.
+
+### I. Success/Failure Criteria
+
+- [ ] Success: prove `LowSliceZeroStarPairConjecture`.
+- [ ] Success: derive `LowSliceOrbitReconstruction` from the zero-star pair
+      theorem.
+- [ ] Partial success: prove one branch of the local obstruction cannot occur.
+- [ ] Productive failure: produce a concrete finite obstruction to the descent
+      strategy and document why the approach must be strengthened.
+- [ ] Quality gate: no new `sorry`, `lake build` passes, proof sketch compiles,
+      computational artifacts are reproducible.
+
+---
+
+The sections below are older project-wide formalization tracks retained for
+context.
 
 ## 0. Baseline
 

@@ -2591,12 +2591,821 @@ of
 \]
 \end{conjecture}
 
-This is the cleanest current form of the two-slice direct-cancellation
-campaign.  A counterexample would be a nonzero rectangular kernel element:
-two different endpoint defects whose named second deletions across the
-opposite side of the partition are indistinguishable.  That is a much more
-specific obstruction than an arbitrary homology class of the deletion
-complex.
+\begin{conjecture}[Double direct cancellation]
+In the same fixed-host singleton situation, equal colored deletion decks force
+both endpoint cancellations:
+\[
+  H_a\cong H_b,
+  \qquad
+  C_b^a\cong C_a^b.
+\]
+\end{conjecture}
+
+This is stronger than the no-kernel conjecture, and it was supported through
+six host vertices.  It is false in general, however; see the cyclic
+nine-vertex counterexample below.  The right target is therefore orbit
+reconstruction rather than direct endpoint cancellation.
+
+\begin{conjecture}[One-slice orbit reconstruction]
+The low color-size slice alone reconstructs the fixed-host orbit.  Namely, if
+\[
+  \{\!\{H_a\}\!\}+\{\!\{A_t:t\in T\}\!\}
+  =
+  \{\!\{H_b\}\!\}+\{\!\{B_t:t\in T\}\!\},
+\]
+then there is an automorphism of the fixed first-colored host \((K,S)\)
+carrying
+\[
+  T\cup\{a\}
+  \quad\text{to}\quad
+  T\cup\{b\}.
+\]
+Dually, the complementary color-size slice should imply the same orbit
+conclusion.
+\end{conjecture}
+
+\begin{remark}[Direct endpoint isolation is false]
+The stronger one-slice endpoint statement fails on a connected \(9\)-vertex
+fixed host.  Label the vertices by
+\[
+  (i,j)\in \{0,1,2\}\times\{0,1,2\},
+\]
+and let the host be invariant under the cyclic shift \(j\mapsto j+1\).  One
+example has edge set
+\[
+\begin{gathered}
+  05,06,08,13,16,17,24,27,28,\\
+  37,48,56,67,68,78,
+\end{gathered}
+\]
+where \(ij\) denotes the edge between the integer-labelled vertices
+\[
+  0=(0,0),\ 1=(0,1),\ 2=(0,2),\
+  3=(1,0),\ldots,\ 8=(2,2).
+\]
+Take \(S=\emptyset\), \(T=\{1\}\), \(a=0\), and \(b=2\).  The cyclic
+automorphism sends \(T\cup\{a\}=\{0,1\}\) to
+\(T\cup\{b\}=\{1,2\}\), so the full fixed-host decks and the low slices agree.
+Nevertheless
+\[
+  (K-a,S-a,T)\not\cong (K-b,S-b,T).
+\]
+The complementary direct cancellation does hold in this example.  Thus the
+six-vertex evidence was seeing a true small-case phenomenon, not the correct
+general theorem.  Direct cancellation remains useful as a size-drop move when
+available, but it cannot be the main endpoint theorem.
+
+This same example also rules out the tempting shortcut ``low-slice equality
+gives either the direct endpoint match or an internal zero-error edge.''  Here
+\(T=\{1\}\), and the unique automorphism carrying
+\(\{1,2\}=T\cup\{b\}\) to \(\{0,1\}=T\cup\{a\}\) sends \(1\) to \(0\), so no
+solving automorphism fixes the internal deleted \(T\)-vertex.  Thus the
+zero-error edge lemma is a local win condition, but a proof of one-slice orbit
+reconstruction still needs a transport/descent argument that can move the
+error along the path rather than demanding a zero-error internal edge at the
+start.
+\end{remark}
+
+\begin{conjecture}[Active zero-star pair]
+Assume the low color-size slice agrees:
+\[
+  \Deck_{T\cup\{a\}}(K,S,T\cup\{a\})
+  =
+  \Deck_{T\cup\{b\}}(K,S,T\cup\{b\}).
+\]
+Then there exist \(x\in T\cup\{a\}\), \(y\in T\cup\{b\}\), and a colored card
+isomorphism
+\[
+  (K-x,S-x,(T\cup\{a\})-\{x\})
+  \cong
+  (K-y,S-y,(T\cup\{b\})-\{y\})
+\]
+whose deleted-star error from \(x\) to \(y\) is zero and for which
+\(x\in S\iff y\in S\).
+\end{conjecture}
+
+This is currently the cleanest local target.  It is stronger than one-slice
+orbit reconstruction only in presentation, not in spirit: the formalized
+zero-star extension lemma immediately turns such a pair into the desired
+automorphism.  Conversely, any automorphism carrying \(T\cup\{a\}\) to
+\(T\cup\{b\}\) restricts to such a zero-star card pair, so Lean now proves
+that the active zero-star pair condition is equivalent to the fixed-host orbit
+conclusion.  The point is not to strengthen the theorem, but to identify the
+kind of local witness the one-slice deck must reveal.
+
+It also survives the cyclic \(n=9\) example: the active zero-star pairs are
+\((0,1)\) and \((1,2)\), corresponding to the two steps of the cyclic
+automorphism \(0\mapsto1\mapsto2\).  Exhaustive \(n=5\) probing found
+\(24832\) low-slice equal states and \(24832\) active zero-star pairs.  A
+bounded \(n=6\) graph-atlas prefix found \(27922\) low-slice equal states and
+\(27922\) active zero-star pairs, and a bounded \(n=7\) graph-atlas prefix
+found \(49888\) low-slice equal states and \(49888\) active zero-star pairs.
+Sampled random-host probes found \(896/896\) active zero-star pairs at
+\(n=8\) and \(263/263\) at \(n=9\).  In those larger probes, most witnesses
+were internal active pairs rather than the endpoint pair \(a\to b\), which is
+good evidence that the target has the right flexibility.
+
+\begin{definition}[Minimum-error active-card graph]
+Form a bipartite graph \(\Gamma\) with left part \(T\cup\{a\}\) and right part
+\(T\cup\{b\}\).  Put an edge \(x\to y\) when the colored cards
+\[
+  (K-x,S-x,(T\cup\{a\})-\{x\}),\qquad
+  (K-y,S-y,(T\cup\{b\})-\{y\})
+\]
+are isomorphic and \(x\in S\iff y\in S\).  Give this edge weight
+\[
+  \epsilon(x,y)=
+  \min_{\phi:x\to y}
+  \left|\{z\neq x: K(x,z)\not\leftrightarrow K(y,\phi(z))\}\right|,
+\]
+where \(\phi\) ranges over all color-preserving card isomorphisms between
+these two cards.  The zero-error subgraph \(\Gamma_0\) consists of edges of
+weight \(0\).
+\end{definition}
+
+Low-slice equality says that \(\Gamma\) has enough card edges to support a
+perfect matching of the active deletion deck.  The active zero-star pair
+conjecture says the stronger-looking but equivalent statement
+\[
+  E(\Gamma_0)\neq\emptyset.
+\]
+Thus a minimal counterexample is exactly a low-slice deck equality whose
+minimum-error active-card graph has no zero edge.  This is a clean local
+obstruction: every visible active card match exists only after changing at
+least one adjacency incident to the deleted vertex.  The remaining proof
+burden is to show that such a positive minimum-error obstruction can be
+recentered at one of its first changed adjacencies to produce a strictly
+smaller active-card obstruction, or else to reduce the total error of the
+chosen deck matching.
+
+For finite hosts, the condition \(x\in S\iff y\in S\) is not really an extra
+mystery: a color-preserving card isomorphism sees the number of first-colored
+vertices left on the card, so it can distinguish whether the deleted vertex
+belonged to \(S\).  The genuinely hidden data is the deleted star, i.e. the
+adjacency vector from the missing vertex into its card.
+
+\begin{lemma}[Passive status is card-visible]
+Let \(K\) be finite.  If
+\[
+  \phi:(K-x,S-x,U-x)\cong(K-y,S-y,U'-y)
+\]
+preserves the first color on the deleted cards, then
+\[
+  x\in S\iff y\in S.
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The isomorphism identifies the first-colored vertices surviving in the two
+cards.  If \(x\in S\), the left card has one fewer first-colored vertex than
+\(S\); if \(x\notin S\), it has the same number.  The same dichotomy holds on
+the right.  Equal surviving counts force the same deleted-vertex status.
+Lean now formalizes the cardinality lemmas as
+\[
+\begin{array}{l}
+\texttt{FixedHostCardIsoData.deletedFirstColor\_card\_lt\_of\_mem},\\
+\texttt{FixedHostCardIsoData.deletedFirstColor\_card\_eq\_of\_not\_mem},
+\end{array}
+\]
+and the visibility statement as
+\[
+  \texttt{FixedHostCardIsoData.firstColor\_deleted\_status\_iff}.
+\]
+\end{proof}
+
+\begin{lemma}[First-error localization]
+Assume there is no active zero-star pair.  Let \(x\in T\cup\{a\}\),
+\(y\in T\cup\{b\}\), and let
+\[
+  \phi:(K-x,S-x,(T\cup\{a\})-\{x\})
+  \cong
+  (K-y,S-y,(T\cup\{b\})-\{y\})
+\]
+be any color-preserving active card isomorphism with \(x\in S\iff y\in S\).
+Then there is a surviving vertex \(z\neq x\) such that
+\[
+  K(x,z)\not\leftrightarrow K(y,\phi(z)).
+\]
+Moreover, deleting \(z\) as well gives a common two-hole colored card
+\[
+  (K-\{x,z\},S-\{x,z\},(T\cup\{a\})-\{x,z\})
+  \cong
+  (K-\{y,\phi(z)\},S-\{y,\phi(z)\},(T\cup\{b\})-\{y,\phi(z)\}).
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+If no such \(z\) existed, the card isomorphism would preserve the entire
+deleted star of \(x\), hence would extend to an automorphism of \(K\) carrying
+\(x\) to \(y\) and \(T\cup\{a\}\) to \(T\cup\{b\}\).  That would be an active
+zero-star pair.  The two-hole statement is just the restriction of \(\phi\) to
+the vertices other than \(x\) and \(z\).  This localization lemma is now
+formalized in Lean: a no-pair obstruction produces an explicit star mismatch
+and a two-hole colored isomorphism over it.
+\end{proof}
+
+Equivalently, Lean proves the normal form
+\[
+  \text{no active zero-star pair}
+  \quad\Longleftrightarrow\quad
+  \text{every active card match has a first star mismatch}.
+\]
+Thus the local obstruction is no longer a vague absence statement.  It is a
+family of concrete two-hole witnesses, one above every visible active card
+edge.  The next step is to show that a minimal such family cannot be closed
+under the active deck matching: following first mismatches either reaches a
+zero-star pair or creates a strictly smaller two-hole obstruction.
+
+\begin{proposition}[Formal local obstruction]
+Define \(\mathcal L(K,S,T,a,b)\) to be the assertion that every active card
+isomorphism
+\[
+  \phi:(K-x,S-x,(T\cup\{a\})-\{x\})
+  \cong
+  (K-y,S-y,(T\cup\{b\})-\{y\})
+\]
+with \(x\in S\iff y\in S\) has a first-error witness \(z\neq x\), together
+with the induced two-hole colored isomorphism after also deleting \(z\) and
+\(\phi(z)\).  Then
+\[
+  \mathcal L(K,S,T,a,b)
+  \quad\Longleftrightarrow\quad
+  \text{there is no active zero-star pair}.
+\]
+Moreover, each localized first-error witness preserves both colors:
+\[
+  z\in S\iff \phi(z)\in S,\qquad
+  z\in T\cup\{a\}\iff \phi(z)\in T\cup\{b\}.
+\]
+Thus every first error is either active-active or inactive-inactive; there are
+no cross-color local errors.
+\end{proposition}
+
+\begin{proof}[Lean status]
+This proposition is now formalized by the Lean declarations
+\[
+\begin{array}{l}
+\texttt{LowSliceLocalObstruction},\\
+\texttt{LowSliceZeroStarPair.localObstruction\_iff\_no\_pair}.
+\end{array}
+\]
+The individual localized witnesses are packaged as
+\texttt{LowSliceCardFirstError}.  The color transport facts are formalized as
+\[
+\begin{array}{l}
+\texttt{LowSliceCardFirstError.sourceFirst\_iff\_targetFirst},\\
+\texttt{LowSliceCardFirstError.sourceActive\_iff\_targetActive},\\
+\texttt{LowSliceCardFirstError.active\_or\_inactive}.
+\end{array}
+\]
+\end{proof}
+
+\begin{remark}[Chosen low-slice matching]
+The low-slice equality is existential, but in the formal campaign we can choose
+a concrete matching of the active deletion deck.  Lean packages this as
+\[
+\begin{array}{l}
+\texttt{LowSliceIsoData.ofSameDeck},\\
+\texttt{LowSliceIsoData.first\_status},\\
+\texttt{LowSliceIsoData.firstError\_of\_no\_pair}.
+\end{array}
+\]
+Thus, over finite hosts, a low-slice deck equality plus the no-pair assumption
+produces a first-error witness above every edge of the chosen matching without
+requiring any separate passive-color-status hypothesis.
+\end{remark}
+
+\begin{corollary}[Active/inactive split]
+The formal local obstruction is equivalent to the following split version: above
+every visible active card edge, there is either an active-active first error
+\[
+  z\in T\cup\{a\},\qquad \phi(z)\in T\cup\{b\},
+\]
+or an inactive-inactive first error
+\[
+  z\notin T\cup\{a\},\qquad \phi(z)\notin T\cup\{b\}.
+\]
+There is no mixed case.
+\end{corollary}
+
+\begin{proof}[Lean status]
+This is formalized as
+\[
+\begin{array}{l}
+\texttt{LowSliceCardFirstError.Active},\\
+\texttt{LowSliceCardFirstError.Inactive},\\
+\texttt{LowSliceLocalSplitObstruction},\\
+\texttt{LowSliceLocalObstruction.iff\_split}.
+\end{array}
+\]
+\end{proof}
+
+\begin{definition}[Formal minimum-error obstruction]
+For a chosen low-slice matching \(M\), define its total star error by
+\[
+  E(M)=\sum_{x\in T\cup\{a\}}
+  \left|\{z\neq x:K(x,z)\not\leftrightarrow K(Mx,Mz)\}\right|.
+\]
+A minimum-error matching is a chosen low-slice matching whose total star error
+is minimal among all chosen low-slice matchings.  In Lean this is represented
+by
+\[
+\begin{array}{l}
+\texttt{FixedHostCardIsoData.starErrorCount},\\
+\texttt{LowSliceIsoData.totalStarErrorCount},\\
+\texttt{LowSliceMinimumErrorMatching}.
+\end{array}
+\]
+The formal theorem
+\[
+  \texttt{LowSliceMinimumErrorMatching.noZeroStarEdge\_iff\_no\_pair}
+\]
+says that, for a minimum-error matching, having no zero-star edge is equivalent
+to the no-active-zero-star-pair obstruction.  Moreover
+\[
+  \texttt{LowSliceMinimumErrorMatching.firstError\_active\_or\_inactive\_of\_no\_pair}
+\]
+gives the branch split above each edge of such an obstruction.
+
+In the active branch, the first-error witness also gives a formal recentering
+operation.  If the first error above \(x\mapsto y\) occurs at an active
+surviving vertex \(z\), then \(z\in T\cup\{a\}\) and \(\phi(z)\in T\cup\{b\}\).
+Lean packages this as
+\[
+\begin{array}{l}
+\texttt{LowSliceMinimumErrorMatching.ActiveFirstError.source},\\
+\texttt{LowSliceMinimumErrorMatching.ActiveFirstError.target},\\
+\texttt{LowSliceMinimumErrorMatching.ActiveFirstError.recenteredTwoHoleIso}.
+\end{array}
+\]
+This is exactly the two-hole transport one would need for a descent or splice
+argument.  The missing mathematical step is to upgrade, splice, or compose this
+two-hole transport so that it either yields a zero-star pair or lowers total
+star error.
+
+The active branch now has a more precise exchange interpretation.  If an active
+first error above \(x\mapsto Mx\) points at an active source \(z\) and active
+target \(z'\), define the successor of the error to be
+\[
+  \sigma(x,E)=M^{-1}(z').
+\]
+There are then two cases.
+\[
+\begin{array}{ll}
+\text{coherent:} & z=\sigma(x,E),\\
+\text{noncoherent:} & z\neq \sigma(x,E).
+\end{array}
+\]
+The coherent case says that the first-error target is already matched to its
+source by the chosen minimum matching.  This should be a side-cycle or
+self-contained two-hole defect, and the intended lemma is that it can be
+removed unless it exposes a smaller fixed-host obstruction.  The noncoherent
+case is the genuine alternating exchange step: it points from the current
+matched edge to a different matched edge.  If every productive local lowering
+move fails, these noncoherent steps should assemble into a closed active
+correction cycle.
+
+Lean records exactly this successor/coherence structure as
+\[
+\begin{array}{l}
+\texttt{LowSliceMinimumErrorMatching.ActiveFirstError.nextLeft},\\
+\texttt{LowSliceMinimumErrorMatching.ActiveFirstError.Coherent},\\
+\texttt{LowSliceMinimumErrorMatching.ActiveFirstError.Noncoherent},\\
+\texttt{LowSliceMinimumErrorMatching.ActiveFirstError.coherentTwoHoleIso},\\
+\texttt{LowSlicePositiveMinimumObstruction.ActiveTransportStep},\\
+\texttt{LowSlicePositiveMinimumObstruction.ActiveExchangeRel},\\
+\texttt{LowSlicePositiveMinimumObstruction.ActiveNoncoherentRel}.
+\end{array}
+\]
+Inside the \(\texttt{ActiveFirstError}\) namespace, the coherent-target theorem
+says that a coherent active target is exactly the matched mate of the active
+source, so \(\texttt{coherentTwoHoleIso}\) is a genuine two-hole transport
+between matched active pairs.  This is the formal side-cycle shape.
+One should not confuse this with immediate removability: the defect is still
+seen from the card deleting \(x\), and Lean records the genuine separation
+\[
+  z\neq x,\qquad z'\neq Mx
+\]
+as \(\texttt{source\_ne\_base}\) and \(\texttt{target\_ne\_baseTarget}\).
+It also proves \(\sigma(x,E)\neq x\).  Thus the coherent case is a matched-pair
+two-hole defect witnessed from a third position, not an automatic cancellation;
+and the noncoherent case is even stricter, since
+\(\texttt{three\_distinct\_of\_noncoherent}\) says that the base \(x\), source
+\(z\), and successor \(\sigma(x,E)\) are all distinct.
+There are now two directed graphs naturally attached to active errors.  The
+relation \(\texttt{ActiveExchangeRel}\) has edge
+\[
+  z\longrightarrow M^{-1}(z')
+\]
+for each active first-error witness; this is the correction graph suggested by
+the mismatched image of the source.  The relation
+\(\texttt{ActiveObserverRel}\) has edge
+\[
+  x\longrightarrow M^{-1}(z'),
+\]
+which follows the deleted card from which the defect was observed.  Both
+relations are loop-free in their useful parts.  Lean records the elementary
+consequence
+\[
+  \texttt{LowSlicePositiveMinimumObstruction.activeNoncoherentRel\_ne},
+\]
+so noncoherent correction edges always connect distinct active vertices; it
+also proves the analogous observer-ne theorem.
+
+If every edge of a positive obstruction admits an active branch, we may choose
+one active first-error witness above each edge.  This gives an
+\(\texttt{ActiveObserverSystem}\), i.e. a self-map
+\[
+  \nu:T\cup\{a\}\to T\cup\{a\},\qquad
+  \nu(x)=M^{-1}(z'_x).
+\]
+The separation theorem gives \(\nu(x)\neq x\) for every \(x\).  Since the active
+slice is finite and nonempty, the generic finite-dynamics lemma
+\[
+  \texttt{exists\_positive\_iterate\_eq\_self\_of\_finite}
+\]
+implies that \(\nu\) has a nontrivial periodic orbit.  Lean packages this as
+\[
+\begin{array}{l}
+\texttt{LowSlicePositiveMinimumObstruction.ActiveObserverSystem},\\
+\texttt{ActiveObserverSystem.exists\_observerCycle},\\
+\texttt{exists\_activeObserverCycle\_of\_allActiveBranches},\\
+\texttt{LowSlicePositiveMinimumObstruction.ActiveObserverCycle}.
+\end{array}
+\]
+Thus the all-active branch really does reduce to a closed observer cycle.  The
+remaining question is whether that observer cycle can be spliced to lower
+\(E(M)\), or whether it composes into a zero-star pair.  Lean also proves that
+each consecutive pair on the packaged cycle is an actual observer-relation edge
+(\(\texttt{ActiveObserverCycle.edge\_at}\)) and that the final edge returns to
+the base (\(\texttt{ActiveObserverCycle.last\_edge\_to\_base}\)).
+The cycle itself has a second split:
+\[
+\begin{array}{l}
+\texttt{ActiveObserverCycle.allCoherent\_or\_hasNoncoherent},\\
+\texttt{ActiveObserverCycle.noncoherentCorrectionEdge\_at}.
+\end{array}
+\]
+So a closed active observer cycle is either entirely coherent, in which case it
+has the shape of a removable side cycle, or it contains a noncoherent index,
+which supplies a genuine correction edge from the defect source to the next
+observer vertex.
+Lean names the two active subforks
+\[
+\begin{array}{l}
+\texttt{NoAllCoherentActiveCycleFork},\\
+\texttt{NoNoncoherentActiveCycleFork},
+\end{array}
+\]
+and proves
+\[
+  \texttt{NoActiveObserverCycleFork.of\_no\_active\_cycle\_subforks}.
+\]
+Thus the active branch has split into two precise no-go statements: no purely
+coherent side cycle, and no observer cycle carrying a noncoherent correction
+edge.
+For the all-coherent subfork, Lean now proves the side-cycle transport
+available on each edge:
+\[
+\begin{array}{l}
+\texttt{ActiveObserverSystem.coherentMatchedTwoHoleIsoAt},\\
+\texttt{ActiveObserverCycle.coherentMatchedTwoHoleIso\_at}.
+\end{array}
+\]
+Concretely, if \(x_{i+1}=\nu(x_i)\) and the selected witness at \(x_i\) is
+coherent, then there is a two-colored isomorphism
+\[
+  K-\{x_i,x_{i+1}\}
+  \cong
+  K-\{Mx_i,Mx_{i+1}\}
+\]
+with the appropriate first and second colors.  Hence an all-coherent active
+cycle is literally a cycle of matched two-hole transports.  The next missing
+lemma is the side-cycle removal lemma: such a closed coherent transport cycle
+should either splice to reduce total star error or expose a smaller fixed-host
+obstruction.
+
+Thus the next purely mathematical lemma is no longer vague descent.  It is:
+in a positive minimum-error obstruction, coherent active steps are removable,
+and noncoherent active steps cannot form an essential closed correction cycle
+without either lowering \(E(M)\) or producing an active zero-star pair.
+
+The inactive branch has a parallel split.  An inactive first-error witness
+points from a source in \(O\cup\{b\}\) to a target in \(O\cup\{a\}\), where
+\(O=V\setminus(T\cup\{a,b\})\).  It is endpoint-exposing if the source is
+\(b\) or the target is \(a\), and it is an outer residual if both source and
+target lie in \(O\).  Lean records this in the
+\(\texttt{InactiveFirstError}\) namespace as
+\[
+\begin{array}{l}
+\texttt{EndpointExposing},\\
+\texttt{OuterResidual},\\
+\texttt{endpointExposing\_or\_outerResidual}.
+\end{array}
+\]
+The mathematical hope is that endpoint-exposing inactive errors are visible to
+restricted Kelly counts involving the distinguished endpoints, while a purely
+outer residual is a smaller fixed-host obstruction living away from the switch
+endpoints.  The theorem
+\(\texttt{not\_endpointExposing\_iff\_outerResidual}\) records that, once
+endpoint exposure is ruled out, this outer residual is the only remaining
+inactive case.
+
+Similarly, if every edge admits an inactive branch, Lean chooses an
+\(\texttt{InactiveObserverSystem}\) and proves that the selected witnesses are
+either endpoint-exposing everywhere or include an explicit outer residual:
+\[
+\begin{array}{l}
+\texttt{InactiveObserverSystem.allEndpointExposing\_or\_hasOuterResidual},\\
+\texttt{exists\_inactiveObserverSystem\_of\_allInactiveBranches}.
+\end{array}
+\]
+It also names the inactive subforks
+\[
+\begin{array}{l}
+\texttt{NoAllEndpointExposingInactiveFork},\\
+\texttt{NoOuterResidualInactiveFork},
+\end{array}
+\]
+with reduction theorem
+\[
+  \texttt{NoInactiveEndpointOuterFork.of\_no\_inactive\_subforks}.
+\]
+
+Combining the active and inactive choices gives the current formal strategic
+fork:
+\[
+  \texttt{LowSlicePositiveMinimumObstruction.strategy\_fork}.
+\]
+Every positive minimum-error obstruction yields one of:
+\[
+\begin{array}{ll}
+\text{(A)} & \text{a nontrivial active observer cycle},\\
+\text{(I)} & \text{an all-inactive endpoint/outer split},\\
+\text{(M)} & \text{genuinely mixed active and inactive branches}.
+\end{array}
+\]
+So the problem has been reduced to ruling out these three concrete obstruction
+types.  Lean records the exact reduction as
+\[
+\begin{array}{l}
+\texttt{NoActiveObserverCycleFork},\\
+\texttt{NoInactiveEndpointOuterFork},\\
+\texttt{NoMixedBranchFork},\\
+\texttt{NoLowSlicePositiveMinimumObstruction.of\_no\_strategy\_forks}.
+\end{array}
+\]
+Thus a proof of the three branch no-go theorems would prove the
+minimum-error-zero route, and hence the zero-star-pair route, by the earlier
+equivalence.
+After splitting the active and inactive branches further, Lean also proves the
+refined five-branch reduction
+\[
+  \texttt{NoLowSlicePositiveMinimumObstruction.of\_no\_refined\_forks}.
+\]
+The five no-go targets are:
+\[
+\begin{array}{ll}
+\text{(A1)} & \text{no all-coherent active observer cycle},\\
+\text{(A2)} & \text{no active observer cycle with a noncoherent correction edge},\\
+\text{(I1)} & \text{no all-inactive endpoint-exposing system},\\
+\text{(I2)} & \text{no all-inactive outer-residual system},\\
+\text{(M)} & \text{no genuinely mixed active/inactive obstruction}.
+\end{array}
+\]
+
+The computational minimum-error probe sharpens the picture.  Exhaustively over
+the \(n=5\) graph-atlas hosts, all \(24832\) low-slice equal states had minimum
+total star error \(0\).  A bounded \(n=6\) graph-atlas run likewise found
+\(27922\) low-slice equal states and \(27922\) minimum-total-zero states.  There
+were no positive minimum-error states in these probes and hence no finite
+no-descent fixture to inspect.  This does not prove the descent theorem, but it
+changes the conjectural shape: the hoped-for theorem is not merely that a
+positive minimum obstruction descends, but perhaps that low-slice equality
+already forces minimum total star error \(0\).
+
+Lean now proves the exact reduction.  Low-slice equality always admits a
+minimum-error matching, by applying the well-ordering principle to the set of
+natural total-error values:
+\[
+  \texttt{LowSliceMinimumErrorMatching.exists\_of\_sameDeck}.
+\]
+For such a matching,
+\[
+  E(M)=0
+  \quad\Longleftrightarrow\quad
+  \text{there is an active zero-star pair},
+\]
+formalized as
+\[
+  \texttt{LowSliceMinimumErrorMatching.totalStarErrorCount\_eq\_zero\_iff\_pair}.
+\]
+Thus the current best target is the minimum-error-zero conjecture:
+\[
+  \text{low-slice equality}\quad\Longrightarrow\quad
+  \min_M E(M)=0.
+\]
+Lean packages this route as
+\[
+\begin{array}{l}
+\texttt{LowSliceMinimumErrorZeroConjecture},\\
+\texttt{LowSliceZeroStarPairConjecture.of\_minimumErrorZero}.
+\end{array}
+\]
+It also packages the exact failure object:
+\[
+\begin{array}{l}
+\texttt{LowSlicePositiveMinimumObstruction},\\
+\texttt{LowSlicePositiveMinimumObstruction.nonempty\_iff\_not\_minimumErrorZero},\\
+\texttt{NoLowSlicePositiveMinimumObstruction},\\
+\texttt{NoLowSlicePositiveMinimumObstruction.iff\_minimumErrorZero}.
+\end{array}
+\]
+Such an obstruction automatically has no zero-star pair, no zero-star edge in
+its minimum matching, and an active/inactive first-error split above every
+matched edge.
+\end{definition}
+
+The one-slice computational probe still supports the orbit version through the
+exhaustive six-vertex atlas scan: low-slice equality, complementary-slice
+equality, full deck equality, and fixed-host orbit success have exactly the
+same state count.  A further seven-vertex atlas scan with \(S=\emptyset\)
+checked \(1403136\) singleton states.  It found \(143488\) exact low-slice
+equalities and no one-slice orbit failures.  Random NetworkX probes on
+eight- and nine-vertex hosts also found no failures in \(400000\) additional
+states.
+
+The same six-vertex scan found that this common count is also exactly the
+number of singleton pairs in the same orbit under \(\operatorname{Aut}(K,S)\).
+This suggests the surviving factorization of the proof:
+\[
+  \text{one-slice equality}
+  \Longrightarrow
+  T\cup\{a\}\sim_{\operatorname{Aut}(K,S)}T\cup\{b\}.
+\]
+This is a reconstruction statement for a marked deletion deck.  It is sharper
+than the original rectangular no-kernel claim, but it does not force the
+specific direct endpoint cards.
+
+\begin{lemma}[Restricted Kelly principle for a marked deletion deck]
+Let \(X=(K,S,U)\) be a two-colored fixed-host graph, and let
+\(\Deck_U(X)\) be the multiset of cards obtained by deleting only vertices of
+the second color \(U\).  For any two-colored pattern \(P\) using
+\(s<|U|\) second-colored vertices, the number of induced colored copies of
+\(P\) in \(X\) is determined by \(\Deck_U(X)\).
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Double-count pairs \((u,\iota)\), where \(u\in U\) and \(\iota\) is an induced
+colored copy of \(P\) in \(X-u\).  A fixed copy of \(P\) in \(X\) avoids exactly
+\(|U|-s\) vertices of \(U\).  Hence
+\[
+  \sum_{u\in U} N_P(X-u)=(|U|-s)N_P(X).
+\]
+Since \(|U|-s\neq 0\), the marked deletion deck determines \(N_P(X)\).
+\end{proof}
+
+Apply this with \(U=T\cup\{a\}\).  The endpoint card \(H_a\) uses only
+\(|U|-1\) second-colored vertices, so one-slice equality forces the type
+\(H_a\) to occur on the \(b\)-side.  If it does not occur as \(H_b\), it must
+occur as some \(B_t\), producing the first edge of a type-flow path.  Iterating
+gives the shortest path
+\[
+  H_a=Y_0\to Y_1\to\cdots\to Y_r=H_b.
+\]
+Thus the only information a nontrivial path can hide from the one-slice deck is
+the extension profile of the single deleted second-colored vertex.  A proof of
+one-slice orbit reconstruction should show that transporting this hidden
+extension profile around a shortest path either produces a fixed-host
+automorphism carrying \(T\cup\{a\}\) to \(T\cup\{b\}\), or creates a smaller
+centered-extension obstruction.
+
+\begin{definition}[Low-slice transport path]
+A low-slice transport path is a shortest type-flow path
+\[
+  H_a=Y_0\to Y_1\to\cdots\to Y_r=H_b
+\]
+together with choices of colored card isomorphisms realizing each equality
+along the path.  Equivalently, it is a sequence of deleted vertices
+\[
+  x_0=a,\quad x_1,\ldots,x_r\in T,\quad x_{r+1}=b
+\]
+and card isomorphisms between the successive punctured fixed hosts obtained by
+deleting \(x_i\) and \(x_{i+1}\), with the active color transported from
+\(T\cup\{a\}\) toward \(T\cup\{b\}\).
+\end{definition}
+
+\begin{lemma}[A zero-error transport edge solves the orbit problem]
+Suppose some edge on a low-slice transport path is realized by a colored card
+isomorphism
+\[
+  (K-x,S-x,(T\cup\{a\})-\{x\})
+  \cong
+  (K-y,S-y,(T\cup\{b\})-\{y\})
+\]
+where \(x\in T\cup\{a\}\), \(y\in T\cup\{b\}\), the deleted vertices have the
+same \(S\)-status, and the star-extension error from \(x\) to \(y\) is zero.
+Then \(T\cup\{a\}\) and \(T\cup\{b\}\) lie in the same
+\(\operatorname{Aut}(K,S)\)-orbit.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The zero-error condition says exactly that the card isomorphism extends across
+the deleted vertex by sending \(x\) to \(y\).  The extension is an automorphism
+of \(K\) preserving \(S\).  The card isomorphism preserves the displayed second
+colors away from the deleted vertices, and the hypotheses \(x\in T\cup\{a\}\),
+\(y\in T\cup\{b\}\) handle the reinserted vertex.  Hence the extension carries
+\(T\cup\{a\}\) to \(T\cup\{b\}\).
+
+This lemma has now been formalized in Lean as the general card-extension
+result for chosen fixed-host card isomorphisms, with the previous same-deleted
+vertex transport edge as a special case.  The formal statement makes the
+hidden condition completely explicit: a chosen punctured-card isomorphism must
+transport the deleted vertex's neighbor set to the neighbor set of the target
+deleted vertex.  Lean then extends that bijection by sending the deleted source
+vertex to the deleted target vertex and checks both the graph automorphism
+condition and the two color-preservation conditions.
+\end{proof}
+
+Lean also proves the matching-level version: a full automorphism induces a
+perfect zero-star matching of the whole active deletion deck, and any such
+matching gives a zero-star pair by choosing the card over \(a\).  Hence the
+orbit conclusion, the active zero-star pair, and the existence of a perfect
+zero-star matching are three equivalent formulations of the same target.  The
+advantage of the matching formulation is tactical: low-slice equality already
+provides a perfect matching of card types, so the remaining question is whether
+one can lower its total star error to zero.
+
+\begin{lemma}[Every transport edge is erroneous in a minimal orbit failure]
+In a minimal counterexample to one-slice orbit reconstruction, no edge on any
+low-slice transport path admits a zero-error realization.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+If a transport edge had a zero-error realization, the previous lemma would
+give an automorphism of \((K,S)\) carrying \(T\cup\{a\}\) to \(T\cup\{b\}\),
+contradicting orbit failure.
+\end{proof}
+
+\begin{lemma}[First-error descent for transport]
+There is no minimal one-slice orbit failure in which every transport edge has
+unavoidable nonzero star-extension error.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Choose a shortest transport path, then among those minimize the total
+star-error support over the chosen card isomorphisms.  Pick an edge whose
+nonzero star error is minimal.  Recenter at its common punctured card and
+regard the failed extension across the deleted vertex as a smaller colored
+centered-extension problem.  If the recentered problem has a zero-error
+representative, replace the offending transport edge and lower the error
+potential.  If it has no zero-error representative, it is a smaller
+counterexample to the centered-extension theorem.  Minimality forbids both
+outcomes.
+\end{proof}
+
+\begin{proposition}[Transport integration proves one-slice orbit reconstruction]
+Assume the first-error descent lemma for all smaller centered-extension
+states.  Then low-slice equality implies fixed-host orbit success.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+Restricted Kelly gives at least one low-slice transport path from \(H_a\) to
+\(H_b\).  In a minimal counterexample, choose it shortest and then
+minimum-error.  If some edge is zero-error, the zero-error edge lemma gives
+orbit success.  If no edge is zero-error, first-error descent gives a smaller
+centered-extension obstruction.  Both contradict minimality.
+\end{proof}
+
+One should not try to prove the stronger statement that the whole low
+type-flow graph is trivial.  It is false in small solved states.  For example,
+the \(n=5\) exhaustive probe found \(1152\) equal-deck singleton states with
+some internal \(T\)-edge satisfying \(A_t\not\cong B_t\), even though the
+endpoint cancellation \(H_a\cong H_b\) always held.  Moreover, the endpoint
+card type itself can coincide with internal detour cards in solved states; in
+the same \(n=5\) probe this happened in \(6472\) states.  Thus the proof has to
+distinguish orbit success from endpoint cancellation and from uniqueness of the
+endpoint type.  Harmless internal circulation, even circulation incident to the
+endpoint card type, may still exist.
+
+The natural proof attempt is a paired minimality argument.  Suppose, for
+example, that the low endpoint defect \([H_b]-[H_a]\) is nonzero.  Its named
+\(O\)-boundary is the rectangular chain.  If the complementary endpoint defect
+vanishes, then the rectangular identity says this boundary is zero, so the low
+defect is a named deletion cycle.  If the complementary endpoint defect is
+nonzero, then the two nonzero endpoint defects share the same rectangular
+boundary.  In both cases, choose a smallest colored separator for one endpoint
+defect and run the support-escalation argument.  The computation suggests
+that the terminal case is impossible even without assuming the other endpoint
+defect is nonzero.
+
+The no-kernel conjecture remains the minimal statement needed for the
+size-drop induction.  A counterexample would be a nonzero rectangular kernel
+element: two different endpoint defects whose named second deletions across
+the opposite side of the partition are indistinguishable.  The double direct
+cancellation conjecture says that even this weaker kind of endpoint defect
+cannot occur.  Either obstruction is much more specific than an arbitrary
+homology class of the deletion complex.
 
 The important nuance is that the rectangular chain is the common image of two
 endpoint defects, not the defect itself.  A moment of the \(D_{t,o}^\ast\)
@@ -2615,8 +3424,9 @@ vertex of \(O\), then the matching term in
 singleton obstruction, a path shortening, or a direct cancellation.  Hence,
 in a minimal unresolved counterexample, every such low separator must use all
 vertices of \(O\).  Dually, every complementary separator must use all
-vertices of \(T\).  These two full-support requirements are incompatible with
-the original one-vertex deck equality.
+vertices of \(T\).  If the support can then be escalated across the other
+side, the only nonproductive exposed terms left are terminal two-hole card
+imbalances.
 \end{conjecture}
 
 This is now the best candidate for the ``make or break'' lemma.  If it is
@@ -2634,9 +3444,10 @@ isomorphism, and therefore should be exactly the kind of smaller detour from
 which we can extract a path shortening or a size drop.  If no such extraction
 is possible, the first visible difference must be supported on all of
 \(O\).  The dual argument forces the complementary first difference to be
-supported on all of \(T\).  A genuine kernel would have to place the first
-visible difference simultaneously on both full supports.  That is a very
-small corner of the search space, and it is the corner to attack next.
+supported on all of \(T\).  This is not yet a contradiction by itself; it is a
+support-escalation step.  A genuine kernel would have to push every
+nonterminal visible difference into a whole two-hole card imbalance.  That is
+a very small corner of the search space, and it is the corner to attack next.
 
 \begin{remark}[Candidate proof of the squeeze]
 Assume a minimal counterexample to the fixed-host singleton theorem in which
@@ -2667,9 +3478,10 @@ both endpoint cancellations fail.
   Hence the detecting copy must use all of \(O\).
 
   \item The dual argument forces the complementary detecting copy to use all
-  of \(T\).  These two full-support detectors together determine a proper
-  colored pattern in the original full hosts \(X_a,X_b\), contradicting their
-  equal deck-reconstructed proper pattern counts.
+  of \(T\).  If either detector still omits a vertex on the other side, the
+  previous step applies again and gives a splice.  Thus an unresolved exposed
+  term must be terminal: it is an imbalance of entire two-hole card types, not
+  a smaller pattern-count separator.
 \end{enumerate}
 
 The fragile step is the second one: a matched two-hole card must really
@@ -3069,9 +3881,10 @@ The rectangular chain
 \]
 need not be the zero chain.  Its nonzero coefficients are exposed
 rectangular boundary terms.  After removing all exposed terms that can be
-used for a full-support squeeze or a smaller obstruction, a remaining
-balanced residual subchain has, for each isomorphism class of two-hole cards,
-equally many positive and negative occurrences.
+used for a support-escalation squeeze, a terminal-exposure obstruction, or a
+smaller obstruction, a remaining balanced residual subchain has, for each
+isomorphism class of two-hole cards, equally many positive and negative
+occurrences.
 
 On such a balanced residual subchain, choose a bijective matching between
 the positive occurrences \(D_{t,o}^a\) and the negative occurrences
@@ -3214,11 +4027,434 @@ cancellation in the complementary path.  Rectangular matches outside the
 active rectangle may be harmless side cycles; they should not be part of the
 minimum-error obstruction.
 
+\begin{definition}[Exposed and residual active terms]
+For a colored two-hole isomorphism class \(Y\), define its active rectangular
+coefficient by
+\[
+  c_{\rm act}(Y)
+  =
+  \#\{(i,j):D_{t_i,o_j}^a\cong Y\}
+  -
+  \#\{(i,j):D_{t_i,o_j}^b\cong Y\}.
+\]
+If \(c_{\rm act}(Y)\neq 0\), call \(Y\) an exposed active type.  The balanced
+active residual is what remains after all exposed active types have either
+been converted into a size drop, a path shortening, an off-path side
+absorption, or a terminal-exposure obstruction.
+\end{definition}
+
+\begin{definition}[Active isolation]
+The full rectangular coefficient of a two-hole type \(Y\) is
+\[
+  c_{\rm full}(Y)
+  =
+  \#\{(t,o)\in T\times O:D_{t,o}^a\cong Y\}
+  -
+  \#\{(t,o)\in T\times O:D_{t,o}^b\cong Y\}.
+\]
+An exposed active type is actively isolated if its active imbalance cannot be
+cancelled by occurrences outside the chosen shortest low and complementary
+paths without creating a shorter path, a direct endpoint cancellation, or a
+smaller fixed-host obstruction.
+\end{definition}
+
+\begin{conjecture}[Active isolation lemma]
+In a minimal fixed-host singleton counterexample with shortest chosen paths,
+every exposed active type is either productive, in the sense above, or actively
+isolated.  Equivalently, an inactive occurrence that cancels an active
+two-hole imbalance is not harmless: matching the active occurrence to that
+inactive occurrence gives a path replacement, a removable side cycle, a direct
+endpoint cancellation, or a smaller obstruction.
+\end{conjecture}
+
+\begin{remark}[Why active isolation is a real extra issue]
+The active rectangle is chosen from two shortest paths; it is not the whole
+rectangle \(T\times O\).  Therefore an active coefficient \(c_{\rm act}(Y)\)
+can be nonzero even when the full coefficient \(c_{\rm full}(Y)\) is zero,
+because the compensating terms live off the two paths.  The proof cannot
+simply declare an exposed active type to be a deck-count contradiction.  It
+must first show that off-path compensation either shortens the chosen paths or
+is a side cycle that can be removed from the obstruction.  If this active
+isolation lemma is false, the minimal bad certificate must be enlarged by a
+neutral side absorber.
+\end{remark}
+
+\begin{definition}[Support saturation in a two-hole card]
+For an occurrence inside \(D_{t,o}^a\) or \(D_{t,o}^b\), call the support
+\(O\)-saturated if it contains every vertex of \(O\setminus\{o\}\), and
+\(T\)-saturated if it contains every vertex of \(T\setminus\{t\}\).  Call it
+terminal if it is both \(O\)- and \(T\)-saturated and also contains the moved
+vertices \(a\) and \(b\), so that it is the whole two-hole card.
+\end{definition}
+
+\begin{conjecture}[Support escalation]
+Let \(Y\) be an actively isolated exposed active type, and let \(P\) be a
+lowest-complexity separator witnessing its exposure.  If an occurrence of \(P\)
+is not \(O\)-saturated, or is not \(T\)-saturated, then a further deletion in
+the missing side produces a productive two-hole splice: a direct cancellation,
+a path chord, or a smaller fixed-host obstruction.  Hence a nonproductive
+actively isolated exposure must be terminal.
+\end{conjecture}
+
+\begin{remark}[The terminal exposure fork]
+This is the sharpest newly visible fork.  Nonterminal exposure should be
+productive because a missing vertex gives another deletion direction in which
+the same discrepancy is still visible.  Terminal exposure is different: it is
+not a low-order pattern-count failure but an imbalance of entire two-hole card
+types along the active rectangle.  If terminal actively isolated exposure can
+occur without a path shortening, then the rectangular campaign needs a new
+global ingredient.  If terminal exposure cannot occur, the only remaining
+case is the balanced residual matching problem.
+\end{remark}
+
+\begin{remark}[The tempting false shortcut]
+There is an attractive but invalid one-line proof at this point.  The low
+slice equality says
+\[
+  [H_a]+\sum_{t\in T}[A_t]
+  =
+  [H_b]+\sum_{t\in T}[B_t].
+\]
+If one could apply ``delete every uncolored vertex of the displayed fixed
+host'' as a well-defined operator on abstract colored card types, then applying
+this operation to the low slice would seem to force the rectangular chain to
+vanish.  That would give direct cancellation immediately.
+
+The flaw is exactly the obstruction we are studying.  The operation
+``delete the vertices of \(O\)'' is not intrinsic to the colored card type.
+After a card isomorphism, the image of the fixed-host set \(O\) may be a
+different uncolored subset.  Thus named partial deletion is not a functor on
+the abstract deck; it is only available on the chosen fixed-host
+representatives.  The active-isolation and support-escalation lemmas are
+attempts to recover enough functoriality from shortest-path minimality.  This
+is why the rectangular side street is promising rather than cosmetic: it
+pinpoints the precise missing naturality statement.
+\end{remark}
+
+\begin{remark}[Strategic assessment]
+Subjectively, this is a good side street, but not yet the main road.  It is
+good because it has reduced the vague question ``why should the deck choose
+the right card isomorphisms?'' to a finite naturality problem for named
+partial deletions.  It is not yet the main road because active isolation could
+fail: off-path terms might absorb every exposed imbalance without shortening
+the chosen paths.  If that happens, the current campaign needs a new global
+minimality or flow argument.
+
+The best-case outcome is that shortest-path minimality restores named
+partial-deletion functoriality: any non-natural card isomorphism creates a
+chord, side-cycle removal, or smaller obstruction.  Then terminal exposure
+disappears, the residual matching is balanced, and the locked-match correction
+cycle becomes the only local lemma left.  The worst-case useful outcome is a
+neutral side absorber, which would be a concrete finite obstruction to this
+proof strategy and a clear computational target.
+\end{remark}
+
+\begin{conjecture}[Shortest-path naturality for named deletion]
+Let a two-hole card isomorphism
+\[
+  \theta:D_{t_i,o_j}^a\cong D_{t',o'}^b
+\]
+match an active occurrence to another occurrence of the same two-hole type.
+If \(\theta\) fails to transport the named \(T/O\)-sides coherently, then one
+of the port or extension-error mechanisms produces a shorter low path, a
+shorter complementary path, a direct endpoint cancellation, or a smaller
+fixed-host singleton obstruction.  If \(\theta\) does transport the named
+sides coherently, then the two occurrences belong to the same removable side
+cycle and do not contribute to a minimal active obstruction.
+\end{conjecture}
+
+\begin{definition}[Name-defect type]
+Let
+\[
+  \theta:D_{t,o}^a\cong D_{t',o'}^b
+\]
+be a two-hole match.  Say \(\theta\) has a low name defect if
+\[
+  \theta(a)\neq b,
+\]
+equivalently if \(\theta^{-1}(b)\neq a\).  Say \(\theta\) has a complementary
+name defect if
+\[
+  \theta(b)\neq a,
+\]
+equivalently if \(\theta^{-1}(a)\neq b\).  Thus \(\theta\) is:
+\begin{enumerate}[leftmargin=2em]
+  \item name-coherent if it has no name defect;
+  \item purely low-defective if it has a low name defect but no complementary
+  name defect;
+  \item purely complementary-defective if it has a complementary name defect
+  but no low name defect;
+  \item mixed-defective if it has both defects.
+\end{enumerate}
+\end{definition}
+
+\begin{lemma}[Name coherence means side coherence]
+If \(\theta:D_{t,o}^a\cong D_{t',o'}^b\) is name-coherent, then
+\[
+  \theta(T\setminus\{t\})=T\setminus\{t'\},
+  \qquad
+  \theta(O\setminus\{o\})=O\setminus\{o'\},
+\]
+and \(\theta(a)=b\), \(\theta(b)=a\).  Hence \(\theta\) transports every named
+side visible in the two-hole card correctly.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The second color in the domain is \((T\setminus\{t\})\cup\{a\}\), and the
+second color in the codomain is \((T\setminus\{t'\})\cup\{b\}\).  If
+\(\theta(a)=b\), preservation of the second color forces the remaining
+second-colored vertices to map exactly to \(T\setminus\{t'\}\).  The complement
+of the second color is \((O\setminus\{o\})\cup\{b\}\) in the domain and
+\((O\setminus\{o'\})\cup\{a\}\) in the codomain.  If \(\theta(b)=a\), the same
+argument gives the \(O\)-side equality.
+\end{proof}
+
+\begin{conjecture}[Name-defect case split]
+In a minimal fixed-host singleton counterexample with shortest active low and
+complementary paths, a two-hole match used to compensate an exposed active
+term falls into the following cases.
+
+\begin{enumerate}[leftmargin=2em]
+  \item Name-coherent matches are removable side-cycle matches unless
+  reinserting \(t,o\) and \(t',o'\) exposes a smaller fixed-host obstruction.
+
+  \item Purely low-defective matches produce a chord or endpoint cancellation
+  in the low type-flow path, unless their low extension error is part of a
+  smaller fixed-host obstruction.
+
+  \item Purely complementary-defective matches produce a chord or endpoint
+  cancellation in the complementary type-flow path, unless their complementary
+  extension error is part of a smaller fixed-host obstruction.
+
+  \item Mixed-defective matches are precisely the candidates for essential
+  locked residual matches.  They must be handled by the extension-error
+  potential \(\Phi\) and the locked correction-cycle argument.
+\end{enumerate}
+\end{conjecture}
+
+\begin{remark}[Why this split is encouraging]
+The naturality problem now has only one genuinely hard branch.  Zero defect is
+not an obstruction to naturality; it is naturality.  One-sided defect points in
+one type-flow direction and should shorten that path.  The two-sided defect is
+the locked case already isolated by the port and extension-error analysis.
+Thus the side street is feeding back into the main proof rather than spawning
+an unrelated new problem.
+\end{remark}
+
+\begin{remark}[One-sided defects have an extension fork]
+The previous case split hides one important condition.  A purely low-defective
+match gives an actual low path chord only when the \(O\)-extension error
+vanishes, and a purely complementary-defective match gives an actual
+complementary chord only when the \(T\)-extension error vanishes.  If the
+relevant extension error is nonzero, the match does not yet contradict
+shortest-path minimality.  Instead it creates a smaller one-star attachment
+problem over the common two-hole card.
+
+For a purely low-defective match
+\[
+  \theta:D_{t,o}^a\cong D_{t',o'}^b
+\]
+with \(\theta(b)=a\), the two possible low extensions compare the attachment
+sets of \(o\) and \(o'\) inside the common two-hole card.  If
+\(\Err_O(\theta)=\emptyset\), then \(A_t\cong B_{t'}\) and the low path has a
+chord or endpoint cancellation.  If \(\Err_O(\theta)\neq\emptyset\), then the
+remaining data are exactly a one-star defect:
+\[
+  \theta(N_K(o)\setminus\{t,o\})
+  \neq
+  N_K(o')\setminus\{t',o'\}.
+\]
+This is smaller in vertex count, but it is not automatically a smaller
+counterexample unless the surrounding rectangular identities imply the
+appropriate punctured-deck equality for this one-star problem.
+\end{remark}
+
+\begin{conjecture}[One-sided defect inheritance]
+In a minimal fixed-host singleton counterexample, let a purely one-sided
+two-hole match appear in the active rectangle.  If its corresponding extension
+error is nonzero, then the common two-hole card together with the two
+reinserted-hole attachment sets inherits a smaller centered-extension
+counterexample.  Equivalently, the nonzero extension error cannot be an
+isolated local mismatch; it carries enough deck equality from the rectangular
+telescoping identities to be handled by the outer size induction.
+\end{conjecture}
+
+\begin{remark}[Inheritance is not local]
+This conjecture is deliberately not a statement about an arbitrary pair of
+one-vertex extensions of an arbitrary two-hole card.  Locally, it is easy to
+take a colored card \(R\), attach two new vertices \(o,o'\) to different
+subsets of \(V(R)\), and arrange a nonzero extension error.  There is no
+reason for those two one-star extensions to have equal punctured decks.
+
+The missing information must come from the fact that the two one-star
+extensions sit on a shortest type-flow path inside a global fixed-host
+singleton state.  Thus the inheritance problem is really a path-localization
+problem: can the segment of the low or complementary path between the two
+one-hole cards be pushed down through the common two-hole deletion?
+\end{remark}
+
+\begin{conjecture}[One-sided path localization]
+Suppose a pure low-defect match
+\[
+  \theta:D_{t,o}^a\cong D_{t',o'}^b
+\]
+has \(\Err_O(\theta)\neq\emptyset\), and suppose the corresponding low cards
+\[
+  A_t,\qquad B_{t'}
+\]
+occur on the chosen shortest low type-flow path.  Then the low path segment
+between \(A_t\) and \(B_{t'}\), after deleting the \(O\)-holes seen by that
+segment, induces equality of the punctured extension decks of the two
+one-star extensions of the common two-hole card.  Consequently the nonzero
+\(O\)-extension error is a smaller centered-extension counterexample.
+
+The dual statement holds for pure complementary defects with nonzero
+\(T\)-extension error.
+\end{conjecture}
+
+\begin{remark}[Path localization only gives a partial deck]
+The previous conjecture is still slightly too optimistic.  A low path segment
+between \(A_t\) and \(B_{t'}\) does not by itself compare every card of the
+two one-star extensions over the common two-hole card
+\[
+  R \cong D_{t,o}^a\cong D_{t',o'}^b.
+\]
+It compares only those deletions that are visible along the segment.  The
+active rectangle supplies additional deletions by the complementary holes
+appearing in the chosen complementary path.  Together, a low segment and a
+complementary segment form a rectangular strip.  That strip may still miss
+some vertices of \(R\).
+
+Thus the honest inheritance target has two parts.  First, the path strip gives
+equality of a \emph{partial} punctured deck for the two one-star extensions of
+\(R\).  Second, minimality or support escalation must show that the missing
+deleted vertices are irrelevant, productive, or terminal.  Only after this
+cover/completion step do we get a smaller centered-extension counterexample.
+\end{remark}
+
+\begin{definition}[Localization strip]
+For a pure low-defect match at an active rectangle entry, choose the shortest
+subpath of the low type-flow path joining the one-hole cards \(A_t\) and
+\(B_{t'}\).  Pair this subpath with the complementary indices used in the
+active rectangle.  The resulting set of two-hole deletions is the localization
+strip.  Its visible vertices are the vertices of the common two-hole card
+whose deletion appears in one of these strip terms.
+\end{definition}
+
+\begin{conjecture}[Partial localization]
+The localization strip of a pure one-sided match with nonzero extension error
+induces equality of the partial punctured decks of the two one-star extensions
+over the common two-hole card, restricted to the visible vertices of the
+strip.
+\end{conjecture}
+
+\begin{conjecture}[Localization cover/completion]
+In a minimal fixed-host singleton counterexample, every invisible vertex of a
+localization strip is productive or terminal.  More explicitly, if deleting an
+invisible vertex from the two one-star extensions changes the partial deck
+comparison, then the resulting exposed term gives a path shortening, direct
+cancellation, or smaller obstruction.  If no invisible deletion is productive,
+then the one-sided defect is supported on all invisible vertices and becomes a
+terminal-exposure obstruction.
+
+Consequently, a nonterminal pure one-sided nonzero extension error inherits a
+full smaller centered-extension counterexample.
+\end{conjecture}
+
+\begin{remark}[Sharper success or failure]
+The one-sided obstruction has now split into two testable claims.  Partial
+localization is mostly bookkeeping: it should follow by restricting the
+telescoping identity to the chosen strip.  Cover/completion is the real
+mathematical point.  If it fails, the failure is a \emph{coverage gap}: a
+shortest path strip sees a nonzero one-star extension error but misses exactly
+the deletions needed to certify punctured-deck equality downstairs.  This is a
+more concrete obstruction than the earlier vague ``inheritance failure''.
+\end{remark}
+
+\begin{remark}[Concrete success or failure]
+This is now the most concrete near-term test of the side street.  If
+one-sided path localization is true, then pure one-sided defects are removed
+by the same size induction that removes direct recentering errors.  If it is
+false, the obstruction is very explicit: a shortest path segment whose
+endpoints share a two-hole deletion but whose induced one-star attachments do
+not inherit deck equality.  That would not kill the reconstruction conjecture,
+but it would kill the current ``shortest-path naturality'' campaign unless a
+new global flow invariant is added.
+\end{remark}
+
+\begin{remark}[A concrete failure mode]
+If the one-sided defect inheritance conjecture is false, the campaign fails in
+a very specific way.  There would be a pure low or pure complementary
+name-defect match with nonzero extension error, but the induced one-star
+attachment problem over the two-hole card would not have equal punctured decks.
+Such a match would not be a locked residual match, because one pair of moved
+vertices is correctly aligned; it would also not be a chord, because the
+extension error is nonzero.  This is a fourth computational falsification
+target, and it is arguably easier to search for than a full mixed locked
+certificate.
+\end{remark}
+
+\begin{remark}[Why this would settle exposed terms]
+This is the active-isolation lemma in its most conceptual form.  The whole
+problem is that named deletion does not descend to abstract card types.  The
+conjecture says that in a minimal shortest-path counterexample, every failure
+of descent is productive, and every nonproductive descent failure is actually
+a removable side cycle.  If this holds, then exposed active coefficients can
+be read as genuine fixed-host imbalances rather than artifacts of a bad choice
+of path representatives.
+\end{remark}
+
+\begin{conjecture}[Exposed term dichotomy]
+In a minimal fixed-host singleton counterexample with shortest low and
+complementary type-flow paths, every exposed active type \(Y\) has one of the
+following two outcomes.
+
+\begin{enumerate}[leftmargin=2em]
+  \item It is productive: an occurrence of \(Y\) gives a direct endpoint
+  cancellation, a smaller fixed-host singleton obstruction, or a chord in one
+  of the two chosen type-flow paths.
+
+  \item It is terminal: after active isolation and support escalation, every
+  lowest-complexity separator realizing the coefficient \(c_{\rm act}(Y)\) is
+  the whole two-hole card on the remaining vertices.
+\end{enumerate}
+
+The second outcome is now the only exposed-term failure mode.  It says that
+all lower-support attempts to see the imbalance have become productive, and
+the remaining imbalance is a pure two-hole card-type imbalance along the
+active rectangle.
+\end{conjecture}
+
+\begin{remark}[How to try to prove the exposed dichotomy]
+Assume, for instance, that \(c_{\rm act}(Y)>0\).  Choose an occurrence
+\[
+  D_{t_i,o_j}^a\cong Y
+\]
+and a smallest colored pattern \(P\) whose count contributes to the positive
+exposure.  If \(P\) misses some vertex \(o\in O\), then the same pattern is
+visible after deleting \(o\) from the low path telescoping identity.  The
+active rectangular identity says that this visible excess is also visible
+after deleting a \(T\)-vertex from the complementary path.  Unwinding the
+corresponding two-hole isomorphism gives exactly the port configuration of the
+two-hole splice lemma.
+
+Thus the attempt has only two possible exits.  Either the port configuration
+is productive, contradicting minimality of the paths or of \(|V(K)|\), or the
+pattern could not have missed any remaining vertex on either side of the
+two-hole rectangle.  Repeating the same argument from both directions forces
+terminal support.  At that point the obstruction is no longer a pattern-count
+separator; it is an imbalance of entire two-hole card types in the active
+rectangle.  That terminal case must either be killed by active isolation
+against the full rectangle, or carried forward as part of the minimal bad
+certificate.
+\end{remark}
+
 \begin{conjecture}[Minimum-error residual matching has no essential lock]
 In a minimal fixed-host singleton counterexample, after all exposed
-rectangular boundary terms have been converted into full-support squeezes or
-smaller obstructions, a minimum-error matching of the balanced residual
-rectangular chain contains no essential locked two-hole match.
+rectangular boundary terms have been converted into productive moves,
+terminal-exposure obstructions, or smaller obstructions, a minimum-error
+matching of the balanced residual rectangular chain contains no essential
+locked two-hole match.
 \end{conjecture}
 
 This is a more operational version of the two-hole splice lemma.  If a
@@ -3254,6 +4490,163 @@ named adjacencies involving the deleted holes, while the two-hole cards are
 unlabelled up to isomorphism.  The two-hole isomorphisms must transport the
 names coherently enough for the alternating cycle to be defined.
 
+\begin{definition}[Minimal bad certificate]
+A minimal bad certificate for the rectangular campaign consists of the
+following finite data.
+
+\begin{enumerate}[leftmargin=2em]
+  \item A fixed-host singleton state
+  \[
+    (K,S,T,a,b)
+  \]
+  with equal colored deletion decks, no automorphism of \((K,S)\) carrying
+  \(T\cup\{a\}\) to \(T\cup\{b\}\), and no direct low or complementary endpoint
+  cancellation.
+
+  \item Shortest nontrivial low and complementary type-flow paths
+  \[
+    H_a=Y_0\to\cdots\to Y_r=H_b,
+    \qquad
+    C_b^a=Z_0\to\cdots\to Z_s=C_a^b.
+  \]
+
+  \item An active rectangular chain
+  \[
+    R_{\rm act}
+    =
+    \sum_{i=1}^r\sum_{j=1}^s
+      \bigl([D_{t_i,o_j}^a]-[D_{t_i,o_j}^b]\bigr)
+  \]
+  whose exposed active types are all either actively isolated and terminal in
+  the sense of the exposed term dichotomy, or are cancelled by neutral
+  off-path side absorbers that do not shorten either path.
+
+  \item A balanced residual subchain of \(R_{\rm act}\), together with a
+  typewise matching and specific two-hole isomorphisms minimizing
+  \[
+    (\Phi,\#\text{essential locked matches}).
+  \]
+
+  \item At least one essential locked match in this minimum, and every
+  correction cycle based at such a lock is neutral: partner swaps neither
+  lower \(\Phi\), nor create a zero-extension chord, nor expose a smaller
+  fixed-host obstruction.
+\end{enumerate}
+\end{definition}
+
+\begin{remark}[Why this certificate is the right failure target]
+This is now a finite obstruction, not a philosophical gap.  Proving that no
+minimal bad certificate exists proves the fixed-host singleton theorem.  On
+the other hand, constructing such a certificate would give a precise reason
+the rectangular campaign fails: either active exposure really can evade
+path-shortening and remain as terminal two-hole exposure, or the balanced
+residual really can support an essential locked minimum-error transport.  Both
+failure modes are concrete enough to search for computationally and to
+formalize in Lean.
+\end{remark}
+
+\begin{remark}[Computational falsification targets]
+A useful search should no longer ask only whether equal fixed-host singleton
+decks are orbit-successful.  The small cases already suggest that they are.
+The sharper search is for one of four internal witnesses, with every
+two-hole match classified by name-defect type.
+
+\begin{enumerate}[leftmargin=2em]
+  \item A neutral side absorber: an active exposed two-hole type whose
+  cancelling occurrences lie off the chosen shortest paths, but where the
+  induced off-path match gives no shorter path and no removable side cycle.
+
+  \item Terminal exposure: an actively isolated exposed type for which every
+  nonterminal support witness is productive, but the whole two-hole card type
+  remains imbalanced along the active rectangle.
+
+  \item A one-sided inheritance failure: a pure low or pure complementary
+  name-defect match with nonzero corresponding extension error, where the
+  induced one-star attachment problem over the common two-hole card does not
+  inherit equal punctured decks.  The sharpened version is a coverage gap:
+  the localization strip gives only a partial deck and the invisible deletions
+  are neither productive nor terminal.
+
+  \item An essential locked residual match: after deleting exposed terms and
+  choosing a minimum-error residual matching, a locked two-hole isomorphism
+  survives with nonzero low and high extension errors and no correction cycle
+  reducing \((\Phi,\#\text{locks})\).
+\end{enumerate}
+
+Finding any one of these would not necessarily disprove reconstruction, but it
+would disprove the current proof campaign as stated.  Failing to find any of
+them in exhaustive fixed-host singleton searches is evidence for exactly the
+lemmas we need to formalize next.
+\end{remark}
+
+\begin{remark}[First fixed-host singleton probe]
+The script
+\[
+  \texttt{research/computational/data/fixed\_host\_singleton\_search.py}
+\]
+exhaustively checks the fixed-host singleton states for \(n\leq 5\), using a
+tiny brute-force colored canonical form.  The \(n=5\) run examined \(174080\)
+singleton states over the \(34\) unlabeled host graphs.  It found \(24832\)
+equal-deck singleton states, no orbit failures, and in every one of these
+states both direct low cancellation and direct complementary cancellation held.
+
+The same run is more informative locally.  Among the two-hole matches inside
+equal-deck states, it found
+\[
+  7392
+\]
+pure low-defective matches and \(7392\) pure complementary-defective matches.
+Of these, \(1920\) in each direction had nonzero corresponding extension
+error.  Thus pure one-sided nonzero extension errors are real local artifacts
+even in solved states.  They cannot be forbidden locally.  This supports the
+new formulation: a one-sided nonzero extension error must either be irrelevant
+because the state is already solved, or inherit a smaller centered-extension
+counterexample from the surrounding path/deck structure.
+
+No mixed-defective matches occurred in this exhaustive \(n=5\) equal-deck
+probe.  A bounded labelled \(n=6\) smoke test over \(100000\) singleton states
+again found no orbit failures; every equal-deck state in the sample had both
+direct endpoint cancellations.  It did find \(21398\) mixed-defective local
+matches, \(624\) of them with nonzero low and high extension errors.  Thus
+mixed locked-looking maps also cannot be forbidden locally.  They must be
+excluded only after exposure
+handling, residual balancing, and \(\Phi\)-minimal partner choice.
+
+The cached Python canonicalizer is adequate for small bounded probes, but
+exhaustive \(n=6\) and beyond should use nauty or a stronger
+colored-canonical-label backend.
+\end{remark}
+
+\begin{remark}[Direct-cancellation probe through six vertices]
+Using NetworkX's graph atlas to supply the \(156\) unlabeled six-vertex host
+graphs, the same script can skip local two-hole classification and test the
+upstream direct-cancellation prediction exhaustively for \(n=6\).  The run
+\[
+  \texttt{fixed\_host\_singleton\_search.py 6 --atlas --skip-local}
+\]
+examined \(4792320\) fixed-host singleton states and found \(406528\)
+equal-deck singleton states.  It found no orbit failures and, more
+importantly for the rectangular campaign, every equal-deck state had both
+direct low cancellation and direct complementary cancellation:
+\[
+  H_a\cong H_b
+  \qquad\text{and}\qquad
+  C_b^a\cong C_a^b.
+\]
+
+This is the strongest current computational evidence for double direct
+cancellation in small hosts, but the cyclic \(n=9\) example above shows that
+double direct cancellation is not a general theorem.  The useful surviving
+lesson is that the small equal-deck states were all orbit-successful.
+
+A separate one-slice probe tests the orbit prediction directly, without
+assuming equality of the whole fixed-host deck.  Through \(n=5\), four counts
+agree at \(24832\): full deck equality, low-slice equality, complementary-slice
+equality, and fixed-host orbit success.  The exhaustive six-vertex atlas run
+gives the same common count \(406528\).  So far there is no computational
+evidence for a one-slice orbit failure.
+\end{remark}
+
 \begin{remark}[Why this is Lean-shaped]
 The potential \(\Phi\) is finite and purely combinatorial.  A Lean proof would
 not need to reason about arbitrary choices forever: choose a minimizing
@@ -3268,18 +4661,23 @@ unrooted deck matching.
 \end{remark}
 
 \begin{remark}[Next local attack]
-The immediate task is now to prove that locked matches cannot exist.  The
-first pass should use only first-order data: first-color status, total
-degree, degree into \(T\), degree into \(O\), and the signed witness charge
-\(\delta\).  If these invariants force
+The immediate task is now to prove one-slice orbit reconstruction.  The cleanest
+route is:
 \[
-  x_T=y_T
-  \qquad\text{or}\qquad
-  x_O=y_O,
+  \text{low-slice equality}
+  \quad\Longrightarrow\quad
+  T\cup\{a\}\sim_{\operatorname{Aut}(K,S)}T\cup\{b\}.
 \]
-then the corresponding port relation is a loop or a chord, hence a splice.
-If they do not, the locked case becomes a finite four-port configuration
-whose second-order boundary can be searched directly.
+The first pass should use the restricted Kelly principle for marked-vertex
+decks to show that any positive type-flow path transports only the hidden
+extension profile of the deleted marked vertex.  Then one tries to prove that a
+shortest transport path integrates to an automorphism of the fixed host, or
+recovers a smaller centered-extension obstruction.
+
+If this orbit-reconstruction route stalls, the backup is the rectangular locked
+residual: use first-color status, total degree, degree into \(T\), degree into
+\(O\), and the signed witness charge \(\delta\) to force a loop or chord in the
+two-hole port relation, then run the \(\Phi\)-minimal partner-swap descent.
 \end{remark}
 
 \begin{remark}[Lean readiness of the fixed-host block]
@@ -3288,6 +4686,8 @@ formalization-ready definitions or straightforward lemmas.
 
 \begin{enumerate}[leftmargin=2em]
   \item The fixed-host colored deletion deck \(\Deck_{K,S}(U)\).
+  \item Low and complementary color-size slice decks.
+  \item The restricted Kelly counting lemma for deleting only marked vertices.
   \item The low and complementary type-flow decompositions.
   \item The rectangular second-boundary identity.
   \item Two-hole ports and the color-bookkeeping lemma.
@@ -3298,12 +4698,12 @@ formalization-ready definitions or straightforward lemmas.
   finite potential \(\Phi\) for a rectangular matching.
 \end{enumerate}
 
-The part that is not yet Lean-ready as a proof is the correction-cycle
-descent: from an essential locked match in a \(\Phi\)-minimal rectangular
-matching, construct a partner swap that reduces
-\((\Phi,\#\text{essential locks})\), or else extract a smaller singleton
-obstruction.  Once that local descent is proved in English, the fixed-host
-singleton theorem has a plausible Lean route.
+The part that is not yet Lean-ready as a proof is orbit reconstruction: from a
+shortest positive type-flow path, construct either an automorphism carrying
+\(T\cup\{a\}\) to \(T\cup\{b\}\), a removable cycle, or a smaller
+centered-extension obstruction.  If that fails, the older correction-cycle
+descent for \(\Phi\)-minimal rectangular matchings is the fallback local proof
+burden.
 \end{remark}
 
 \begin{proposition}[Rectangular kernel exclusion solves singleton]
@@ -5129,7 +6529,11 @@ useful formal infrastructure.
   \item Attack the no nonzero rectangular kernel lemma.  This is now the
   most concrete fixed-host singleton target: a proof gives the direct
   cancellation needed for the size-drop induction, while a counterexample
-  gives a precise obstruction to the current campaign.
+  gives a precise obstruction to the current campaign.  The first subtarget is
+  active isolation and support escalation: every unbalanced active two-hole
+  type must either produce a smaller move or become terminal exposure.  The
+  name-defect case split reduces active isolation to zero-defect side cycles,
+  one-sided path chords, and mixed-defect locked matches.
 
   \item Prove the two-hole splice lemma, or find a locked two-hole match.
   This is the local step inside the rectangular kernel argument: every
@@ -5139,7 +6543,8 @@ useful formal infrastructure.
   \item Define the balanced residual rectangular potential \(\Phi\), choose a
   \(\Phi\)-minimal residual matching, and prove the minimum-error residual
   matching lemma: no essential locked match survives after all exposed terms
-  and partner swaps that reduce \((\Phi,\#\text{locks})\).
+  have been handled and all partner swaps that reduce
+  \((\Phi,\#\text{locks})\) have been performed.
 
   \item Define the root-anchored centered subproblem and prove that direct
   recentering preserves punctured deck equality.
@@ -5184,20 +6589,31 @@ The proof currently hinges on four increasingly local claims.
 \end{enumerate}
 
 The next English task is to attack this sharpened fixed-host obstruction.  The
-most local target is the fixed-host singleton switch: prove that two
-pseudo-similar colored vertices relative to a fixed background \((K,S,T)\)
-must actually be related by an automorphism.  This has now split into two
-smaller claims: no closed fixed-host singleton flow through \(T\), and no
-nonterminal fixed-host witness cycle balancing the signed two-step charges.
-Direct singleton edges are now size-drop moves: after direct recentering, the
-remaining neighborhood-selection failure is a smaller colored centered
-problem.  The same-size detour obstruction has been sharpened further: prove
-that the singleton type-flow graph has no positive-length path from \(H_a\)
-to \(H_b\).  The complementary type-flow slice gives a second path through
-the non-\(T\) vertices; two-slice incompatibility is now another possible way
-to force shortening.  The exchange-chain, neutral-reversibility, and
-witness-tail claims are proposed tools for shortening such paths.  The
-higher-order boundary formulation has now been sharpened to a rectangular
+most local target is now the one-slice orbit theorem for the fixed-host
+singleton switch.  The restricted Kelly lemma proves the first half:
+one-slice equality forces the endpoint card type \(H_a\) to appear on the
+other side of the low slice.  The remaining problem is endpoint detour
+interpretation: show that if this occurrence routes through old marked
+vertices \(t\in T\), then the resulting transport path integrates to an
+automorphism carrying \(T\cup\{a\}\) to \(T\cup\{b\}\), or else descends to a
+smaller centered obstruction.
+
+Computationally, the six-vertex atlas scan supports the clean factorization
+\[
+  \text{low-slice equality}
+  \Longleftrightarrow
+  \text{full fixed-host deck equality}
+  \Longleftrightarrow
+  T\cup\{a\}\sim_{\operatorname{Aut}(K,S)}T\cup\{b\},
+\]
+and every state in this common class has both direct cancellations.  This is
+the best current route, but the direct-cancellation clause is a small-case
+bonus: a connected nine-vertex cyclic example shows that orbit success need
+not imply low direct cancellation.  Orbit success itself is enough to solve
+the singleton step.
+
+The rectangular formulation remains the fallback if one-slice orbit
+reconstruction fails.  It sharpens the same obstruction to a rectangular
 kernel problem:
 \[
   \partial_O([H_b]-[H_a])
@@ -5209,16 +6625,34 @@ fixed-host singleton theorem follows by size-drop induction.  If not, the
 approach has found its likely break point: a genuine nonzero rectangular
 kernel for the colored deletion operator, rather than merely a missing
 low-order invariant.  The rectangular kernel has itself been localized to
-the two-hole splice lemma, and then to the minimum-error rectangular matching
-lemma for the balanced residual chain.  A productive two-hole match gives a direct cancellation, a smaller
-fixed-host singleton state, or a chord in one of the two shortest type-flow
-paths.  Thus the immediate make-or-break target is the essential locked case:
-a two-hole match whose four ports stay internal to \(T\) and \(O\), whose low
-and high extension errors are nonzero or color-incompatible, and which
-survives after all exposed rectangular terms are handled and the residual
-matching minimizes
+named-deletion naturality.  The name-defect split says that zero-defect matches
+should be removable side cycles, one-sided defects should be chords when their
+corresponding extension errors vanish, while nonzero one-sided extension
+errors require partial localization plus a cover/completion argument before
+they inherit smaller centered-extension obstructions.  Only mixed defects
+should enter the locked residual analysis.  A productive two-hole match gives
+a direct cancellation, a smaller fixed-host singleton state, or a chord in one
+of the two shortest type-flow paths.  Thus the immediate make-or-break target
+is the essential locked case: a mixed-defective two-hole match whose four ports
+stay internal to \(T\) and \(O\), whose low and high extension errors are
+nonzero or color-incompatible, and which survives after all exposed
+rectangular terms are handled and the residual matching minimizes
 \[
   (\Phi,\#\text{essential locks}).
 \]
+
+Equivalently, the English proof has been reduced to one primary make-or-break
+lemma, with four fallback rectangular lemmas behind it:
+\[
+  \text{one-slice equality}\Rightarrow\text{fixed-host orbit success}.
+\]
+If this is true, the singleton step closes directly.  If it is false, the
+fallback rectangular proof requires the older four local lemmas: active
+exposure isolation, support escalation to productive splice or terminal
+exposure, one-sided localization with cover/completion, and exclusion of
+essential mixed locked matches in a minimum-error residual transport plan.  A
+failure should now appear concretely as either a one-slice orbit failure, a
+terminal exposed active term, a one-sided coverage gap, or an essential locked
+residual match whose correction cycles are neutral.
 
 \end{document}
