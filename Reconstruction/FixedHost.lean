@@ -274,14 +274,6 @@ def FixedHostSingletonSolved (K : SimpleGraph V) (S T : Set V) (a b : V) : Prop 
 def FixedHostSingletonConjecture (K : SimpleGraph V) (S T : Set V) (a b : V) : Prop :=
   FixedHostSingletonState K S T a b → FixedHostSingletonSolved K S T a b
 
-/-- The low direct-shadow cancellation `H_a ≅ H_b`. -/
-def LowDirectCancellation (K : SimpleGraph V) (S T : Set V) (a b : V) : Prop :=
-  FixedHostCardIso K S T T a b
-
-/-- The complementary direct cancellation `C_b^a ≅ C_a^b`. -/
-def ComplementaryDirectCancellation (K : SimpleGraph V) (S T : Set V) (a b : V) : Prop :=
-  FixedHostCardIso K S (singletonLeft T a) (singletonRight T b) b a
-
 /-- Equality of the low color-size slice
 `{{H_a}} + {{A_t : t ∈ T}} = {{H_b}} + {{B_t : t ∈ T}}`, represented by a
 matching between the second-colored deletion vertices. -/
@@ -296,36 +288,10 @@ def ComplementarySliceSameDeck (K : SimpleGraph V) (S T : Set V) (a b : V) : Pro
   FixedHostSameSubdeck K S (singletonLeft T a) (singletonRight T b)
     (complementaryDeleteLeft T a b) (complementaryDeleteRight T a b)
 
-/-- The too-strong one-slice endpoint-isolation proposition for the low slice.
-This held in the first small probes but is false in general; it remains useful
-as a named condition for size-drop arguments when it happens. -/
-def LowSliceEndpointIsolation (K : SimpleGraph V) (S T : Set V) (a b : V) : Prop :=
-  LowSliceSameDeck K S T a b → LowDirectCancellation K S T a b
-
-/-- The complementary analogue of the too-strong endpoint-isolation condition. -/
-def ComplementarySliceEndpointIsolation
-    (K : SimpleGraph V) (S T : Set V) (a b : V) : Prop :=
-  ComplementarySliceSameDeck K S T a b → ComplementaryDirectCancellation K S T a b
-
-/-- Both direct endpoint cancellations.  This is a useful size-drop condition
-but is too strong as a general fixed-host singleton theorem. -/
-def DoubleDirectCancellation (K : SimpleGraph V) (S T : Set V) (a b : V) : Prop :=
-  LowDirectCancellation K S T a b ∧ ComplementaryDirectCancellation K S T a b
-
 /-- A sharper possible route: the low slice alone reconstructs the fixed-host
 orbit of the singleton color set. -/
 def LowSliceOrbitReconstruction (K : SimpleGraph V) (S T : Set V) (a b : V) : Prop :=
   LowSliceSameDeck K S T a b → FixedHostSingletonSolved K S T a b
-
-/-- The complementary analogue of `LowSliceOrbitReconstruction`. -/
-def ComplementarySliceOrbitReconstruction
-    (K : SimpleGraph V) (S T : Set V) (a b : V) : Prop :=
-  ComplementarySliceSameDeck K S T a b → FixedHostSingletonSolved K S T a b
-
-/-- A too-strong finite group/card factor: a solved singleton switch need not
-have both direct endpoint cancellations.  Kept only as a named failed target. -/
-def OrbitImpliesDoubleDirect (K : SimpleGraph V) (S T : Set V) (a b : V) : Prop :=
-  FixedHostSingletonSolved K S T a b → DoubleDirectCancellation K S T a b
 
 /-- A chosen fixed-host card isomorphism.  Unlike `FixedHostCardIso`, this
 remembers the actual card map, so we can ask whether its deleted-vertex star
@@ -950,215 +916,6 @@ abbrev ComplementarySliceIsoData (K : SimpleGraph V) (S T : Set V) (a b : V) :=
   FixedHostSubdeckIsoData K S (singletonLeft T a) (singletonRight T b)
     (complementaryDeleteLeft T a b) (complementaryDeleteRight T a b)
 
-/-- A transport edge compares two cards that delete the same vertex `z`, but
-with the active singleton on opposite sides.  Low-slice internal edges have
-`z ∈ T`; complementary-slice internal edges have `z ∈ O`. -/
-def SingletonTransportEdge (K : SimpleGraph V) (S T : Set V) (a b z : V) : Prop :=
-  FixedHostCardIso K S (singletonRight T b) (singletonLeft T a) z z
-
-/-- A chosen realization of a transport edge.  This is stronger data than the
-proposition `SingletonTransportEdge`: it remembers the actual punctured-card
-isomorphism whose extension error will be measured. -/
-structure SingletonTransportEdgeIso (K : SimpleGraph V) (S T : Set V) (a b z : V) where
-  cardIso : TwoColorIso (K.deleteVert z) (K.deleteVert z)
-    (deleteColor S z) (deleteColor (singletonRight T b) z)
-    (deleteColor S z) (deleteColor (singletonLeft T a) z)
-
-namespace SingletonTransportEdgeIso
-
-/-- A chosen transport edge gives the corresponding existential transport
-edge. -/
-theorem transportEdge {K : SimpleGraph V} {S T : Set V} {a b z : V}
-    (e : SingletonTransportEdgeIso K S T a b z) :
-    SingletonTransportEdge K S T a b z :=
-  ⟨e.cardIso⟩
-
-/-- The star-extension error is zero when the punctured-card isomorphism
-preserves the missing vertex's neighbor set. -/
-def ZeroStarError {K : SimpleGraph V} {S T : Set V} {a b z : V}
-    (e : SingletonTransportEdgeIso K S T a b z) : Prop :=
-  ∀ x : {w : V // w ≠ z}, K.Adj z x.1 ↔ K.Adj z (e.cardIso.iso.toEquiv x).1
-
-/-- The punctured-card map preserves the passive first color. -/
-theorem map_first_iff {K : SimpleGraph V} {S T : Set V} {a b z : V}
-    (e : SingletonTransportEdgeIso K S T a b z) (x : {w : V // w ≠ z}) :
-    x.1 ∈ S ↔ (e.cardIso.iso.toEquiv x).1 ∈ S := by
-  simpa [deleteColor] using e.cardIso.map_first x
-
-/-- The punctured-card map carries the right active color to the left active
-color. -/
-theorem map_second_iff {K : SimpleGraph V} {S T : Set V} {a b z : V}
-    (e : SingletonTransportEdgeIso K S T a b z) (x : {w : V // w ≠ z}) :
-    (x.1 ∈ T ∨ x.1 = b) ↔
-      ((e.cardIso.iso.toEquiv x).1 ∈ T ∨ (e.cardIso.iso.toEquiv x).1 = a) := by
-  simpa [deleteColor] using e.cardIso.map_second x
-
-section Extension
-
-variable [DecidableEq V]
-
-/-- Extend the punctured-card bijection to the full vertex set by fixing the
-deleted vertex. -/
-def extendedPerm {K : SimpleGraph V} {S T : Set V} {a b z : V}
-    (e : SingletonTransportEdgeIso K S T a b z) : Equiv.Perm V :=
-  Equiv.Perm.extendDomain e.cardIso.iso.toEquiv (Equiv.refl {w : V // w ≠ z})
-
-@[simp] theorem extendedPerm_apply_deleted {K : SimpleGraph V} {S T : Set V} {a b z : V}
-    (e : SingletonTransportEdgeIso K S T a b z) :
-    e.extendedPerm z = z := by
-  simpa [extendedPerm] using
-    (Equiv.Perm.extendDomain_apply_not_subtype e.cardIso.iso.toEquiv
-      (Equiv.refl {w : V // w ≠ z}) (b := z) (by simp))
-
-theorem extendedPerm_apply_ne {K : SimpleGraph V} {S T : Set V} {a b z x : V}
-    (e : SingletonTransportEdgeIso K S T a b z) (hx : x ≠ z) :
-    e.extendedPerm x = (e.cardIso.iso.toEquiv ⟨x, hx⟩).1 := by
-  simpa [extendedPerm] using
-    (Equiv.Perm.extendDomain_apply_subtype e.cardIso.iso.toEquiv
-      (Equiv.refl {w : V // w ≠ z}) (b := x) hx)
-
-/-- A zero-star-error transport edge extends to a graph automorphism of the
-fixed host. -/
-def extendIsoOfZeroStarError {K : SimpleGraph V} {S T : Set V} {a b z : V}
-    (e : SingletonTransportEdgeIso K S T a b z) (hstar : e.ZeroStarError) :
-    K ≃g K where
-  toEquiv := e.extendedPerm
-  map_rel_iff' := by
-    intro x y
-    by_cases hx : x = z
-    · subst x
-      by_cases hy : y = z
-      · subst y
-        simp
-      · simpa [extendedPerm_apply_ne e hy] using (hstar ⟨y, hy⟩).symm
-    · by_cases hy : y = z
-      · subst y
-        simpa [extendedPerm_apply_ne e hx, SimpleGraph.adj_comm] using (hstar ⟨x, hx⟩).symm
-      · simpa [SimpleGraph.deleteVert, extendedPerm_apply_ne e hx, extendedPerm_apply_ne e hy]
-          using e.cardIso.iso.map_rel_iff (a := ⟨x, hx⟩) (b := ⟨y, hy⟩)
-
-/-- If the fixed deleted vertex has the same active-color status on the two
-full sides, then a zero-star-error transport edge gives a two-colored
-automorphism carrying the right active color to the left active color.  For
-low-slice internal edges this status hypothesis follows from `z ∈ T`; for
-complementary-slice internal edges it follows from `z ∈ O`. -/
-def extendTwoColorIsoOfZeroStarError {K : SimpleGraph V} {S T : Set V} {a b z : V}
-    (e : SingletonTransportEdgeIso K S T a b z)
-    (hzSecond : z ∈ singletonRight T b ↔ z ∈ singletonLeft T a)
-    (hstar : e.ZeroStarError) :
-    TwoColorIso K K S (singletonRight T b) S (singletonLeft T a) where
-  iso := e.extendIsoOfZeroStarError hstar
-  map_first := by
-    intro x
-    change x ∈ S ↔ e.extendedPerm x ∈ S
-    by_cases hx : x = z
-    · subst x
-      simp
-    · simpa [extendedPerm_apply_ne e hx] using e.map_first_iff ⟨x, hx⟩
-  map_second := by
-    intro x
-    change x ∈ singletonRight T b ↔ e.extendedPerm x ∈ singletonLeft T a
-    by_cases hx : x = z
-    · subst x
-      simpa using hzSecond
-    · simpa [extendedPerm_apply_ne e hx] using e.map_second_iff ⟨x, hx⟩
-
-end Extension
-
-/-- The Lean version of the zero-error transport-edge lemma: if the deleted
-vertex has matching active-color status on both full sides and the star error
-is zero, then the singleton switch is solved. -/
-theorem solved_of_zeroStarError {K : SimpleGraph V} {S T : Set V} {a b z : V}
-    (e : SingletonTransportEdgeIso K S T a b z)
-    (hzSecond : z ∈ singletonRight T b ↔ z ∈ singletonLeft T a)
-    (hstar : e.ZeroStarError) :
-    FixedHostSingletonSolved K S T a b := by
-  classical
-  exact ⟨(e.extendTwoColorIsoOfZeroStarError hzSecond hstar).symm⟩
-
-/-- A low-slice internal deleted vertex has matching active-color status on the
-right and left full singleton colors. -/
-theorem activeStatus_of_mem_T {T : Set V} {a b z : V} (hz : z ∈ T) :
-    z ∈ singletonRight T b ↔ z ∈ singletonLeft T a := by
-  simp [hz]
-
-/-- A complementary-slice internal deleted vertex has matching active-color
-status on the right and left full singleton colors. -/
-theorem activeStatus_of_mem_outside {T : Set V} {a b z : V}
-    (hz : z ∈ singletonOutside T a b) :
-    z ∈ singletonRight T b ↔ z ∈ singletonLeft T a := by
-  rcases hz with ⟨hzT, hza, hzb⟩
-  simp [hzT, hza, hzb]
-
-/-- Low-slice form of the zero-error transport-edge lemma. -/
-theorem solved_of_zeroStarError_mem_T {K : SimpleGraph V} {S T : Set V} {a b z : V}
-    (e : SingletonTransportEdgeIso K S T a b z) (hz : z ∈ T)
-    (hstar : e.ZeroStarError) :
-    FixedHostSingletonSolved K S T a b :=
-  e.solved_of_zeroStarError (activeStatus_of_mem_T hz) hstar
-
-/-- Complementary-slice form of the zero-error transport-edge lemma. -/
-theorem solved_of_zeroStarError_mem_outside {K : SimpleGraph V} {S T : Set V} {a b z : V}
-    (e : SingletonTransportEdgeIso K S T a b z) (hz : z ∈ singletonOutside T a b)
-    (hstar : e.ZeroStarError) :
-    FixedHostSingletonSolved K S T a b :=
-  e.solved_of_zeroStarError (activeStatus_of_mem_outside hz) hstar
-
-end SingletonTransportEdgeIso
-
-/-- A zero-error realization of a transport edge: besides the punctured-card
-edge, there is an actual automorphism of the full fixed host carrying the
-right active color to the left active color.  The English proof tries to show
-that every nonzero-error transport edge descends to a smaller centered
-obstruction. -/
-def SingletonTransportEdgeZeroError
-    (K : SimpleGraph V) (S T : Set V) (a b z : V) : Prop :=
-  SingletonTransportEdge K S T a b z ∧
-    Nonempty (TwoColorIso K K S (singletonRight T b) S (singletonLeft T a))
-
-/-- A zero-error transport edge solves the fixed-host singleton orbit problem. -/
-theorem SingletonTransportEdgeZeroError.solved {K : SimpleGraph V} {S T : Set V}
-    {a b z : V} (h : SingletonTransportEdgeZeroError K S T a b z) :
-    FixedHostSingletonSolved K S T a b := by
-  rcases h with ⟨_, ⟨e⟩⟩
-  exact ⟨e.symm⟩
-
-/-- The graph underlying a natural low shadow `K-z`. -/
-abbrev lowShadowGraph (K : SimpleGraph V) (z : V) : SimpleGraph {w : V // w ≠ z} :=
-  K.deleteVert z
-
-/-- Low-slice `A_t = (K-t, S-t, (T-t) ∪ {a})`. -/
-def lowCardASecondColor (T : Set V) (a t : V) : Set {w : V // w ≠ t} :=
-  deleteColor (singletonLeft T a) t
-
-@[simp] theorem mem_lowCardASecondColor (T : Set V) (a t : V) (x : {w : V // w ≠ t}) :
-    x ∈ lowCardASecondColor T a t ↔ x.1 ∈ T ∨ x.1 = a := by
-  simp [lowCardASecondColor]
-
-/-- Low-slice `B_t = (K-t, S-t, (T-t) ∪ {b})`. -/
-def lowCardBSecondColor (T : Set V) (b t : V) : Set {w : V // w ≠ t} :=
-  deleteColor (singletonRight T b) t
-
-@[simp] theorem mem_lowCardBSecondColor (T : Set V) (b t : V) (x : {w : V // w ≠ t}) :
-    x ∈ lowCardBSecondColor T b t ↔ x.1 ∈ T ∨ x.1 = b := by
-  simp [lowCardBSecondColor]
-
-/-- Complementary-slice `C_o^a = (K-o, S-o, T ∪ {a})`. -/
-def compCardASecondColor (T : Set V) (a o : V) : Set {w : V // w ≠ o} :=
-  deleteColor (singletonLeft T a) o
-
-@[simp] theorem mem_compCardASecondColor (T : Set V) (a o : V) (x : {w : V // w ≠ o}) :
-    x ∈ compCardASecondColor T a o ↔ x.1 ∈ T ∨ x.1 = a := by
-  simp [compCardASecondColor]
-
-/-- Complementary-slice `C_o^b = (K-o, S-o, T ∪ {b})`. -/
-def compCardBSecondColor (T : Set V) (b o : V) : Set {w : V // w ≠ o} :=
-  deleteColor (singletonRight T b) o
-
-@[simp] theorem mem_compCardBSecondColor (T : Set V) (b o : V) (x : {w : V // w ≠ o}) :
-    x ∈ compCardBSecondColor T b o ↔ x.1 ∈ T ∨ x.1 = b := by
-  simp [compCardBSecondColor]
-
 /-- The two-hole vertex type obtained by deleting `t` and `o`. -/
 abbrev deleteTwoVertex (t o : V) :=
   {x : V // x ≠ t ∧ x ≠ o}
@@ -1377,49 +1134,6 @@ def LowSliceLocalObstruction
       (x.1 ∈ S ↔ y.1 ∈ S) →
         Nonempty (LowSliceCardFirstError K S T a b x y e)
 
-/-- The local obstruction split into the two color-compatible cases available
-above every active card edge: an active-active first error or an
-inactive-inactive first error. -/
-def LowSliceLocalSplitObstruction
-    (K : SimpleGraph V) (S T : Set V) (a b : V) : Prop :=
-  ∀ (x : singletonLeft T a) (y : singletonRight T b),
-    ∀ e : FixedHostCardIsoData K S
-        (singletonLeft T a) (singletonRight T b) x.1 y.1,
-      (x.1 ∈ S ↔ y.1 ∈ S) →
-        (Nonempty {E : LowSliceCardFirstError K S T a b x y e // E.Active}) ∨
-          (Nonempty {E : LowSliceCardFirstError K S T a b x y e // E.Inactive})
-
-/-- Finite-host local obstruction with the passive first-color status omitted.
-In finite hosts that status is visible from the card itself. -/
-def LowSliceFiniteLocalObstruction
-    (K : SimpleGraph V) (S T : Set V) (a b : V) : Prop :=
-  ∀ (x : singletonLeft T a) (y : singletonRight T b),
-    ∀ e : FixedHostCardIsoData K S
-        (singletonLeft T a) (singletonRight T b) x.1 y.1,
-      Nonempty (LowSliceCardFirstError K S T a b x y e)
-
-namespace LowSliceLocalObstruction
-
-/-- The unclassified local obstruction is equivalent to the active/inactive
-split form. -/
-theorem iff_split {K : SimpleGraph V} {S T : Set V} {a b : V} :
-    LowSliceLocalObstruction K S T a b ↔
-      LowSliceLocalSplitObstruction K S T a b := by
-  constructor
-  · intro hlocal x y e hFirst
-    rcases hlocal x y e hFirst with ⟨E⟩
-    rcases E.active_or_inactive_source with hE | hE
-    · exact Or.inl ⟨⟨E, hE⟩⟩
-    · exact Or.inr ⟨⟨E, hE⟩⟩
-  · intro hsplit x y e hFirst
-    rcases hsplit x y e hFirst with hactive | hinactive
-    · rcases hactive with ⟨E⟩
-      exact ⟨E.1⟩
-    · rcases hinactive with ⟨E⟩
-      exact ⟨E.1⟩
-
-end LowSliceLocalObstruction
-
 namespace LowSliceZeroStarPair
 
 /-- In a no-zero-star-pair obstruction, every active card match localizes to a
@@ -1480,20 +1194,6 @@ theorem localObstruction_of_no_pair
     (hno : ¬ LowSliceZeroStarPair K S T a b) :
     LowSliceLocalObstruction K S T a b :=
   localObstruction_iff_no_pair.mpr hno
-
-/-- In finite hosts, the local obstruction no longer needs an explicit proof
-that the two deleted vertices have the same passive first-color status. -/
-theorem finiteLocalObstruction_iff_no_pair
-    [Finite V] {K : SimpleGraph V} {S T : Set V} {a b : V} :
-    LowSliceFiniteLocalObstruction K S T a b ↔
-      ¬ LowSliceZeroStarPair K S T a b := by
-  constructor
-  · intro hlocal hpair
-    rcases hpair with ⟨x, y, e, _hFirst, hzero⟩
-    rcases hlocal x y e with ⟨E⟩
-    exact (e.zeroStarError_iff_no_starMismatch.mp hzero E.z) E.mismatch
-  · intro hno x y e
-    exact cardFirstError_of_no_pair hno x y e e.firstColor_deleted_status_iff
 
 end LowSliceZeroStarPair
 
