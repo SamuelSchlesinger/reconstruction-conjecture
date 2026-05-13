@@ -123,6 +123,15 @@ to make the deck-counting and descent consequences of that obstruction precise.
             transports to their observer successors.
       - [x] Prove all-coherent active cycles carry matched two-hole transports
             along every cycle edge.
+      - [x] Prove the cycle adjacency-mismatch lemma: on an all-coherent active
+            observer cycle, the host adjacency between two consecutive cycle
+            bases disagrees with the host adjacency between their matched
+            mates under the chosen minimum matching
+            (`ActiveObserverCycle.adjacency_mismatch_at`).
+      - [x] Prove the matching moves at least one cycle vertex on an
+            all-coherent cycle (`ActiveObserverCycle.exists_moved_by_matching`)
+            and cannot fix two consecutive cycle vertices
+            (`ActiveObserverCycle.matching_moves_consecutive_at`).
       - [ ] Prove coherent active steps are removable side-cycle matches, unless
             they expose a smaller fixed-host obstruction.
       - [ ] Prove noncoherent active steps assemble into a lowering exchange

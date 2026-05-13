@@ -2659,6 +2659,39 @@ theorem adjacency_mismatch_at [Finite V]
   rw [hsrc_val, ← himg]
   exact hmis
 
+/-- On an all-coherent active observer cycle, the chosen matching cannot fix
+two consecutive cycle vertices pointwise: at every index, at least one of the
+two consecutive matched mates is genuinely different from the cycle vertex
+itself.  This is the parity obstruction to the matching being "trivial" on the
+cycle. -/
+theorem matching_moves_consecutive_at [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    {o : LowSlicePositiveMinimumObstruction K S T a b}
+    (C : ActiveObserverCycle o) (hall : C.AllCoherent) (n : ℕ) :
+    ¬ ((o.min.toIsoData.toEquiv
+            (C.system.observerMap^[n] C.base)).1 =
+          (C.system.observerMap^[n] C.base).1 ∧
+        (o.min.toIsoData.toEquiv
+            (C.system.observerMap^[n + 1] C.base)).1 =
+          (C.system.observerMap^[n + 1] C.base).1) := by
+  rintro ⟨h1, h2⟩
+  apply C.adjacency_mismatch_at hall n
+  rw [h1, h2]
+
+/-- On an all-coherent active observer cycle, the chosen matching moves at
+least one cycle vertex: there is some index where the matched mate differs from
+the cycle vertex on the host. -/
+theorem exists_moved_by_matching [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    {o : LowSlicePositiveMinimumObstruction K S T a b}
+    (C : ActiveObserverCycle o) (hall : C.AllCoherent) :
+    ∃ n : ℕ,
+      (o.min.toIsoData.toEquiv (C.system.observerMap^[n] C.base)).1 ≠
+        (C.system.observerMap^[n] C.base).1 := by
+  by_contra h
+  push_neg at h
+  exact C.matching_moves_consecutive_at hall 0 ⟨h 0, h 1⟩
+
 end ActiveObserverCycle
 
 /-- The all-active branch yields a packaged active observer cycle. -/
