@@ -1,3 +1,4 @@
+import Mathlib.Algebra.BigOperators.Group.Finset.Lemmas
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Combinatorics.SimpleGraph.DegreeSum
 import Mathlib.Combinatorics.SimpleGraph.Finite
@@ -1362,6 +1363,16 @@ noncomputable def totalStarErrorCount [Finite V]
   exact ∑ x : singletonLeft T a,
     FixedHostCardIsoData.starErrorCount (e.cardIso x)
 
+/-- The total deleted-star error of any chosen low-slice matching is even. -/
+theorem totalStarErrorCount_even [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    (e : LowSliceIsoData K S T a b) :
+    Even e.totalStarErrorCount := by
+  classical
+  letI := Fintype.ofFinite V
+  dsimp [totalStarErrorCount]
+  exact Finset.even_sum _ (fun x _ => (e.cardIso x).starErrorCount_even)
+
 /-- Total star error is zero exactly when every matched low-slice card has zero
 star error. -/
 theorem totalStarErrorCount_eq_zero_iff [Finite V]
@@ -1967,6 +1978,19 @@ theorem no_pair [Finite V]
     ¬ LowSliceZeroStarPair K S T a b :=
   o.min.totalStarErrorCount_pos_iff_no_pair.mp o.positive
 
+/-- The total star error of a positive minimum-error obstruction is at least 2.
+This follows from the parity lemma: a per-card star error is always even, so
+the total is even, and a positive even number is at least 2. -/
+theorem totalStarErrorCount_ge_two [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    (o : LowSlicePositiveMinimumObstruction K S T a b) :
+    2 ≤ o.min.toIsoData.totalStarErrorCount := by
+  have hpos : 0 < o.min.toIsoData.totalStarErrorCount := o.positive
+  have heven : Even o.min.toIsoData.totalStarErrorCount :=
+    o.min.toIsoData.totalStarErrorCount_even
+  rcases heven with ⟨k, hk⟩
+  omega
+
 /-- A positive minimum-error obstruction has no zero-star edge in its chosen
 minimum matching. -/
 theorem noZeroStarEdge [Finite V]
@@ -1974,6 +1998,25 @@ theorem noZeroStarEdge [Finite V]
     (o : LowSlicePositiveMinimumObstruction K S T a b) :
     o.min.toIsoData.NoZeroStarEdge :=
   o.min.noZeroStarEdge_iff_no_pair.mpr o.no_pair
+
+/-- In a positive minimum-error obstruction, every card iso in the chosen
+matching has star error count at least 2.  This is the parity lemma applied
+edge-wise: each card is forced to have at least one mismatch (no zero-star
+edges), and the parity lemma forces the count to be even. -/
+theorem cardIso_starErrorCount_ge_two [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    (o : LowSlicePositiveMinimumObstruction K S T a b)
+    (x : singletonLeft T a) :
+    2 ≤ (o.min.toIsoData.cardIso x).starErrorCount := by
+  classical
+  letI := Fintype.ofFinite V
+  have hpos : 0 < (o.min.toIsoData.cardIso x).starErrorCount :=
+    (o.min.toIsoData.cardIso x).starErrorCount_pos_iff.mpr (o.noZeroStarEdge x)
+  have heven : Even (o.min.toIsoData.cardIso x).starErrorCount :=
+    (o.min.toIsoData.cardIso x).starErrorCount_even
+  rcases heven with ⟨k, hk⟩
+  omega
+
 
 /-- Every edge of a positive minimum-error obstruction splits into the active or
 inactive first-error branch. -/
@@ -2907,6 +2950,45 @@ theorem toMinimalPeriod_iterate_injOn [Finite V]
   exact Function.iterate_eq_iterate_iff_of_lt_minimalPeriod hm hn
 
 end ActiveObserverCycle
+
+/-- Along any active observer system on a positive minimum-error obstruction,
+the chosen minimum-error card iso at every base has star error count at least 2.
+
+This combines two facts: (i) the active first-error witness at each base
+contributes at least one star mismatch; (ii) the parity lemma forces the
+per-card star error count to be even. -/
+theorem ActiveObserverSystem.starErrorCount_ge_two [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    {o : LowSlicePositiveMinimumObstruction K S T a b}
+    (B : ActiveObserverSystem o) (x : singletonLeft T a) :
+    2 ≤ (o.min.toIsoData.cardIso x).starErrorCount := by
+  classical
+  letI := Fintype.ofFinite V
+  set E : LowSliceMinimumErrorMatching.ActiveFirstError o.min x := B.witness x
+  -- E.error.z is a star mismatch witness for the card iso at x
+  have hmis : (o.min.toIsoData.cardIso x).StarMismatch E.error.z :=
+    E.error.mismatch
+  -- So there's at least one mismatch
+  have hpos : 0 < (o.min.toIsoData.cardIso x).starErrorCount := by
+    rw [(o.min.toIsoData.cardIso x).starErrorCount_pos_iff]
+    intro hzero
+    exact ((o.min.toIsoData.cardIso x).zeroStarError_iff_no_starMismatch.mp
+      hzero E.error.z) hmis
+  -- And the parity lemma makes it even
+  have heven : Even (o.min.toIsoData.cardIso x).starErrorCount :=
+    (o.min.toIsoData.cardIso x).starErrorCount_even
+  rcases heven with ⟨k, hk⟩
+  omega
+
+/-- On an active observer cycle (under the all-active branch), the chosen
+minimum-error card iso at any cycle base has star error at least 2. -/
+theorem ActiveObserverCycle.starErrorCount_at_cycle_ge_two [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    {o : LowSlicePositiveMinimumObstruction K S T a b}
+    (C : ActiveObserverCycle o) (n : ℕ) :
+    2 ≤ (o.min.toIsoData.cardIso
+          (C.system.observerMap^[n] C.base)).starErrorCount :=
+  C.system.starErrorCount_ge_two _
 
 /-- The all-active branch yields a packaged active observer cycle. -/
 theorem exists_activeObserverCycleStructure_of_allActiveBranches [Finite V]

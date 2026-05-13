@@ -132,6 +132,18 @@ to make the deck-counting and descent consequences of that obstruction precise.
             all-coherent cycle (`ActiveObserverCycle.exists_moved_by_matching`)
             and cannot fix two consecutive cycle vertices
             (`ActiveObserverCycle.matching_moves_consecutive_at`).
+      - [x] Prove the parity lemma for star error:
+            `FixedHostCardIsoData.starErrorCount_even` —
+            the per-card star error count is always even, since the card iso
+            forces equal degrees and the symmetric-difference count is then
+            twice the off-diagonal piece.
+      - [x] Derive `totalStarErrorCount_even` and
+            `cardIso_starErrorCount_ge_two`: in a positive minimum-error
+            obstruction, each chosen card iso has star error count ≥ 2,
+            so total star error ≥ 2.
+      - [x] Formalize twin-difference set and `AreTwins` predicate
+            (`twinDifferenceSet`, `AreTwins`, `twinDifferenceSet_comm`,
+            `AreTwins.refl`, `AreTwins.symm`).
       - [ ] Prove coherent active steps are removable side-cycle matches, unless
             they expose a smaller fixed-host obstruction.
       - [ ] Prove noncoherent active steps assemble into a lowering exchange
