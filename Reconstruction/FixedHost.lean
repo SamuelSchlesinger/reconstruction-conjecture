@@ -2036,6 +2036,35 @@ theorem totalStarErrorCount_ge_two_mul_ncard [Finite V]
     simp [Set.toFinset_card]]
   exact Finset.sum_le_sum (fun x _ => o.cardIso_starErrorCount_ge_two x)
 
+end LowSlicePositiveMinimumObstruction
+
+/-- Star-error gap for minimum-error matchings: the total star error is either
+zero or at least `2 * |singletonLeft T a|`.
+
+This packages the parity bound at the matching level: a minimum-error matching
+with strictly positive total error gives a positive obstruction, which by the
+parity bound has total at least twice the number of left vertices.  In
+particular, a minimum-error matching cannot have total star error equal to 1,
+3, 5, ... or any value strictly between 0 and `2|singletonLeft|`. -/
+theorem LowSliceMinimumErrorMatching.totalStarErrorCount_zero_or_ge [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    (m : LowSliceMinimumErrorMatching K S T a b) :
+    m.toIsoData.totalStarErrorCount = 0 ∨
+      2 * (singletonLeft T a).ncard ≤ m.toIsoData.totalStarErrorCount := by
+  classical
+  by_cases h : m.toIsoData.totalStarErrorCount = 0
+  · exact Or.inl h
+  · right
+    have hpos : 0 < m.toIsoData.totalStarErrorCount := Nat.pos_of_ne_zero h
+    have hsame : LowSliceSameDeck K S T a b := m.toIsoData.sameSubdeck
+    let o : LowSlicePositiveMinimumObstruction K S T a b :=
+      { low := hsame
+        min := m
+        positive := hpos }
+    exact o.totalStarErrorCount_ge_two_mul_ncard
+
+namespace LowSlicePositiveMinimumObstruction
+
 
 /-- Every edge of a positive minimum-error obstruction splits into the active or
 inactive first-error branch. -/
