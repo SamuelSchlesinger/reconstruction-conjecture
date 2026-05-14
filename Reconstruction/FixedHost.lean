@@ -2066,6 +2066,36 @@ theorem LowSliceMinimumErrorMatching.totalStarErrorCount_zero_or_ge [Finite V]
 namespace LowSlicePositiveMinimumObstruction
 
 
+/-- With empty `T`, there is no active first-error witness anywhere.  This is
+because `singletonLeft ∅ a = {a}`, so the witness vertex `z ≠ a` cannot be in
+`singletonLeft`, contradicting the active condition. -/
+theorem no_activeFirstError_of_T_empty [Finite V]
+    {K : SimpleGraph V} {S : Set V} {a b : V}
+    (m : LowSliceMinimumErrorMatching K S ∅ a b)
+    (x : singletonLeft (∅ : Set V) a)
+    (E : LowSliceMinimumErrorMatching.ActiveFirstError m x) : False := by
+  have hz : E.error.z.1 ∈ singletonLeft (∅ : Set V) a := E.active
+  rw [mem_singletonLeft] at hz
+  have hz' : E.error.z.1 = a := hz.resolve_left (Set.notMem_empty _)
+  have hx_mem : x.1 ∈ singletonLeft (∅ : Set V) a := x.2
+  rw [mem_singletonLeft] at hx_mem
+  have hx : x.1 = a := hx_mem.resolve_left (Set.notMem_empty _)
+  exact E.error.z.2 (hz'.trans hx.symm)
+
+/-- With empty `T`, no positive minimum-error obstruction admits the all-active
+branch.  This rules out one of the five subforks (the all-coherent and
+noncoherent active cycle forks) in the special case `T = ∅`. -/
+theorem not_allActiveBranches_of_T_empty [Finite V]
+    {K : SimpleGraph V} {S : Set V} {a b : V}
+    (o : LowSlicePositiveMinimumObstruction K S ∅ a b) :
+    ¬ (∀ x : singletonLeft (∅ : Set V) a,
+        Nonempty (LowSliceMinimumErrorMatching.ActiveFirstError o.min x)) := by
+  intro h
+  let x : singletonLeft (∅ : Set V) a :=
+    ⟨a, by simp [singletonLeft]⟩
+  rcases h x with ⟨E⟩
+  exact no_activeFirstError_of_T_empty o.min x E
+
 /-- Every edge of a positive minimum-error obstruction splits into the active or
 inactive first-error branch. -/
 theorem firstError_active_or_inactive [Finite V]
