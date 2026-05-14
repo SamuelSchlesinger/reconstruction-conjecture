@@ -3027,6 +3027,35 @@ theorem toMinimalPeriod_iterate_injOn [Finite V]
       C.toMinimalPeriod.system.observerMap^[n] C.toMinimalPeriod.base ↔ m = n := by
   exact Function.iterate_eq_iterate_iff_of_lt_minimalPeriod hm hn
 
+/-- The minimal period of an active observer cycle is bounded by the size of
+`singletonLeft T a`. -/
+theorem minimalPeriod_le_ncard_singletonLeft [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    {o : LowSlicePositiveMinimumObstruction K S T a b}
+    (C : ActiveObserverCycle o) :
+    Function.minimalPeriod C.system.observerMap C.base ≤
+      (singletonLeft T a).ncard := by
+  classical
+  letI : Fintype (singletonLeft T a) := Fintype.ofFinite _
+  rw [Set.ncard_eq_toFinset_card']
+  have h := Function.minimalPeriod_le_card
+    (f := C.system.observerMap) (x := C.base)
+  rw [Set.toFinset_card]
+  exact h
+
+/-- The number of singleton-left vertices is at least 2 whenever there is an
+active observer cycle on a positive minimum-error obstruction.  This rules out
+trivial cases like `T = ∅` for the all-active branch. -/
+theorem ncard_singletonLeft_ge_two_of_cycle [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    {o : LowSlicePositiveMinimumObstruction K S T a b}
+    (C : ActiveObserverCycle o) :
+    2 ≤ (singletonLeft T a).ncard := by
+  have h1 : 1 < Function.minimalPeriod C.system.observerMap C.base :=
+    C.minimalPeriod_base_gt_one
+  have h2 := C.minimalPeriod_le_ncard_singletonLeft
+  omega
+
 end ActiveObserverCycle
 
 /-- Along any active observer system on a positive minimum-error obstruction,
