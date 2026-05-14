@@ -1059,6 +1059,170 @@ abbrev ComplementarySliceIsoData (K : SimpleGraph V) (S T : Set V) (a b : V) :=
   FixedHostSubdeckIsoData K S (singletonLeft T a) (singletonRight T b)
     (complementaryDeleteLeft T a b) (complementaryDeleteRight T a b)
 
+/-- The complementary-slice zero-star pair target: some complementary-slice
+card match deletes a vertex from `O ∪ {b}` on the left and `O ∪ {a}` on the
+right, with matching first-color status, and has zero deleted-star error.
+
+A complementary zero-star pair plays the same role as a low-slice zero-star
+pair: it extends to a full fixed-host singleton solution.  The two slices give
+two independent routes to orbit success. -/
+def ComplementarySliceZeroStarPair (K : SimpleGraph V) (S T : Set V) (a b : V) :
+    Prop :=
+  ∃ x : complementaryDeleteLeft T a b,
+    ∃ y : complementaryDeleteRight T a b,
+      ∃ e : FixedHostCardIsoData K S
+          (singletonLeft T a) (singletonRight T b) x.1 y.1,
+        (x.1 ∈ S ↔ y.1 ∈ S) ∧ e.ZeroStarError
+
+/-- A perfect complementary-slice zero-star matching: every complementary-slice
+deleted vertex on the left is matched to a complementary-slice deleted vertex
+on the right by a card isomorphism whose deleted-star error is zero. -/
+structure ComplementarySliceZeroStarMatching
+    (K : SimpleGraph V) (S T : Set V) (a b : V) where
+  toEquiv : complementaryDeleteLeft T a b ≃ complementaryDeleteRight T a b
+  cardIso : ∀ x : complementaryDeleteLeft T a b,
+    FixedHostCardIsoData K S (singletonLeft T a) (singletonRight T b)
+      x.1 (toEquiv x).1
+  first_status : ∀ x : complementaryDeleteLeft T a b,
+    x.1 ∈ S ↔ (toEquiv x).1 ∈ S
+  zero_star : ∀ x : complementaryDeleteLeft T a b, (cardIso x).ZeroStarError
+
+namespace FixedHostCardIsoData
+
+/-- Singleton-switch specialization of the general zero-star card-extension
+lemma for a complementary-slice step deleting non-singleton vertices on both
+sides. -/
+theorem solved_singleton_of_zeroStarError_complementary
+    {K : SimpleGraph V} {S T : Set V} {a b x y : V}
+    (e : FixedHostCardIsoData K S (singletonLeft T a) (singletonRight T b) x y)
+    (hFirst : x ∈ S ↔ y ∈ S)
+    (hxNotActive : x ∉ singletonLeft T a)
+    (hyNotActive : y ∉ singletonRight T b)
+    (hstar : e.ZeroStarError) :
+    FixedHostSingletonSolved K S T a b := by
+  have hSecond : x ∈ singletonLeft T a ↔ y ∈ singletonRight T b :=
+    ⟨fun h => absurd h hxNotActive, fun h => absurd h hyNotActive⟩
+  exact e.nonempty_twoColorIso_of_zeroStarError hFirst hSecond hstar
+
+end FixedHostCardIsoData
+
+namespace ComplementarySliceZeroStarPair
+
+/-- A vertex in `complementaryDeleteLeft` is outside `singletonLeft`, provided
+the endpoint `b` itself is not active.  This is the non-degeneracy assumption
+that `b ∉ T ∪ {a}` — typically holds in the singleton-switch setup. -/
+theorem mem_not_active_of_b_not_active {T : Set V} {a b : V}
+    (hb : b ∉ singletonLeft T a) {x : V} (hx : x ∈ complementaryDeleteLeft T a b) :
+    x ∉ singletonLeft T a := by
+  rcases hx with hxOut | hxb
+  · intro h
+    rw [mem_singletonLeft] at h
+    rcases h with hT | ha
+    · exact hxOut.1 hT
+    · exact hxOut.2.1 ha
+  · simp only [Set.mem_singleton_iff] at hxb
+    rw [hxb]
+    exact hb
+
+/-- Analogous: a vertex in `complementaryDeleteRight` is outside
+`singletonRight`, provided `a ∉ T ∪ {b}`. -/
+theorem mem_not_active_right_of_a_not_active {T : Set V} {a b : V}
+    (ha : a ∉ singletonRight T b) {y : V}
+    (hy : y ∈ complementaryDeleteRight T a b) :
+    y ∉ singletonRight T b := by
+  rcases hy with hyOut | hya
+  · intro h
+    rw [mem_singletonRight] at h
+    rcases h with hT | hb
+    · exact hyOut.1 hT
+    · exact hyOut.2.2 hb
+  · simp only [Set.mem_singleton_iff] at hya
+    rw [hya]
+    exact ha
+
+/-- A complementary-slice zero-star pair is enough to solve the singleton
+switch, provided `a, b` are genuinely "outside" the active colors of the other
+side (the standard non-degeneracy: `b ∉ T ∪ {a}` and `a ∉ T ∪ {b}`). -/
+theorem solved {K : SimpleGraph V} {S T : Set V} {a b : V}
+    (hb : b ∉ singletonLeft T a) (ha : a ∉ singletonRight T b)
+    (h : ComplementarySliceZeroStarPair K S T a b) :
+    FixedHostSingletonSolved K S T a b := by
+  rcases h with ⟨x, y, e, hFirst, hstar⟩
+  have hxNotActive : x.1 ∉ singletonLeft T a :=
+    mem_not_active_of_b_not_active hb x.2
+  have hyNotActive : y.1 ∉ singletonRight T b :=
+    mem_not_active_right_of_a_not_active ha y.2
+  exact e.solved_singleton_of_zeroStarError_complementary
+    hFirst hxNotActive hyNotActive hstar
+
+end ComplementarySliceZeroStarPair
+
+namespace ComplementarySliceZeroStarMatching
+
+/-- Any chosen complementary-slice zero-star matching produces a
+complementary-slice zero-star pair. -/
+theorem to_pair {K : SimpleGraph V} {S T : Set V} {a b : V}
+    (m : ComplementarySliceZeroStarMatching K S T a b)
+    (hne : Nonempty (complementaryDeleteLeft T a b)) :
+    ComplementarySliceZeroStarPair K S T a b := by
+  obtain ⟨x⟩ := hne
+  exact ⟨x, m.toEquiv x, m.cardIso x, m.first_status x, m.zero_star x⟩
+
+/-- A perfect complementary-slice zero-star matching solves the singleton
+switch (given the non-degeneracy assumptions on `a` and `b`). -/
+theorem solved {K : SimpleGraph V} {S T : Set V} {a b : V}
+    (hb : b ∉ singletonLeft T a) (ha : a ∉ singletonRight T b)
+    (m : ComplementarySliceZeroStarMatching K S T a b) :
+    FixedHostSingletonSolved K S T a b := by
+  -- The b-vertex is always in complementaryDeleteLeft.
+  let xb : complementaryDeleteLeft T a b := ⟨b, by simp⟩
+  exact ComplementarySliceZeroStarPair.solved hb ha
+    (m.to_pair ⟨xb⟩)
+
+end ComplementarySliceZeroStarMatching
+
+namespace ComplementarySliceZeroStarPair
+
+/-- Conversely, any full singleton-switch solution restricts to a
+complementary-slice zero-star pair, using `b` on the left side. -/
+theorem of_solved {K : SimpleGraph V} {S T : Set V} {a b : V}
+    (hb : b ∉ singletonLeft T a)
+    (h : FixedHostSingletonSolved K S T a b) :
+    ComplementarySliceZeroStarPair K S T a b := by
+  rcases h with ⟨e⟩
+  -- Take the b-vertex on the left.
+  let x : complementaryDeleteLeft T a b := ⟨b, by simp⟩
+  -- Its image under the singleton-switch automorphism, viewed in the
+  -- complementary-right side.
+  have himg_not_active :
+      (e.iso.toEquiv b) ∉ singletonRight T b := by
+    intro h
+    exact hb ((e.map_second b).mpr h)
+  let y : complementaryDeleteRight T a b :=
+    ⟨e.iso.toEquiv b, by
+      -- complementaryDeleteRight = singletonOutside ∪ {a}.
+      -- We need image ∈ singletonOutside ∨ image = a.
+      by_cases hya : e.iso.toEquiv b = a
+      · exact Or.inr hya
+      · refine Or.inl ⟨?_, hya, ?_⟩
+        · intro hT
+          exact himg_not_active (Or.inl hT)
+        · intro hb_img
+          exact himg_not_active (Or.inr hb_img)⟩
+  refine ⟨x, y, FixedHostCardIsoData.ofTwoColorIso e b, ?_, ?_⟩
+  · simpa [x, y] using e.map_first b
+  · simpa [x, y] using FixedHostCardIsoData.ofTwoColorIso_zeroStarError e b
+
+/-- Complementary-slice zero-star pairs are equivalent to the desired
+fixed-host singleton orbit conclusion (given non-degeneracy on `a, b`). -/
+theorem iff_solved {K : SimpleGraph V} {S T : Set V} {a b : V}
+    (hb : b ∉ singletonLeft T a) (ha : a ∉ singletonRight T b) :
+    ComplementarySliceZeroStarPair K S T a b ↔
+      FixedHostSingletonSolved K S T a b :=
+  ⟨solved hb ha, of_solved hb⟩
+
+end ComplementarySliceZeroStarPair
+
 /-- The two-hole vertex type obtained by deleting `t` and `o`. -/
 abbrev deleteTwoVertex (t o : V) :=
   {x : V // x ≠ t ∧ x ≠ o}
