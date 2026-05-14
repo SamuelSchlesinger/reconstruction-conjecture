@@ -2017,6 +2017,25 @@ theorem cardIso_starErrorCount_ge_two [Finite V]
   rcases heven with ⟨k, hk⟩
   omega
 
+/-- In a positive minimum-error obstruction, the total star error is at least
+twice the number of singleton-left vertices.  This is the parity bound summed
+over all matched edges. -/
+theorem totalStarErrorCount_ge_two_mul_ncard [Finite V]
+    {K : SimpleGraph V} {S T : Set V} {a b : V}
+    (o : LowSlicePositiveMinimumObstruction K S T a b) :
+    2 * (singletonLeft T a).ncard ≤
+      o.min.toIsoData.totalStarErrorCount := by
+  classical
+  letI := Fintype.ofFinite V
+  dsimp [LowSliceIsoData.totalStarErrorCount]
+  rw [Set.ncard_eq_toFinset_card']
+  rw [show 2 * (singletonLeft T a).toFinset.card =
+        ∑ _x : singletonLeft T a, 2 by
+    rw [Finset.sum_const, Finset.card_univ, smul_eq_mul, mul_comm]
+    congr 1
+    simp [Set.toFinset_card]]
+  exact Finset.sum_le_sum (fun x _ => o.cardIso_starErrorCount_ge_two x)
+
 
 /-- Every edge of a positive minimum-error obstruction splits into the active or
 inactive first-error branch. -/
