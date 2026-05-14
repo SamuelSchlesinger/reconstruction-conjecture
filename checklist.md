@@ -144,6 +144,17 @@ to make the deck-counting and descent consequences of that obstruction precise.
       - [x] Formalize twin-difference set and `AreTwins` predicate
             (`twinDifferenceSet`, `AreTwins`, `twinDifferenceSet_comm`,
             `AreTwins.refl`, `AreTwins.symm`).
+      - [x] Prove `totalStarErrorCount_ge_two_mul_ncard`: in a positive
+            obstruction, total star error ≥ 2 * |singletonLeft|.
+      - [x] Prove `LowSliceMinimumErrorMatching.totalStarErrorCount_zero_or_ge`:
+            the star-error gap — every minimum-error matching has total error
+            either 0 or ≥ 2 * |singletonLeft|.
+      - [x] Prove the active observer cycle bounds:
+            `minimalPeriod_le_ncard_singletonLeft` and
+            `ncard_singletonLeft_ge_two_of_cycle` — observer cycles exist only
+            when |singletonLeft| ≥ 2.
+      - [x] Close the `T = ∅` special case for the all-active branch:
+            `not_allActiveBranches_of_T_empty`.
       - [ ] Prove coherent active steps are removable side-cycle matches, unless
             they expose a smaller fixed-host obstruction.
       - [ ] Prove noncoherent active steps assemble into a lowering exchange
