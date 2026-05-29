@@ -10,6 +10,7 @@ import Reconstruction.Regular
 import Reconstruction.ConnectedComponents
 import Reconstruction.Disconnected.ComponentCount
 import Reconstruction.Disconnected
+import Reconstruction.Separator
 import Reconstruction.Trees
 import Reconstruction.Search
 import Reconstruction.FixedHost

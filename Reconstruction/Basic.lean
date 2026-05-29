@@ -46,6 +46,42 @@ theorem SameDeck.trans {G H K : SimpleGraph V}
   obtain ⟨iso₂⟩ := hσ₂ (σ₁ v)
   exact ⟨iso₁.trans iso₂⟩
 
+/-! ### Complementation
+
+Reconstructibility is closed under complementation: `G` is reconstructible iff
+its complement `Gᶜ` is. This is a classical observation (Bondy's
+"reconstructor's manual") and a basic tool — it lets every positive result be
+dualized (e.g. universal-vertex ↔ isolated-vertex, dense ↔ sparse). -/
+
+/-- An isomorphism of graphs induces an isomorphism of their complements (same
+vertex map, adjacency negated). -/
+def Iso.compl {W : Type*} {G : SimpleGraph V} {H : SimpleGraph W} (e : G ≃g H) :
+    Gᶜ ≃g Hᶜ where
+  toEquiv := e.toEquiv
+  map_rel_iff' := by
+    intro a b
+    change Hᶜ.Adj (e a) (e b) ↔ Gᶜ.Adj a b
+    simp only [SimpleGraph.compl_adj, ne_eq, (EquivLike.injective e).eq_iff,
+      e.map_rel_iff]
+
+/-- Deleting a vertex commutes with complementation: `Gᶜ - v = (G - v)ᶜ`. -/
+lemma compl_deleteVert (G : SimpleGraph V) (v : V) :
+    Gᶜ.deleteVert v = (G.deleteVert v)ᶜ := by
+  ext x y
+  simp only [SimpleGraph.compl_adj, SimpleGraph.induce_adj, ne_eq, Subtype.coe_inj]
+
+/-- **The complement deck is reconstructible.** If `G` and `H` have the same
+deck, so do their complements. Hence reconstructibility is closed under
+complementation. -/
+theorem SameDeck.compl {G H : SimpleGraph V} (h : G.SameDeck H) :
+    Gᶜ.SameDeck Hᶜ := by
+  obtain ⟨σ, hσ⟩ := h
+  refine ⟨σ, fun v => ?_⟩
+  obtain ⟨e⟩ := hσ v
+  refine ⟨?_⟩
+  rw [compl_deleteVert, compl_deleteVert]
+  exact e.compl
+
 end SimpleGraph
 
 /-- **The Reconstruction Conjecture** (Kelly 1942, Ulam 1960).

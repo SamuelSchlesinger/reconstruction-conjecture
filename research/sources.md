@@ -7,6 +7,9 @@ Entries flagged `(verify)` still have an incomplete or unverified field.
 <a name="arxiv2411_03133"></a>
 **[arxiv2411_03133]** Pizzimenti, A. E., and Rakhimov, U. (2024). "Reconstructing edge-deleted unicyclic graphs". arXiv:2411.03133. URL: https://arxiv.org/abs/2411.03133.
 
+<a name="arvindkoblerverbitsky24"></a>
+**[arvindkoblerverbitsky24]** Arvind, V., Köbler, J., and Verbitsky, O. (2024). "On the expressibility of the reconstructional color refinement". Preprint arXiv:2406.09351; journal version in *Theoretical Computer Science* (2025). URL: https://arxiv.org/abs/2406.09351. (Color refinement applied to the vertex-deleted deck; shows connectedness is determined from the weakened "deck of CR-colorings", and poses whether the deck determines `CR(G)`/`WL(G)`.)
+
 <a name="babai16"></a>
 **[babai16]** Babai, L. (2016). "Graph isomorphism in quasipolynomial time [extended abstract]". In *Proceedings of the 48th Annual ACM Symposium on Theory of Computing (STOC 2016)*, pp. 684–697. Preprint arXiv:1512.03547. URL: https://arxiv.org/abs/1512.03547.
 
@@ -31,8 +34,14 @@ Entries flagged `(verify)` still have an incomplete or unverified field.
 <a name="cds80"></a>
 **[cds80]** Cvetković, D., Doob, M., and Sachs, H. (1980). *Spectra of Graphs: Theory and Application*. Academic Press, New York. ISBN: 0-12-195150-2. (URL unknown — verify.)
 
+<a name="chenlinmawei25"></a>
+**[chenlinmawei25]** Chen, P., Lin, Z., Ma, J., and Wei, F. (2025). "Undecidability of polynomial inequalities in tournaments". *International Mathematics Research Notices* (2025). Preprint arXiv:2412.04972. URL: https://arxiv.org/abs/2412.04972. (Tournament analogue of Hatami–Norine: positivity of homomorphism-density polynomial inequalities is undecidable for tournaments — evidence that orientation-agnostic density/positivity arguments cannot decide the undirected reconstruction conjecture, since the directed version is false.)
+
 <a name="coolsaet23"></a>
 **[coolsaet23]** Coolsaet, K., D'hondt, S., and Goedgebeur, J. (2023). "House of Graphs 2.0: a database of interesting graphs and more". *Discrete Applied Mathematics* 325, 97–107. Preprint arXiv:2210.17253. Web interface: https://houseofgraphs.org.
+
+<a name="dellgroherattan18"></a>
+**[dellgroherattan18]** Dell, H., Grohe, M., and Rattan, G. (2018). "Lovász meets Weisfeiler and Leman". In *45th International Colloquium on Automata, Languages, and Programming (ICALP 2018)*, LIPIcs 107, 40:1–40:14. Preprint arXiv:1802.08876. URL: https://arxiv.org/abs/1802.08876. (`k`-WL indistinguishability ⟺ equal homomorphism counts from all treewidth-`≤ k` graphs; with Kelly's Lemma this shows WL reads a subset of the deck's counting information.)
 
 <a name="spinoza-west19"></a>
 **[spinoza-west19]** Spinoza, H., and West, D. B. (2019). "Reconstruction from the deck of k-vertex induced subgraphs". *Journal of Graph Theory* 90, 497–522. Preprint arXiv:1803.04063. URL: https://arxiv.org/abs/1803.04063.
@@ -64,8 +73,14 @@ Entries flagged `(verify)` still have an incomplete or unverified field.
 <a name="hararyplantholt85"></a>
 **[hararyplantholt85]** Harary, F., and Plantholt, M. (1985). "The graph reconstruction number". *Journal of Graph Theory* 9(4), 451–454. DOI: https://doi.org/10.1002/jgt.3190090403.
 
+<a name="hataminorine11"></a>
+**[hataminorine11]** Hatami, H., and Norine, S. (2011). "Undecidability of linear inequalities in graph homomorphism densities". *Journal of the American Mathematical Society* 24(2), 547–565. Preprint arXiv:1005.2382. URL: https://arxiv.org/abs/1005.2382. (Foundational undecidability result for homomorphism-density inequalities; the general positivity/SDP barrier relevant to flag-algebra attacks.)
+
 <a name="heinrich25"></a>
-**[heinrich25]** Heinrich, I., et al. (2025). "Interval graphs are reconstructible" (title paraphrased — verify). Preprint arXiv:2504.02353. URL: https://arxiv.org/abs/2504.02353.
+**[heinrich25]** Heinrich, I., Kiyomi, M., Otachi, Y., and Schweitzer, P. (2025). "Interval graphs are reconstructible". Preprint arXiv:2504.02353. URL: https://arxiv.org/abs/2504.02353. (Reconstructs interval graphs via decomposition along separators of more than one vertex; the authors note the method may adapt to bounded treewidth and beyond.)
+
+<a name="kklovsz20"></a>
+**[kklovsz20]** Kunszenti-Kovács, D., Lovász, L., and Szegedy, B. (2020). "A counterexample to the Bollobás–Riordan conjectures on sparse graph limits". Preprint arXiv:2003.05272. URL: https://arxiv.org/abs/2003.05272. (Convergent normalized sparse subgraph densities need not arise from any kernel — there is no clean sparse-graphon analogue, which obstructs density/limit attacks on sparse reconstruction.)
 
 <a name="hhrt07"></a>
 **[hhrt07]** Hemaspaandra, E., Hemaspaandra, L. A., Radziszowski, S., and Tripathi, R. (2007). "Complexity results in graph reconstruction". *Discrete Applied Mathematics* 155(2), 103–118. Earlier version in *MFCS 2004*; preprint arXiv:cs/0410021. URL: https://arxiv.org/abs/cs/0410021.
@@ -159,6 +174,9 @@ Entries flagged `(verify)` still have an incomplete or unverified field.
 
 <a name="oeis-a000088"></a>
 **[oeis-a000088]** *Number of graphs on n unlabeled nodes*, OEIS A000088. URL: https://oeis.org/A000088.
+
+<a name="oliveirathatte13"></a>
+**[oliveirathatte13]** Oliveira, R., and Thatte, B. (2013). "An algebraic formulation of the graph reconstruction conjecture". Preprint arXiv:1301.4121; published in *Journal of Combinatorial Theory, Series B*. URL: https://arxiv.org/abs/1301.4121. (The existing algebraic attack: uses matrix rank over ℝ of covering-number matrices built on Kocay's Lemma — linear algebra, not densities/WL/SDP. Establishes what the linear theory of the deck already provides.)
 
 <a name="ramachandran81"></a>
 **[ramachandran81]** Ramachandran, S. (1981). "On a new digraph reconstruction conjecture". *Journal of Combinatorial Theory, Series B* 31, 143–149. (Year/venue — verify.)

@@ -42,11 +42,21 @@ sporadic results. Cross-check with
 
 Detail docs:
 
+- [**Separator decomposition — current primary programme**](separator-decomposition.md)
+  — the active attack: reconstruct class by class up a ladder of separator
+  size (components → cut vertices/blocks → multi-vertex separators → clique
+  separators), reusing the project's component-decomposition machinery. Adopted
+  after a strategy review found flag-algebra and Weisfeiler–Leman attacks dead
+  or counting-equivalent; see the doc for the literature-grounded comparison.
 - [Counting / Kelly-style approaches](counting-approach.md)
 - [Spectral / algebraic approaches](spectral-approach.md)
 - [Random and probabilistic approaches](random-and-probabilistic.md)
 - [Structural reductions](structural-reductions.md)
 - [Counterexample search](counterexample-search.md)
+- [Fixed-host `T = empty` full-slice target](fixed-host-t-empty.md)
+  — *superseded.* This centered-extension/fixed-host campaign hit a
+  falsification of its low-slice target; retained for the proved infrastructure
+  and as the record of why the project pivoted to separator decomposition.
 
 ## What would suffice to prove
 

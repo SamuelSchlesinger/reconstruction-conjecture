@@ -27,6 +27,7 @@ such that $G - v \cong H - \sigma(v)$ for all $v \in V$.
 | `SameDeck` is reflexive | [`Basic.lean`](Reconstruction/Basic.lean) |
 | `SameDeck` is symmetric | [`Basic.lean`](Reconstruction/Basic.lean) |
 | `SameDeck` is transitive | [`Basic.lean`](Reconstruction/Basic.lean) |
+| Complement deck is reconstructible: $G \sim_{\text{deck}} H \Rightarrow G^c \sim_{\text{deck}} H^c$ (reconstructibility closed under complementation) | [`Basic.lean`](Reconstruction/Basic.lean) |
 | $\|E(G-v)\| + \deg(v) = \|E(G)\|$ | [`EdgeCount.lean`](Reconstruction/EdgeCount.lean) |
 | $\deg(v) = \|E(G)\| - \|E(G-v)\|$ | [`EdgeCount.lean`](Reconstruction/EdgeCount.lean) |
 | $\sum_v \|E(G-v)\| = (|V|-2)\|E(G)\|$ | [`EdgeCount.lean`](Reconstruction/EdgeCount.lean) |
@@ -44,6 +45,13 @@ such that $G - v \cong H - \sigma(v)$ for all $v \in V$.
 | Componentwise assembly: matched connected components with per-component isomorphisms assemble to a global graph isomorphism | [`Disconnected.lean`](Reconstruction/Disconnected.lean) |
 | Component-count assembly: equal component multiplicities for every component type imply a global graph isomorphism | [`Disconnected.lean`](Reconstruction/Disconnected.lean) |
 | Disconnected graphs are reconstructible (Kelly 1942) | [`Disconnected.lean`](Reconstruction/Disconnected.lean) |
+| Vertex separators, cut vertices, and 2-connectivity (separator-decomposition programme) | [`Separator.lean`](Reconstruction/Separator.lean) |
+| Separators — hence cut vertices and 2-connectivity — are isomorphism invariants | [`Separator.lean`](Reconstruction/Separator.lean) |
+| Separator reassembly engine: a piecewise-adjacency-preserving, piece-matching bijection is a global isomorphism (amalgamation over a shared separator; generalizes the disjoint-union/component assembly) | [`Separator.lean`](Reconstruction/Separator.lean) |
+| Cut-vertex reassembly: a card isomorphism $G-v \cong H-v$ preserving the link of $v$ extends to $G \cong H$ | [`Separator.lean`](Reconstruction/Separator.lean) |
+| Data-carrying component assembly with vertex-action lemma (`componentIso`, `componentIso_apply`) | [`Disconnected.lean`](Reconstruction/Disconnected.lean) |
+| Cut-vertex reconstruction reduces to a piece-matching of $G-v$ agreeing on $v$'s attachment (complete structural reduction for Bondy's case) | [`Separator.lean`](Reconstruction/Separator.lean) |
+| **Graphs with a universal (dominating) vertex are reconstructible** (Manvel's method, simplest case) | [`Separator.lean`](Reconstruction/Separator.lean) |
 | One-card extension API: adding a new vertex with chosen neighbors recovers the card after deleting the new vertex, and every same-deck reconstruction lies in this search space | [`Search.lean`](Reconstruction/Search.lean) |
 | Adjacency matrix of induced subgraph = principal submatrix | [`Spectral.lean`](Reconstruction/Spectral.lean) |
 | Isomorphic graphs have equal characteristic polynomials | [`Spectral.lean`](Reconstruction/Spectral.lean) |
@@ -110,6 +118,18 @@ it is now reduced to proving equality of the top-length proper-support and
 full-support closed-walk counts.
 the full reconstruction conjecture itself remains open mathematics.
 
+The project's **active attack** is the separator-decomposition programme
+(`research/attacks/separator-decomposition.md`): reconstruct class by class up a
+ladder of separator size, reusing the component-decomposition machinery.
+`Separator.lean` lays the vocabulary layer (cut vertices, separators,
+2-connectivity, and their isomorphism-invariance); the next targets are Bondy's
+cut-vertex reduction (`BondySeparableReconstructible`) and, beyond it, chordal
+graphs via clique separators (open mathematics). This direction was adopted
+after a strategy review found the spectral, flag-algebra, and Weisfeiler–Leman
+attacks either barred by known obstructions or equivalent to Kelly counting, and
+after the centered-extension/fixed-host campaign's low-slice target was refuted
+(`research/attacks/fixed-host-t-empty.md`).
+
 ## File Structure
 
 ```
@@ -124,6 +144,7 @@ Reconstruction/
   Regular.lean         -- Regularity is reconstructible from degree sequence
   ConnectedComponents.lean -- Number of connected components is reconstructible
   Disconnected.lean    -- Disconnected-case reconstruction theorem
+  Separator.lean       -- Cut vertices, separators, 2-connectivity; iso-invariance (separator-decomposition programme)
   Trees.lean           -- Tree-case consequences from component machinery
   Search.lean          -- One-card extension search-space API
   Spectral.lean        -- Characteristic polynomial, derivative formula, spectral reconstructibility

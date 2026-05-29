@@ -191,6 +191,61 @@ theorem isoOfComponentIsoEquiv {G H : SimpleGraph V}
   exact ⟨(isoSigmaComponents G).trans
     ((componentSigmaGraphIsoOfComponentIso e hiso).trans (isoSigmaComponents H).symm)⟩
 
+/-! ### Data-carrying component assembly
+
+A variant of `componentSigmaGraphIsoOfComponentIso` / `isoOfComponentIsoEquiv`
+that takes the per-component isomorphisms as *data* (not merely `Nonempty`) and
+exposes the assembled isomorphism's action vertex by vertex
+(`componentIso_apply`). Separator reconstruction needs this: to check that an
+assembled card isomorphism preserves a deleted vertex's link, one must know how
+it acts on each vertex, and the `Nonempty`-based assembly discards that. -/
+
+/-- Data version of `componentSigmaGraphIsoOfComponentIso`: assemble the Sigma
+isomorphism from given per-component isomorphisms. -/
+def componentSigmaGraphIso {G H : SimpleGraph V}
+    (e : G.ConnectedComponent ≃ H.ConnectedComponent)
+    (ι : ∀ c : G.ConnectedComponent,
+      G.induce (c.supp : Set V) ≃g H.induce ((e c).supp : Set V)) :
+    componentSigmaGraph G ≃g componentSigmaGraph H where
+  toEquiv := Equiv.sigmaCongr e fun c => (ι c).toEquiv
+  map_rel_iff' := by
+    intro p q
+    rcases p with ⟨c, v⟩
+    rcases q with ⟨d, w⟩
+    constructor
+    · rintro ⟨hcd, hadj⟩
+      have hcd' : c = d := e.injective hcd
+      subst hcd'
+      refine ⟨rfl, ?_⟩
+      exact ((ι c).map_rel_iff (a := v) (b := w)).mp (by
+        simpa [Equiv.sigmaCongr] using hadj)
+    · rintro ⟨hcd, hadj⟩
+      subst hcd
+      refine ⟨rfl, ?_⟩
+      simpa [Equiv.sigmaCongr] using
+        ((ι c).map_rel_iff (a := v) (b := w)).mpr hadj
+
+/-- Data version of `isoOfComponentIsoEquiv`: a component bijection together with
+per-component isomorphisms assembles into a global isomorphism `G ≃g H`. -/
+def componentIso {G H : SimpleGraph V}
+    (e : G.ConnectedComponent ≃ H.ConnectedComponent)
+    (ι : ∀ c : G.ConnectedComponent,
+      G.induce (c.supp : Set V) ≃g H.induce ((e c).supp : Set V)) :
+    G ≃g H :=
+  (isoSigmaComponents G).trans
+    ((componentSigmaGraphIso e ι).trans (isoSigmaComponents H).symm)
+
+/-- The assembled isomorphism acts on a vertex `x` via the isomorphism of the
+component containing `x`. -/
+theorem componentIso_apply {G H : SimpleGraph V}
+    (e : G.ConnectedComponent ≃ H.ConnectedComponent)
+    (ι : ∀ c : G.ConnectedComponent,
+      G.induce (c.supp : Set V) ≃g H.induce ((e c).supp : Set V)) (x : V) :
+    componentIso e ι x =
+      ((ι (G.connectedComponentMk x))
+        ⟨x, ConnectedComponent.connectedComponentMk_mem⟩ : V) :=
+  rfl
+
 /-- If every connected-component isomorphism class has the same multiplicity
 in `G` and `H`, then `G` and `H` are isomorphic.
 

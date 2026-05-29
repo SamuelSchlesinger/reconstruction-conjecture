@@ -5,25 +5,109 @@ optimization, and fixed-host singleton viewpoints. Items are checked only when
 the Lean code builds and the corresponding theorem, API, computation, or
 writeup is actually in place.
 
-## Current Campaign: Fixed-Host Singleton / Local Obstruction
+## Current Programme: Separator Decomposition (active)
 
-Target theorem:
+The project's primary attack is now **reconstruction by separator
+decomposition** — see [`research/attacks/separator-decomposition.md`](research/attacks/separator-decomposition.md).
+Reconstruct class by class up a ladder of separator size, reusing the existing
+component-decomposition machinery (`Disconnected.lean`):
+
+- **Rung 0 — components (`S = ∅`):** done (`SameDeck.iso_of_not_connected`).
+- **Rung 1 — cut vertices / blocks (`|S| = 1`):** Bondy 1969 reduction. **Active.**
+  Done in `Reconstruction/Separator.lean` (all builds, no `sorry`, standard
+  axioms only):
+  - [x] Primitives: `IsSeparator`, `IsCutVertex`, `NoCutVertex`,
+        `TwoConnected`, `MinDegreeTwo`.
+  - [x] Iso-invariance of all predicates (`IsSeparator.map`, `IsCutVertex.map`,
+        `MinDegreeTwo.map`, `TwoConnected.map`) via `Iso.induceImage`.
+  - [x] **Separator reassembly engine** `isoOfSamePiece` / `isoOfSamePiece'`,
+        with the structural lemma `adj_samePiece` (every edge lies in one
+        piece) and the helper `mem_iff_of_fixOn`. This is the amalgamation-over-
+        `S` generalization of `isoOfComponentIsoEquiv`.
+  - [x] **Deleted-vertex reassembly constructor** `isoOfDeleteVertIso` (+ the
+        `extendMap` combinator and its `apply` lemmas): a *card* isomorphism
+        `G − v ≃g H − w` that preserves the link extends to a global `G ≃g H`
+        sending `v` to `w`. The deleted vertices `v`, `w` may differ — exactly
+        what a deck matching gives (it matches `v` to `σ v`). Uses only
+        `propext`, `Quot.sound`.
+  - [x] **Data-carrying component assembly** in `Disconnected.lean`:
+        `componentSigmaGraphIso`, `componentIso`, and the action lemma
+        `componentIso_apply` (`componentIso e ι x = ι (component of x) x`,
+        provable by `rfl`). This is the `Nonempty`-free assembly needed for
+        link-tracking.
+  - [x] **Complete structural reduction** `nonempty_iso_of_cutVertex_pieces`:
+        a bijection of `G − v` components, per-component induced-subgraph isos,
+        and the link condition (each piece iso preserves adjacency to `v`)
+        assemble into `Nonempty (G ≃g H)`. This finishes the **entire
+        structural side** of rung 1: `G ≅ H` is reduced to a piece-matching of
+        `G − v` that agrees on `v`'s attachment.
+  - [ ] Deck recovery (Bondy 1969, *purely deck-theoretic*): from `SameDeck`
+        and a cut vertex, produce the component bijection `e`, the per-component
+        isos `ι`, and the link condition `hlink` that
+        `nonempty_iso_of_cutVertex_pieces` consumes. This is the substantive
+        1969 argument (recognizing the cut vertex's card, recovering the
+        component-with-attachment pieces and their matching from deck counts).
+  - [ ] Prove `BondySeparableReconstructible`; derive the Yongzhi reduction.
+- **First deck-level reconstruction theorem from the machinery:**
+  `nonempty_iso_of_universal_vertex` — **graphs with a universal (dominating)
+  vertex are reconstructible** (Manvel's method, simplest case). The link
+  condition is automatic for a universal vertex, and degree-reconstructibility
+  (`SameDeck.card_edgeFinset_eq` + `degree_eq_of_card_edgeFinset_eq_of_deleteVert_iso`)
+  forces the matched-card vertex `σ v` to be universal in `H`, so
+  `isoOfDeleteVertIso` applies. Supporting: `IsUniversal`, `isUniversal_iff_degree`,
+  `nonempty_iso_of_universal_card_iso`. Validates the constructor on a real
+  reconstruction result while the cut-vertex deck recovery is developed.
+- **Rung 2 — multi-vertex separators:** Heinrich et al. 2025 (interval graphs).
+- **Rung 3 — clique separators (chordal graphs):** open mathematics.
+
+Mathlib gap: it has `Connected`/`ConnectedComponent`/`induce` but **no** cut
+vertices, vertex separators, `k`-vertex-connectivity, or blocks — all must be
+defined. Staged targets are stated as `def … : Prop`, never `theorem … := sorry`.
+
+**Core foundation added:** `SameDeck.compl` (in `Basic.lean`) — the complement
+deck is reconstructible, so reconstructibility is closed under complementation
+(classical; Bondy's manual). Built from `Iso.compl` (complement of a graph iso)
+and `compl_deleteVert` (`Gᶜ - v = (G - v)ᶜ`). Uses only `propext`, `Quot.sound`.
+This dualizes every positive result (e.g. universal-vertex ↔ isolated-vertex,
+dense ↔ sparse) and is a basic tool the project previously lacked.
+
+## Superseded Campaign: Fixed-Host Singleton / Local Obstruction
+
+> **STATUS: low-slice target REFUTED (2026-05).** The note
+> [`research/attacks/fixed-host-t-empty.md`](research/attacks/fixed-host-t-empty.md)
+> exhibits a 9-vertex host (`S = ∅`, `T = ∅`) with `K − a ≅ K − b` of minimum
+> star error `2` and trivial `Aut(K)` that does **not** satisfy the full
+> singleton-colored deck equality. This is a counterexample to the two targets
+> below — `LowSliceZeroStarPairConjecture` and `LowSliceOrbitReconstruction`
+> are **false as stated** (the low slice alone cannot reconstruct the orbit).
+> The full-deck `FixedHostSingletonConjecture` (which also assumes the
+> *complementary* slice) is untouched and remains open. The `FixedHost.lean`
+> infrastructure (3469 lines, zero `sorry`) is correct and retained; the
+> all-active `T = ∅` branch was closed precisely because no observer cycle can
+> exist when `|T ∪ {a}| = 1`, so the live obstruction is the inactive branch,
+> which is exactly what the counterexample realizes. The corrected target is
+> the transition-cycle closure (full slice), recorded in the note — but the
+> project's primary effort has moved to the separator-decomposition programme
+> above.
+
+Refuted target theorem:
 
 ```lean
 def LowSliceZeroStarPairConjecture (K : SimpleGraph V) (S T : Set V) (a b : V) : Prop :=
   LowSliceSameDeck K S T a b → LowSliceZeroStarPair K S T a b
 ```
 
-Equivalent target:
+Refuted equivalent target:
 
 ```lean
 LowSliceSameDeck K S T a b → FixedHostSingletonSolved K S T a b
 ```
 
-Current proof posture: refute the local obstruction.  We have already shown
-that the failure of an active zero-star pair is exactly a family of local
-first-error witnesses over two-hole colored cards.  The next autonomous work is
-to make the deck-counting and descent consequences of that obstruction precise.
+Original proof posture (now known unattainable via the low slice alone): refute
+the local obstruction.  We had shown that the failure of an active zero-star
+pair is exactly a family of local first-error witnesses over two-hole colored
+cards.  The low-slice descent consequence of that obstruction is false; the
+complementary slice is mathematically necessary.
 
 ### A. Baseline And Hygiene
 
