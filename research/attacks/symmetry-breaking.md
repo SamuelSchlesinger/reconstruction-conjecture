@@ -91,6 +91,19 @@ regular case (`IsRegularOfDegree.valueSeparated`).
 
 The ladder above these:
 
+2½. **Twin-flexible mixed classes** (next formal rung; construction fully
+   specified): if every *mixed* card-degree class of `G − v` consists of
+   pairwise **twins** in the card (identical neighbourhoods off each other),
+   then `v` is rigid. Plan: (i) a twin transposition is a card
+   automorphism; (ii) for equal-size subsets `A, B` of a twin class, the
+   involution pairing `A∖B` with `B∖A` is an automorphism carrying the
+   `A`-marking to the `B`-marking; (iii) `SameDeck.nbrCount_eq` forces the
+   transported marking to have the true per-class counts, so class-by-class
+   corrections (disjoint supports) compose into the required `α`. New
+   reconstructible class: graphs with a vertex whose mixed classes are twin
+   classes. Companion corollary already landed: an **injective-degree card**
+   has no mixed class at all (`nonempty_iso_of_injective_card_degrees`).
+
 3. **Refinement-forced**: run color refinement on the card seeded with the
    (now always-available) class-count constraints `S(t)`; rigidity of the
    refined coloring suffices. (The Arvind–Köbler–Verbitsky CR-deck question

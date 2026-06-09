@@ -222,6 +222,13 @@ component-decomposition machinery (`Disconnected.lean`):
         deficit stamp). Corollary `nonempty_iso_of_valueSeparated`: **graphs
         with a value-separated vertex are reconstructible** — strictly
         extends regular graphs (`IsRegularOfDegree.valueSeparated`).
+  - [x] Corollary: **injective-degree cards force reconstruction**
+        (`nonempty_iso_of_injective_card_degrees`) — a size-≤1 class is
+        never mixed.
+  - [ ] Twin-flexible rung (2½, spec in `symmetry-breaking.md`): mixed
+        classes that are twin classes are automorphism-correctable; new
+        class theorem via twin transpositions + disjoint-support
+        composition + `SameDeck.nbrCount_eq`.
   - [ ] Rigidity census (computational): enumerate `n ≤ 10` graphs without
         a rigid vertex — the enumerated wall.
 - **Deck recovery (the frontier) — see

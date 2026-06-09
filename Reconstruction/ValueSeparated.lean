@@ -340,6 +340,20 @@ theorem nonempty_iso_of_valueSeparated {v : V} (hsep : G.ValueSeparated v)
     Nonempty (G ≃g H) :=
   nonempty_iso_of_rigidVertex hsep.rigidVertex h hV
 
+omit [DecidableRel H.Adj] in
+/-- A card with pairwise-distinct degrees has no mixed class at all, so its
+deleted vertex is value-separated; **a graph with an injective-degree card
+is reconstructible**. A purely card-side recognizable criterion. -/
+theorem nonempty_iso_of_injective_card_degrees {v : V}
+    (hinj : Function.Injective fun x : {w : V // w ≠ v} =>
+      (G.deleteVert v).degree x)
+    (h : G.SameDeck H) (hV : 3 ≤ Fintype.card V) :
+    Nonempty (G ≃g H) := by
+  refine nonempty_iso_of_valueSeparated (v := v) (fun x y hx hy hdeg => ?_) h hV
+  have hxy : x = y := hinj hdeg
+  rw [hxy] at hx
+  exact hx hy
+
 /-- Every vertex of a regular graph is value-separated: non-neighbours keep
 card-degree `d`, neighbours drop to `d − 1`. -/
 theorem IsRegularOfDegree.valueSeparated {d : ℕ}
