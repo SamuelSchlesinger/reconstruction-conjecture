@@ -20,8 +20,9 @@ namespace SimpleGraph
 variable {V : Type*} [Fintype V] [DecidableEq V]
 variable {G H : SimpleGraph V} [DecidableRel G.Adj] [DecidableRel H.Adj]
 
-/-- **Regular graphs are reconstructible.** If `G` is `d`-regular and has the same
-deck as `H` (on ≥ 3 vertices), then `H` is also `d`-regular.
+/-- **Regularity is deck-recognizable.** If `G` is `d`-regular and has the same
+deck as `H` (on ≥ 3 vertices), then `H` is also `d`-regular. (For the full
+reconstruction theorem see `Reconstruction.RegularReconstruction`.)
 
 The degree multiset of a `d`-regular graph consists entirely of `d`'s. Since the
 degree multiset is reconstructible (`SameDeck.degreeMultiset_eq`), `H` has the same

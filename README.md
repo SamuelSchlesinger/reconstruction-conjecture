@@ -52,6 +52,23 @@ such that $G - v \cong H - \sigma(v)$ for all $v \in V$.
 | Data-carrying component assembly with vertex-action lemma (`componentIso`, `componentIso_apply`) | [`Disconnected.lean`](Reconstruction/Disconnected.lean) |
 | Cut-vertex reconstruction reduces to a piece-matching of $G-v$ agreeing on $v$'s attachment (complete structural reduction for Bondy's case) | [`Separator.lean`](Reconstruction/Separator.lean) |
 | **Graphs with a universal (dominating) vertex are reconstructible** (Manvel's method, simplest case) | [`Separator.lean`](Reconstruction/Separator.lean) |
+| Reachability characterization of separators/cut vertices (`Separates`, `isCutVertex_iff_separates`) | [`SeparatorChar.lean`](Reconstruction/SeparatorChar.lean) |
+| Cut vertex ⇒ deleted graph is disconnected with ≥ 2 components | [`SeparatorComponents.lean`](Reconstruction/SeparatorComponents.lean) |
+| `MinDegreeTwo ↔ ∀v, 2 ≤ deg v`; universal-vertex iso-invariance | [`SeparatorDegree.lean`](Reconstruction/SeparatorDegree.lean) |
+| `IsUniversal v ↔ Gᶜ.IsIsolated v`; **isolated-vertex graphs are reconstructible**; universal-vertex reconstruction re-derived via complementation | [`SeparatorDual.lean`](Reconstruction/SeparatorDual.lean) |
+| **Graphs with a disconnected complement (joins / decomposable graphs) are reconstructible** — the complement-dual of Kelly's disconnected-graph theorem | [`SeparatorDual.lean`](Reconstruction/SeparatorDual.lean) |
+| Simplicial vertices, clique separators, their iso-invariance, and intra-separator adjacency (structural input for rungs 2–3) | [`CliqueSeparator.lean`](Reconstruction/CliqueSeparator.lean) |
+| Multi-vertex separator reassembly: a card iso $G-S \cong H-S$ preserving the separator's edges and attachment extends to $G \cong H$ (structural core of Heinrich et al.'s Reconstruction-by-Separation; generalizes the cut-vertex assembler to arbitrary $S$) | [`SeparatorAssembler.lean`](Reconstruction/SeparatorAssembler.lean) |
+| Chordal graphs: definition (no induced $\geq 4$-cycle, via `cycleGraph n ↪g G`), iso-invariance, hereditariness, small-graph base case; Dirac's simplicial-vertex / clique-separator theorems stated as targets (rung-3 structure layer) | [`Chordal.lean`](Reconstruction/Chordal.lean) |
+| A shortest path is chordless (a geodesic has no chord) | [`Geodesic.lean`](Reconstruction/Geodesic.lean) |
+| Induced-cycle bridge: a chordless cycle of length $\geq 4$ yields an embedding $\text{cycleGraph } n \hookrightarrow_g G$ (the object chordality forbids) | [`InducedCycle.lean`](Reconstruction/InducedCycle.lean) |
+| Two internally-disjoint paths glue into a cycle | [`CycleFromPaths.lean`](Reconstruction/CycleFromPaths.lean) |
+| Minimal-separator reachability: a vertex of an inclusion-minimal separator has a neighbour in every component of $G-S$ | [`MinimalSeparator.lean`](Reconstruction/MinimalSeparator.lean) |
+| Two-arc induced cycle: two internally-disjoint chordless arcs with no cross-edges glue to $\text{cycleGraph } n \hookrightarrow_g G$ | [`InducedCycle.lean`](Reconstruction/InducedCycle.lean) |
+| **Minimal separators are cliques** (Dirac's lemma): in a chordal graph, an inclusion-minimal separator induces a clique | [`MinimalSeparatorClique.lean`](Reconstruction/MinimalSeparatorClique.lean) |
+| **Dirac's clique-separator theorem**: a finite chordal connected non-complete graph has a clique separator (+ a $\subseteq$-minimal separator always exists) | [`Dirac.lean`](Reconstruction/Dirac.lean) |
+| **Dirac's simplicial-vertex theorem** (1961): every finite nonempty chordal graph has a simplicial vertex (perfect-elimination base) | [`Dirac.lean`](Reconstruction/Dirac.lean) |
+| **Chordal ⟺ perfect elimination ordering** (Dirac/Fulkerson–Gross characterization, both directions) | [`PEO.lean`](Reconstruction/PEO.lean) |
 | One-card extension API: adding a new vertex with chosen neighbors recovers the card after deleting the new vertex, and every same-deck reconstruction lies in this search space | [`Search.lean`](Reconstruction/Search.lean) |
 | Adjacency matrix of induced subgraph = principal submatrix | [`Spectral.lean`](Reconstruction/Spectral.lean) |
 | Isomorphic graphs have equal characteristic polynomials | [`Spectral.lean`](Reconstruction/Spectral.lean) |
@@ -63,6 +80,15 @@ such that $G - v \cong H - \sigma(v)$ for all $v \in V$.
 | Top-trace support split: closed walks are partitioned into proper-support and full-support pieces, with the proper part expanded as a sum over exact vertex supports | [`TopTrace.lean`](Reconstruction/TopTrace.lean) |
 | Conditional constant-term reduction: `c_0` follows from equality of $\operatorname{tr}(A^{|V|})$ | [`CharPolyFull.lean`](Reconstruction/CharPolyFull.lean) |
 | Conditional constant-term reduction from equality of the two top-trace support-count pieces | [`CharPolyFull.lean`](Reconstruction/CharPolyFull.lean) |
+| **2-connectedness is deck-recognizable**: `G` is 2-connected iff `G` and every card are connected, and same-deck graphs agree on it | [`SeparatorComponents.lean`](Reconstruction/SeparatorComponents.lean) |
+| Multiset Kelly engine: exact-support closed walks = full-support walks of the induced subgraph; full-support counts are iso-invariants; subset sums regroup over isomorphism classes (`GraphIsoClass`) weighted by Kelly counts | [`SupportCount.lean`](Reconstruction/SupportCount.lean) |
+| **The proper-support top-trace sector is reconstructible** (`SameDeck.properSupportClosedWalkCount_eq`) | [`SupportCount.lean`](Reconstruction/SupportCount.lean) |
+| **Full-support closed $n$-walks are exactly Hamiltonian-cycle traversals**: `fullSupportClosedWalkCount |V| = hamiltonianHomCount` (injective homs $C_n \hookrightarrow G$) | [`HamiltonianWalk.lean`](Reconstruction/HamiltonianWalk.lean) |
+| Constant term of the characteristic polynomial reduced to **one hypothesis**: the Hamiltonian count is deck-reconstructible (Tutte 1979, staged as `HamiltonianHomCountReconstructible`) | [`CharPolyFull.lean`](Reconstruction/CharPolyFull.lean), [`HamiltonianWalk.lean`](Reconstruction/HamiltonianWalk.lean) |
+| **Kocay's lemma, deck form: host cover counts are reconstructible** (`SameDeck.coverTypeCount_eq`) — the number of ways to cover the whole vertex set by induced copies of any pattern family (each pattern on `< |V|` vertices) is deck-determined; isolates the one summand of Kocay's identity that Kelly cannot see | [`KocayHost.lean`](Reconstruction/KocayHost.lean) |
+| **The rigid-card criterion** (`RigidVertex`, `nonempty_iso_of_rigidVertex`): a vertex is rigid when every degree-data-matched card isomorphism can be corrected by a card automorphism to respect attachments; **one rigid vertex makes a graph reconstructible** — the first formal theorem of the symmetry-breaking programme | [`RegularReconstruction.lean`](Reconstruction/RegularReconstruction.lean) |
+| **Regular graphs are reconstructible** (`nonempty_iso_of_regular`): the degree deficit stamps the deleted vertex's neighbourhood into each card (`degree_deleteVert`, `adj_iff_degree_deleteVert_ne`); every vertex of a regular graph is rigid, so this is the criterion's base case | [`RegularReconstruction.lean`](Reconstruction/RegularReconstruction.lean) |
+| **Subgraph-copy counts are reconstructible** (`SameDeck.injHomCount_eq`): injective-homomorphism copy counts (= $\|\mathrm{Aut}\,F\|$ × subgraph copies) for patterns on `< \|V\|` vertices — Kelly's Lemma upgraded from induced to arbitrary copies, via partition-by-image and the `GraphIsoClass` regrouping | [`HomCount.lean`](Reconstruction/HomCount.lean) |
 
 ### Reconstructible Invariants
 
@@ -113,10 +139,14 @@ disconnected-graph reconstruction theorem, trace reconstruction below the
 vertex count, the top-trace support split, component iso-class matching from per-class counts,
 larger-component matching above a size threshold, and non-constant
 characteristic-polynomial coefficients) is proved. The remaining internal
-staged target is the constant-term characteristic-polynomial reconstruction;
-it is now reduced to proving equality of the top-length proper-support and
-full-support closed-walk counts.
-the full reconstruction conjecture itself remains open mathematics.
+staged target is the constant-term characteristic-polynomial reconstruction.
+The proper-support sector is now **proved** reconstructible
+(`SupportCount.lean`), and the full-support sector is identified with the
+Hamiltonian-cycle count (`HamiltonianWalk.lean`), so the staged target is
+reduced exactly to Tutte's 1979 theorem that the Hamiltonian-cycle count is
+reconstructible (`HamiltonianHomCountReconstructible`), to be proved via
+Kocay's disconnected-spanning-subgraph counting.
+The full reconstruction conjecture itself remains open mathematics.
 
 The project's **active attack** is the separator-decomposition programme
 (`research/attacks/separator-decomposition.md`): reconstruct class by class up a
@@ -142,6 +172,7 @@ Reconstruction/
   KellyEdgeCount.lean  -- Alternate edge-count reconstruction via Kelly's Lemma
   Kocay.lean           -- Kocay-style cover-counting identities
   Regular.lean         -- Regularity is reconstructible from degree sequence
+  RegularReconstruction.lean -- Regular graphs ARE reconstructible (deficit marking)
   ConnectedComponents.lean -- Number of connected components is reconstructible
   Disconnected.lean    -- Disconnected-case reconstruction theorem
   Separator.lean       -- Cut vertices, separators, 2-connectivity; iso-invariance (separator-decomposition programme)
@@ -150,6 +181,10 @@ Reconstruction/
   Spectral.lean        -- Characteristic polynomial, derivative formula, spectral reconstructibility
   TraceReconstruction.lean -- Trace(A^k) reconstructibility for k < |V|
   TopTrace.lean        -- Top-trace support split and exact-support expansion
+  SupportCount.lean    -- Proper-support sector reconstructible (multiset Kelly engine)
+  KocayHost.lean       -- Kocay's lemma, deck form: host cover counts reconstructible
+  HomCount.lean        -- Subgraph-copy (injective-hom) counts reconstructible
+  HamiltonianWalk.lean -- Full-support sector = Hamiltonian homomorphism count
   Newton.lean          -- Newton/Faddeev-LeVerrier trace identity
   CharPolyFull.lean    -- Constant-term + full charpoly reconstruction target (sorry)
 ```

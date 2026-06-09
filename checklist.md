@@ -41,6 +41,13 @@ component-decomposition machinery (`Disconnected.lean`):
         assemble into `Nonempty (G ≃g H)`. This finishes the **entire
         structural side** of rung 1: `G ≅ H` is reduced to a piece-matching of
         `G − v` that agrees on `v`'s attachment.
+  - [x] **2-connectedness is deck-recognizable** (`SeparatorComponents.lean`):
+        `isCutVertex_iff_not_connected_deleteVert` (a vertex of a connected
+        graph is a cut vertex iff its card is disconnected),
+        `twoConnected_iff_forall_deleteVert_connected` (2-connected ⟺
+        connected with all cards connected), and `SameDeck.twoConnected_iff`
+        (same-deck graphs agree on 2-connectivity). This is the recognition
+        half of rung 1; the recovery half (below) is the open content.
   - [ ] Deck recovery (Bondy 1969, *purely deck-theoretic*): from `SameDeck`
         and a cut vertex, produce the component bijection `e`, the per-component
         isos `ι`, and the link condition `hlink` that
@@ -57,8 +64,170 @@ component-decomposition machinery (`Disconnected.lean`):
   `isoOfDeleteVertIso` applies. Supporting: `IsUniversal`, `isUniversal_iff_degree`,
   `nonempty_iso_of_universal_card_iso`. Validates the constructor on a real
   reconstruction result while the cut-vertex deck recovery is developed.
+- **Foundations expanded (parallel fan-out):** four independent modules added,
+  each builds, zero `sorry`, standard axioms:
+  - `SeparatorChar.lean` — `Separates` predicate + `isSeparator_iff_separates`,
+    `isCutVertex_iff_separates` (the missing separator-theory primitive).
+  - `SeparatorComponents.lean` — `IsCutVertex.not_connected_deleteVert`,
+    `nonempty_deleteVert`, `two_le_card_components`.
+  - `SeparatorDegree.lean` — `IsUniversal.map`, `minDegreeTwo_iff`,
+    `isUniversal_complete`, `minDegreeTwo_complete`.
+  - `SeparatorDual.lean` — `IsIsolated`, `isUniversal_iff_compl_isIsolated`,
+    `IsIsolated.not_connected`, **`nonempty_iso_of_isolated_vertex`**, and
+    `nonempty_iso_of_universal_vertex_via_compl` (the complement re-derivation).
+  - `CliqueSeparator.lean` — `IsSimplicial`(+`.map`), `IsCliqueSeparator`(+`.map`,
+    projections), `isClique_image_of_iso`, `IsCliqueSeparator.adj_of_mem`.
+- **Multi-vertex separator assembler — DONE** (`SeparatorAssembler.lean`):
+  `extendFixingSet` (extend a permutation of `Sᶜ` to `V` fixing `S`),
+  `nonempty_iso_of_induce_compl_iso` (a card iso `G − S ≃g H − S` preserving the
+  separator's internal edges and the `S`-to-`Sᶜ` attachment extends to
+  `G ≃g H`), and `nonempty_iso_of_separator_pieces` (the per-component form).
+  This generalizes `nonempty_iso_of_cutVertex_pieces` from `S = {v}` to an
+  arbitrary separator and is the structural core of Heinrich et al.'s
+  Reconstruction-by-Separation (Lemma 24). The **structural reassembly side of
+  rungs 2–3 is now complete**; what remains for any class is the deck-theoretic
+  recovery (separator + component matching + attachment).
 - **Rung 2 — multi-vertex separators:** Heinrich et al. 2025 (interval graphs).
-- **Rung 3 — clique separators (chordal graphs):** open mathematics.
+  See [`research/attacks/rung-2-3-plan.md`](research/attacks/rung-2-3-plan.md):
+  reassembly is done (above); the wall is deck recovery (a ~50-page resilient
+  structure theory). Next concrete targets are the chordal structure layer
+  (Dirac clique-separator existence, PEO) — see the plan's ordered lemma list.
+- **Rung 3 — clique separators (chordal graphs):** OPEN mathematics. Needs the
+  chordal/PEO/Dirac/clique-tree layer (entirely absent from Mathlib); see the
+  rung-2/3 plan for the ordered lemma list.
+  - [x] **Chordal structure layer started** (`Chordal.lean`): `IsChordal`
+        (no induced `≥ 4`-cycle, defined as `IsEmpty (cycleGraph n ↪g G)` for
+        `n ≥ 4` — a graph embedding reflects adjacency, so this is exactly "no
+        induced `Cₙ`"), `IsChordal.map` (iso-invariance), `IsChordal.induce`
+        (hereditary), `isChordal_of_card_le_three` and `isChordal_bot`
+        (small-graph / edgeless base cases).
+        plus `IsChordal.deleteVert` (deleting any vertex stays chordal — the PEO
+        recursion step). Simplicial base cases proved:
+        `isSimplicial_of_subsingleton_neighborSet` (isolated/leaf vertices are
+        simplicial — axiom-free) and `isSimplicial_top` (complete-graph case).
+        Dirac's theorems stated as targets: `DiracSimplicial` (chordal ⇒ has a
+        simplicial vertex), `DiracCliqueSeparator` (non-complete chordal ⇒ has a
+        clique separator — the structural input that makes the reassembly
+        engine's hypothesis available), and the crux `MinimalSeparatorClique`
+        (a minimal separator of a chordal graph induces a clique).
+  - [x] **Induced-cycle-extraction foundations — DONE** (the novel,
+        no-Mathlib-support core; all build, standard axioms only):
+        - `Geodesic.lean`: `Walk.geodesic_not_adj_of_lt` (+ symm) — a shortest
+          path is chordless (the linchpin: a chord would shortcut it).
+        - `InducedCycle.lean`: `cycleGraph_adj_val` (value-level cycleGraph
+          adjacency = consecutive-or-wrap, via `Fin.coe_int_sub_eq_ite`+
+          `fin_omega`) and **`inducedCycleEmbedding`** (a chordless `IsCycle`
+          walk of length `n ≥ 4` ⟶ `cycleGraph n ↪g G`, the bridge to the
+          embedding-based `IsChordal`).
+        - `CycleFromPaths.lean`: `Walk.isCycle_append_reverse` — two
+          internally-disjoint paths glue into a cycle.
+  - [x] **Minimality ⇒ neighbour in each component — DONE**
+        (`MinimalSeparator.lean`): `exists_adj_mem_component` — from
+        inclusion-minimality and a separated pair `u₀, w₀`, every `x ∈ S` has a
+        neighbour in `u₀`'s component. The delicate reachability surgery (a walk
+        from `u₀` in `G − (S\{x})` can't escape its component) done cleanly via
+        `reachable_iff_reflTransGen` + `ReflTransGen` `tail`-induction. Standard
+        axioms.
+  - [x] **`MinimalSeparatorClique` — PROVED** (`MinimalSeparatorClique.lean`,
+        `minimalSeparatorClique`; standard axioms only). In a chordal graph an
+        inclusion-minimal separator is a clique. Final assembly:
+        - `inducedCycleEmbedding_of_paths` (`InducedCycle.lean`): the two-arc
+          induced-cycle bridge — two internally-disjoint chordless arcs `x → y`
+          with no cross-edges glue to `cycleGraph (|P|+|Q|) ↪g G`. Carries the
+          glued-cycle `Fin n` getVert index bookkeeping (4 index regions, WLOG
+          `a ≤ b`, each reducing to chordless-P/Q, no-cross, or wrap/diagonal).
+        - `exists_chordless_arc` (`MinimalSeparatorClique.lean`): a chordless
+          `x`–`y` arc through a prescribed component — a geodesic in
+          `G[component ∪ {x,y}]` (built by `Walk.induce` of the assembled
+          connecting walk, then `Reachable.exists_walk_length_eq_dist`), mapped
+          to `G`; chordless via `geodesic_not_adj_of_lt` + `map_adj_iff`, its
+          interior confined by the induced subgraph.
+        - `minimalSeparatorClique`: glues the two arcs (through `u₀`'s and
+          `w₀`'s components, distinct since `S` separates them), discharging
+          cross-edges by `adj_connectedComponentMk_eq` and edge/interior
+          disjointness by the shared-only-`x,y` support characterization,
+          contradicting `IsChordal`.
+  - [x] **`DiracCliqueSeparator` — PROVED** (`Dirac.lean`,
+        `diracCliqueSeparator`, under `[Finite V]`; standard axioms). A finite
+        chordal connected non-complete graph has a clique separator: a
+        non-complete connected graph has a separator (`{a,b}ᶜ` for a non-adjacent
+        pair, whose induced `{a,b}` is edgeless — `reachable_bot`); a
+        `⊆`-minimal one exists (`Set.Finite.exists_minimal`,
+        `exists_minimal_separator`), and is a clique by `minimalSeparatorClique`.
+        This is the structural input the reassembly engine needs (rung 3).
+  - [x] `isSimplicial_of_induce` (`Dirac.lean`; axiom-free) — the
+        simplicial-vertex transfer lemma (a vertex simplicial in `G[T]` with all
+        its `G`-neighbours in `T` is simplicial in `G`); the bridge for the
+        `DiracSimplicial` induction.
+  - [x] **`DiracSimplicial` — PROVED** (`Dirac.lean`, `diracSimplicial`;
+        standard axioms). A finite nonempty chordal graph has a simplicial vertex
+        (Dirac 1961). Type-polymorphic strong induction on `|V|` (`dirac_aux`, one
+        named universe so the induced-subgraph recursion stays in type) of the
+        strong form "complete, or two non-adjacent simplicial vertices":
+        `exists_simplicial_of_induce_disj` extracts a simplicial vertex of a set
+        `T'` from the inductive dichotomy on `G[T]` (a clique `T \ T'` ⇒ the two
+        non-adjacent simplicial vertices can't both avoid `T'`); a connected
+        non-complete graph peels a component across a clique separator
+        (`diracCliqueSeparator`) and recurses on `G[component ∪ S]`, a
+        disconnected graph peels two whole components, transferring via
+        `isSimplicial_of_induce`.
+  - [x] **`isChordal_iff_hasPEO` — PROVED** (`PEO.lean`; standard axioms). The
+        full Dirac/Fulkerson–Gross characterization: a finite graph is chordal
+        **iff** it has a perfect elimination ordering. `IsPEO l`: `l` enumerates
+        the vertices so each suffix `v :: rest` has `v`'s later neighbours forming
+        a clique.
+        - `hasPEO_of_chordal` (⟹): induction (`peo_aux`) peeling a
+          `G[s]`-simplicial vertex (`diracSimplicial`) off the front of the list
+          for the remaining `Finset s`, its `s`-neighbourhood a clique by
+          `isClique_neighbors_of_isSimplicial_induce`.
+        - `isChordal_of_hasPEO` (⟸): in any induced `≥ 4`-cycle, the PEO-earliest
+          vertex (`exists_earliest_suffix`) has both cycle neighbours later, so
+          the PEO forces them adjacent — contradicting the cycle's chordlessness
+          (`cycleGraph_not_adj_pred_succ`, the `Fin n` modular facts handled by
+          `abel` + `Nat.mod_eq_of_lt` flattening for `omega`).
+        Next: clique trees, `treewidth = ω − 1`.
+- **Symmetry-breaking programme (user-directed, 2026-06) — see
+  [`research/attacks/symmetry-breaking.md`](research/attacks/symmetry-breaking.md):**
+  - [x] **Regular graphs are reconstructible — PROVED**
+        (`RegularReconstruction.lean`; standard axioms):
+        `nonempty_iso_of_regular`, via the deficit stamp
+        (`degree_deleteVert`: deleting `v` lowers degrees exactly on `N(v)`;
+        `IsRegularOfDegree.adj_iff_degree_deleteVert_ne`: in a `d`-regular
+        graph the stamp is legible as card-degree `≠ d`) and the
+        `isoOfDeleteVertIso` assembler. Base case of the deficit-marking
+        mechanism; also corrects the attacks-index row that conflated the
+        open cubic **2-deck** problem with the closed 1-deck case.
+  - [x] **Rigid-card criterion — PROVED** (`RegularReconstruction.lean`;
+        standard axioms): `RigidVertex` (every degree-data-matched card iso
+        is correctable by a card automorphism to respect attachments) and
+        `nonempty_iso_of_rigidVertex` — **one rigid vertex ⟹
+        reconstructible**. `IsRegularOfDegree.rigidVertex` shows every
+        vertex of a regular graph is rigid; regular reconstruction is now
+        the corollary. "Graphs with a rigid vertex" is the project's first
+        new formally-verified reconstructible class.
+  - [ ] Shift-recurrence lemma (Discovery A, `symmetry-breaking.md`):
+        `S(t) = C(t) − D'(t) + S(t−1)` determines the neighbour-card-degree
+        multiset uniquely — no Hall condition needed (the imagined level-2
+        obstruction dissolves); yields `SameDeck → M_G(v) = M_H(σ v)`.
+  - [ ] **Value-separated ⟹ rigid** (Discovery B): telescoping
+        `n_t − m_t = n_{t−1} − m_{t−1}` + all-or-nothing classes; corollary
+        extends `nonempty_iso_of_regular` to graphs with a value-separated
+        vertex. Full proof recipe recorded in the note, ready to formalize.
+  - [ ] Rigidity census (computational): enumerate `n ≤ 10` graphs without
+        a rigid vertex — the enumerated wall.
+- **Deck recovery (the frontier) — see
+  [`research/attacks/deck-recovery.md`](research/attacks/deck-recovery.md):**
+  - [x] Forced-structure cases done: disconnected, **`Gᶜ` disconnected (joins /
+        decomposable graphs)** (`nonempty_iso_of_compl_not_connected`, the
+        complement-dual of Kelly), isolated vertex, universal vertex. These
+        exhaust what recovery gives "for free" (`S = ∅` in `G` or `Gᶜ`, no
+        attachment data needed).
+  - [ ] Attachment recovery — the wall: cut-vertex `δ ≥ 2` (Bondy end-block
+        analysis), 2-connected (Yongzhi target), interval (Heinrich 50-page
+        structure theory), chordal (open mathematics). The reduction
+        "recovered data ⇒ `G ≃g H`" is done (the assembler); the existential
+        recovery of the separator + component matching + attachment is the open
+        content.
 
 Mathlib gap: it has `Connected`/`ConnectedComponent`/`induce` but **no** cut
 vertices, vertex separators, `k`-vertex-connectivity, or blocks — all must be
@@ -473,6 +642,69 @@ context.
         top-length closed-walk counts.
       - Added `SameDeck.charPoly_coeff_zero_eq_of_support_counts_eq`: the
         constant coefficient follows from those two support-count equalities.
+      - [x] **Proper-support sector PROVED** (`SupportCount.lean`;
+        standard axioms): `SameDeck.properSupportClosedWalkCount_eq`.
+        Machinery: `exactSupportClosedWalkCount_eq_fullSupport_induce`
+        (exact-support walks = full-support walks of the induced subgraph,
+        via Mathlib's `Walk.induce`/`Walk.map` with a two-injection counting
+        argument), `fullSupportClosedWalkCount_eq_of_iso` (iso-invariance),
+        `GraphIsoClass` (isomorphism classes of graphs on `Fin m` as a
+        finite quotient), and `sum_fullSupport_induce_eq` (regrouping
+        subset sums into Kelly-count-weighted class sums).
+      - [x] **Full-support sector identified as the Hamiltonian sector**
+        (`HamiltonianWalk.lean`; standard axioms):
+        `fullSupportClosedWalkCount_card_eq_hamiltonianHomCount` — a closed
+        `|V|`-walk with full support has no room to repeat a vertex, so it
+        traverses a Hamiltonian cycle; `hamiltonianHomCount` counts the
+        injective homs `cycleGraph |V| →g G` (= 2·|V| per Hamiltonian
+        cycle). Machinery: `walkOfFn` (walks from vertex sequences),
+        `walk_ext_getVert` (walks are determined by their vertex
+        sequences), `homRCW` (unrolling an injective hom to a rooted
+        closed walk).
+      - Added `SameDeck.charPoly_coeff_zero_eq_of_fullSupport_eq` and
+        `SameDeck.charPoly_coeff_zero_eq_of_hamiltonianHomCount_eq`: the
+        constant term now follows from the **single** hypothesis that the
+        Hamiltonian homomorphism counts agree — exactly Tutte's 1979
+        theorem, staged as `HamiltonianHomCountReconstructible`.
+      - [ ] Prove `HamiltonianHomCountReconstructible` via Kocay: (i)
+        Möbius/triangular induction over `coverTypeCount_sum_inducedIsoClass`
+        to reconstruct all disconnected spanning-subgraph counts (the
+        descending-induction pattern of `Disconnected/ComponentCount.lean`);
+        (ii) extract the Hamiltonian count from products of path counts
+        (Stark 2025 arXiv:2509.02604 gives the modern elementary route).
+        - [x] **Keystone PROVED — Kocay's lemma, deck form**
+          (`KocayHost.lean`; standard axioms):
+          `SameDeck.coverTypeCount_eq` — host cover counts are
+          reconstructible for every pattern family on `< |V|` vertices.
+          Via `prod_subgraphCount_eq_coverTypeCount_add` (Kocay's identity
+          with the host term isolated) and
+          `sum_coverTypeCount_induce_eq` (regrouping proper subsets by
+          `GraphIsoClass` with Kelly weights).
+        - [x] **Subgraph-copy (non-induced) counting layer — PROVED**
+          (`HomCount.lean`; standard axioms): `SameDeck.injHomCount_eq` —
+          injective-homomorphism copy counts (= `|Aut F|` × subgraph-copy
+          counts) are reconstructible for `|F| < n`. Via the
+          partition-by-image identity `injHomCount_eq_sum_induce`
+          (`injHomCount F G = ∑_{|U|=|F|} injHomCount F (G[U])`), target-iso
+          invariance, and the third instantiation of the `GraphIsoClass`
+          regrouping (`sum_injHomCount_induce_eq`).
+        - [ ] Vertex-disjointness collapse: for disconnected `D` on `n`
+          vertices with components `D₁ … D_m`, every spanning union of
+          copies of the `Dᵢ` is `≅ D` (component sizes sum to `n`), so
+          `∏ s'(Dᵢ,G)` determines `s'(D,G)` — all disconnected spanning
+          subgraph counts in one step.
+          - [x] **Tuple layer + staged target landed**
+            (`SpanningTuple.lean`; standard axioms): `injTupleCount` with
+            the product formula `injTupleCount_eq_prod` and deck-invariance
+            `SameDeck.injTupleCount_eq`; the collapse itself stated
+            precisely as the `Prop`-valued staged target
+            `DisjointSpanningTupleCountReconstructible` (pairwise-disjoint
+            spanning placement tuples), with the intended proof recorded:
+            partition tuples by image union, regroup by `GraphIsoClass` as
+            in `KocayHost.lean`, isolate the full-vertex-set fiber.
+        - [ ] Hamiltonian extraction: two-path families `a + b = n + 2`
+          and triangular elimination over spanning tree/unicyclic types,
+          or Stark's endpoint-refined Hamiltonian-path route.
 - [ ] Close `SimpleGraph.SameDeck.charPoly_coeff_zero_eq`.
       - Literature status: proven; the full adjacency characteristic
         polynomial is reconstructible from the deck, so the constant term is

@@ -35,19 +35,43 @@ sporadic results. Cross-check with
 | Graphs with $m > n \cdot \log_2 n$ edges | Müller edge-reconstruction (asymptotically stronger) | P (Müller 1977 [muller77][muller77]) | — |
 | Almost every graph | Random 3-card argument | P (Bollobás 1990) | — |
 | Bipartite graphs | Kelly + spectral partial results | O | High payoff (see below) |
-| 3-regular (cubic) graphs | Structural / Kelly; 2-reconstructibility known (Kostochka–Nahvi–West–Zirlin 2021 [kostochkanahviwestzirlin21][kostochkanahviwestzirlin21]) | O | High payoff |
+| 3-regular (cubic) graphs | **Closed at the 1-deck**: regular graphs are reconstructible by deficit marking (folklore; formalized in `RegularReconstruction.lean`). The open cubic problem is reconstruction from the **2-deck** (Kostochka–Nahvi–West–Zirlin 2021 [kostochkanahviwestzirlin21][kostochkanahviwestzirlin21]) | P (1-deck) / O (2-deck) | — |
 | Triangle-free graphs | Kelly counting of small subgraphs | O | Medium |
 | Strongly regular graphs | Parameter reconstructibility | O | Low (cospectral obstruction) |
 | General graphs | Composite of all above | O | Very low (no single lever) |
 
 Detail docs:
 
+- [**Strategy review 2026-06 — verified literature updates and ranked attack ideas**](strategy-2026-06.md)
+  — corrects the McKay bound (now `n ≤ 13`, McKay 2022), records the sharpened
+  reduction chain (Yongzhi 1988 → Ramachandran–Monikandan 2009 →
+  Aravind–Monikandan 2026: RC ⟺ 2-connected with `γ = 2` or
+  `diam(G) = diam(Gᶜ) = 2`), the Stark 2025 Kocay-lemma generalization, and
+  ranks the live options (finish Tutte via Kocay; Bondy rung 1; the unexplored
+  SPQR/Tutte-decomposition programme; chordal clique trees; the 1-WL deck
+  question; the Kocay-rank computational probe).
+- [**Canonical symmetry-breaking — candidate mechanisms**](symmetry-breaking.md)
+  — the corridor left open by the barrier analysis: deficit marking and the
+  rigid-card criterion (base case **proved**: regular graphs are
+  reconstructible, `RegularReconstruction.lean`), deck descent/transition
+  cocycles (recycling the FixedHost observer-cycle corpus), and
+  stability-then-exact for the dense residual class.
 - [**Separator decomposition — current primary programme**](separator-decomposition.md)
   — the active attack: reconstruct class by class up a ladder of separator
   size (components → cut vertices/blocks → multi-vertex separators → clique
   separators), reusing the project's component-decomposition machinery. Adopted
   after a strategy review found flag-algebra and Weisfeiler–Leman attacks dead
   or counting-equivalent; see the doc for the literature-grounded comparison.
+- [Rung 2/3 formalization plan (interval & chordal)](rung-2-3-plan.md)
+  — grounded plan for the higher rungs: how the `isoOfSamePiece` engine maps onto
+  Heinrich et al. 2025 (interval graphs), why chordal reconstruction is open, the
+  severe Mathlib gap, and the ordered list of tractable next lemmas (the
+  multi-vertex assembler being the immediate target — now done).
+- [Deck recovery — where the wall is](deck-recovery.md)
+  — the map of the genuine frontier: what `SameDeck` reconstructs for free, why
+  the forced-structure cases (disconnected, join, universal, isolated) are
+  tractable and now formalized, and why attachment recovery (cut-vertex `δ ≥ 2`,
+  interval, chordal) is the hard/open content.
 - [Counting / Kelly-style approaches](counting-approach.md)
 - [Spectral / algebraic approaches](spectral-approach.md)
 - [Random and probabilistic approaches](random-and-probabilistic.md)
@@ -67,6 +91,7 @@ column cites the original reduction.
 | If one proves … | … then it implies | Source |
 |---|---|---|
 | Every 2-connected graph is reconstructible | Reconstruction Conjecture (via Bondy's separable reduction) | Bondy 1969 [bondy69][bondy69] |
+| Every 2-connected graph with `γ(G) = 2` or `diam(G) = diam(Gᶜ) = 2` is reconstructible | Reconstruction Conjecture (sharpest known reduction; via Yongzhi 1988 → Ramachandran–Monikandan 2009 → Aravind–Monikandan 2026) | [arXiv:2601.00620](https://arxiv.org/abs/2601.00620) |
 | Every bipartite graph is reconstructible | Widely believed to imply the general conjecture; not a formal reduction, but a canonical stress test | folklore; see Bondy 1991 [bondy91][bondy91] |
 | Every 3-regular graph is reconstructible | A classical "hard" subclass; a structural reduction is not known, but failure here would likely yield the first counterexample | Harary's problem list |
 | Edge-reconstruction of graphs with $m \le n \cdot \log_2 n$ edges | Closes the remaining gap to Müller 1977 [muller77][muller77] | Nash-Williams 1978 [nashwilliams78][nashwilliams78] |
