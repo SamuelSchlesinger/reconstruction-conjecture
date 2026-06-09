@@ -232,8 +232,17 @@ component-decomposition machinery (`Disconnected.lean`):
         - [x] Step (i) **PROVED** (`Twins.lean`; standard axioms):
           `AreTwinVertices` and `twinSwapIso` — a twin transposition is a
           card automorphism (sixteen-case adjacency check).
-        - [ ] Step (ii): the `A∖B ↔ B∖A` correction involution within a
-          twin class. Step (iii): disjoint-support composition + rigidity.
+        - [x] Step (ii) core **PROVED** (`Twins.lean`; standard axioms):
+          `twin_involution_map_rel` / `twinInvolutionIso` — **any
+          involution that only moves vertices to their twins is an
+          automorphism** (involutivity closes the colliding-pairs corner).
+          This subsumes per-class composition: one global twin-supported
+          involution suffices, no `noncommProd` needed.
+        - [ ] Step (iii): build the marking-correction involution from
+          `SameDeck.nbrCount_eq` (choose per-class bijections
+          `A∖B ≃ B∖A`, glue as one involutive map, feed
+          `twinInvolutionIso`); conclude the twin-flexible rigidity
+          theorem.
   - [ ] Rigidity census (computational): enumerate `n ≤ 10` graphs without
         a rigid vertex — the enumerated wall.
 - **Deck recovery (the frontier) — see
