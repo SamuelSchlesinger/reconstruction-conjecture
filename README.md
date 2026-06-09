@@ -175,6 +175,7 @@ Reconstruction/
   Regular.lean         -- Regularity is reconstructible from degree sequence
   RegularReconstruction.lean -- Rigid-card criterion; regular graphs reconstructible
   ValueSeparated.lean  -- Value-separated vertices are rigid (telescoping)
+  Twins.lean           -- Twin transpositions are automorphisms (rung 2.5, step i)
   ConnectedComponents.lean -- Number of connected components is reconstructible
   Disconnected.lean    -- Disconnected-case reconstruction theorem
   Separator.lean       -- Cut vertices, separators, 2-connectivity; iso-invariance (separator-decomposition programme)

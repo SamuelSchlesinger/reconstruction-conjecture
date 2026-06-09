@@ -229,6 +229,11 @@ component-decomposition machinery (`Disconnected.lean`):
         classes that are twin classes are automorphism-correctable; new
         class theorem via twin transpositions + disjoint-support
         composition + `SameDeck.nbrCount_eq`.
+        - [x] Step (i) **PROVED** (`Twins.lean`; standard axioms):
+          `AreTwinVertices` and `twinSwapIso` — a twin transposition is a
+          card automorphism (sixteen-case adjacency check).
+        - [ ] Step (ii): the `A∖B ↔ B∖A` correction involution within a
+          twin class. Step (iii): disjoint-support composition + rigidity.
   - [ ] Rigidity census (computational): enumerate `n ≤ 10` graphs without
         a rigid vertex — the enumerated wall.
 - **Deck recovery (the frontier) — see

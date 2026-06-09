@@ -9,6 +9,7 @@ import Reconstruction.Kocay
 import Reconstruction.Regular
 import Reconstruction.RegularReconstruction
 import Reconstruction.ValueSeparated
+import Reconstruction.Twins
 import Reconstruction.ConnectedComponents
 import Reconstruction.Disconnected.ComponentCount
 import Reconstruction.Disconnected
