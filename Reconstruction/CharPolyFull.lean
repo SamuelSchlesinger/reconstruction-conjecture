@@ -2,6 +2,7 @@ import Reconstruction.Spectral
 import Reconstruction.TraceReconstruction
 import Reconstruction.TopTrace
 import Reconstruction.Newton
+import Reconstruction.SupportCount
 
 /-!
 # Reconstruction Conjecture — Full Characteristic Polynomial
@@ -136,6 +137,25 @@ theorem SameDeck.charPoly_coeff_zero_eq_of_support_counts_eq (h : G.SameDeck H)
   h.charPoly_coeff_zero_eq_of_trace_card_eq hV
     (trace_adjMatrix_card_eq_of_support_counts_eq hproper hfull)
 
+/-- Conditional constant-term reconstruction from the **full-support sector
+alone**. The proper-support sector of the top trace is unconditionally
+reconstructible (`SameDeck.properSupportClosedWalkCount_eq`, via Kelly's
+Lemma and the exact-support/isomorphism-class regrouping in
+`Reconstruction.SupportCount`), so the constant coefficient — hence the whole
+characteristic polynomial — is now reduced to equality of the full-support
+top-length closed-walk counts. Those walks traverse Hamiltonian cycles, so
+this hypothesis is precisely the deck-reconstructibility of the
+Hamiltonian-cycle count (Tutte 1979, via Kocay's spanning-subgraph
+counting). -/
+theorem SameDeck.charPoly_coeff_zero_eq_of_fullSupport_eq (h : G.SameDeck H)
+    (hV : 3 ≤ Fintype.card V)
+    (hfull :
+      G.fullSupportClosedWalkCount (Fintype.card V) =
+        H.fullSupportClosedWalkCount (Fintype.card V)) :
+    (G.charPoly ℤ).coeff 0 = (H.charPoly ℤ).coeff 0 :=
+  h.charPoly_coeff_zero_eq_of_support_counts_eq hV
+    (h.properSupportClosedWalkCount_eq _) hfull
+
 /-- **The constant term of the characteristic polynomial is reconstructible.**
 
 The constant term `c_0 = (-1)^n det(A)` is determined by the Cayley–Hamilton
@@ -146,17 +166,18 @@ derivative formula (`Spectral.lean`) and `tr(A^k)` from walk counting
 theorem SameDeck.charPoly_coeff_zero_eq (h : G.SameDeck H)
     (hV : 3 ≤ Fintype.card V) :
     (G.charPoly ℤ).coeff 0 = (H.charPoly ℤ).coeff 0 := by
-  -- TODO: The constant term c_0 = (-1)^n det(A) is determined by the
-  -- Cayley–Hamilton trace identity: n · c_0 = -(tr(A^n) + c_{n-1} tr(A^{n-1})
-  -- + ⋯ + c_1 tr(A)). The coefficients c_1,...,c_{n-1} are reconstructible
-  -- (Spectral.lean) and tr(A^k) for k < n is reconstructible
-  -- (TraceReconstruction.lean). The remaining ingredient is tr(A^n), which is NOT
-  -- directly covered by Kelly's Lemma (needs k < n). Schwenk's approach recovers
-  -- tr(A^n) via the Sachs coefficient formula expressing c_0 as a sum over
-  -- elementary spanning subgraphs; alternatively, a walk decomposition argument
-  -- expresses tr(A^n) in terms of reconstructible subgraph counts plus lower-order
-  -- traces.
-  -- Depends on: `trace_adjMatrix_pow_eq` and `newton_trace_charpoly`.
+  -- TODO (single remaining ingredient): by
+  -- `charPoly_coeff_zero_eq_of_fullSupport_eq` the constant term is reduced to
+  -- equality of the full-support top-length closed-walk counts. A closed walk
+  -- of length `n = |V|` visiting all `n` vertices traverses a Hamiltonian
+  -- cycle (`Reconstruction.HamiltonianWalk`:
+  -- `fullSupportClosedWalkCount_card_eq_hamiltonianHomCount`), so the remaining
+  -- content is exactly Tutte's theorem that the number of Hamiltonian cycles
+  -- is reconstructible — to be proved via Kocay's lemma: disconnected spanning
+  -- subgraph counts are reconstructible by Möbius inversion over the
+  -- cover-count identity (`Kocay.lean`), and the Hamiltonian count is
+  -- extracted from products of path counts.
+  refine h.charPoly_coeff_zero_eq_of_fullSupport_eq hV ?_
   sorry
 
 /-- **The full characteristic polynomial is reconstructible.**
