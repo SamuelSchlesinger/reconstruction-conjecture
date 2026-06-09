@@ -88,6 +88,7 @@ such that $G - v \cong H - \sigma(v)$ for all $v \in V$.
 | **Kocay's lemma, deck form: host cover counts are reconstructible** (`SameDeck.coverTypeCount_eq`) — the number of ways to cover the whole vertex set by induced copies of any pattern family (each pattern on `< |V|` vertices) is deck-determined; isolates the one summand of Kocay's identity that Kelly cannot see | [`KocayHost.lean`](Reconstruction/KocayHost.lean) |
 | **The rigid-card criterion** (`RigidVertex`, `nonempty_iso_of_rigidVertex`): a vertex is rigid when every degree-data-matched card isomorphism can be corrected by a card automorphism to respect attachments; **one rigid vertex makes a graph reconstructible** — the first formal theorem of the symmetry-breaking programme | [`RegularReconstruction.lean`](Reconstruction/RegularReconstruction.lean) |
 | **Regular graphs are reconstructible** (`nonempty_iso_of_regular`): the degree deficit stamps the deleted vertex's neighbourhood into each card (`degree_deleteVert`, `adj_iff_degree_deleteVert_ne`); every vertex of a regular graph is rigid, so this is the criterion's base case | [`RegularReconstruction.lean`](Reconstruction/RegularReconstruction.lean) |
+| **Graphs with a value-separated vertex are reconstructible** (`nonempty_iso_of_valueSeparated`): if some vertex has every card-degree class all-neighbours or all-non-neighbours, it is rigid — proved by the telescoping recurrence on value-class counts (Discovery B of the symmetry-breaking programme); strictly extends the regular case | [`ValueSeparated.lean`](Reconstruction/ValueSeparated.lean) |
 | **Subgraph-copy counts are reconstructible** (`SameDeck.injHomCount_eq`): injective-homomorphism copy counts (= $\|\mathrm{Aut}\,F\|$ × subgraph copies) for patterns on `< \|V\|` vertices — Kelly's Lemma upgraded from induced to arbitrary copies, via partition-by-image and the `GraphIsoClass` regrouping | [`HomCount.lean`](Reconstruction/HomCount.lean) |
 
 ### Reconstructible Invariants
@@ -172,7 +173,8 @@ Reconstruction/
   KellyEdgeCount.lean  -- Alternate edge-count reconstruction via Kelly's Lemma
   Kocay.lean           -- Kocay-style cover-counting identities
   Regular.lean         -- Regularity is reconstructible from degree sequence
-  RegularReconstruction.lean -- Regular graphs ARE reconstructible (deficit marking)
+  RegularReconstruction.lean -- Rigid-card criterion; regular graphs reconstructible
+  ValueSeparated.lean  -- Value-separated vertices are rigid (telescoping)
   ConnectedComponents.lean -- Number of connected components is reconstructible
   Disconnected.lean    -- Disconnected-case reconstruction theorem
   Separator.lean       -- Cut vertices, separators, 2-connectivity; iso-invariance (separator-decomposition programme)

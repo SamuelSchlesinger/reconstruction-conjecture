@@ -209,10 +209,15 @@ component-decomposition machinery (`Disconnected.lean`):
         `S(t) = C(t) − D'(t) + S(t−1)` determines the neighbour-card-degree
         multiset uniquely — no Hall condition needed (the imagined level-2
         obstruction dissolves); yields `SameDeck → M_G(v) = M_H(σ v)`.
-  - [ ] **Value-separated ⟹ rigid** (Discovery B): telescoping
-        `n_t − m_t = n_{t−1} − m_{t−1}` + all-or-nothing classes; corollary
-        extends `nonempty_iso_of_regular` to graphs with a value-separated
-        vertex. Full proof recipe recorded in the note, ready to formalize.
+  - [x] **Value-separated ⟹ rigid — PROVED** (Discovery B;
+        `ValueSeparated.lean`, standard axioms): `ValueSeparated.rigidVertex`
+        via the telescoping induction `nbr_nonNbr_transfer` over value-class
+        counts (`classCount_transfer` from the card iso,
+        `fullDegCount_transfer` from the degree multiset and deleted degree,
+        `fullDegCount_eq`/`classCount_eq`/`shiftNbrCount_succ` from the
+        deficit stamp). Corollary `nonempty_iso_of_valueSeparated`: **graphs
+        with a value-separated vertex are reconstructible** — strictly
+        extends regular graphs (`IsRegularOfDegree.valueSeparated`).
   - [ ] Rigidity census (computational): enumerate `n ≤ 10` graphs without
         a rigid vertex — the enumerated wall.
 - **Deck recovery (the frontier) — see

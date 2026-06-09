@@ -116,7 +116,7 @@ theorem IsRegularOfDegree.adj_iff_degree_deleteVert_ne {d : ℕ}
 
 /-- Degree is invariant under graph isomorphisms (helper, by transporting
 the neighbour set along the isomorphism). -/
-private theorem iso_degree_eq {V₁ V₂ : Type*} [Fintype V₁] [Fintype V₂]
+theorem iso_degree_eq {V₁ V₂ : Type*} [Fintype V₁] [Fintype V₂]
     {A : SimpleGraph V₁} {B : SimpleGraph V₂}
     [DecidableRel A.Adj] [DecidableRel B.Adj]
     (φ : A ≃g B) (a : V₁) : B.degree (φ a) = A.degree a := by

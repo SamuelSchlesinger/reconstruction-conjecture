@@ -82,9 +82,12 @@ and `H`-side counts `m_t` of neighbours in the (shared) value class `t`,
 both satisfy the same recurrence against the same `D'`, `C`, so
 `n_t − m_t = n_{t−1} − m_{t−1} = ⋯ = 0`; value-separation says
 `n_t ∈ {0, C(t)}`, hence `m_t = n_t` makes *every* vertex of the class
-agree on both sides. **Value-separated vertices are rigid** — a strict
-extension of the regular case (where every class is all-or-nothing
-trivially), with a fully elementary proof ready to formalize.
+agree on both sides. **Value-separated vertices are rigid — PROVED**
+(`ValueSeparated.rigidVertex`, `nonempty_iso_of_valueSeparated` in
+`Reconstruction/ValueSeparated.lean`; the telescoping induction is
+`nbr_nonNbr_transfer`, the deck-side count matching is
+`classCount_transfer`/`fullDegCount_transfer`). A strict extension of the
+regular case (`IsRegularOfDegree.valueSeparated`).
 
 The ladder above these:
 
@@ -113,10 +116,9 @@ bulk/flank theory is a rigidity proof for interval cards).
 (b) the shift-recurrence lemma (Discovery A): per-value identity
 `D'(t) = C(t) − S(t) + S(t−1)` from `degree_deleteVert`, then uniqueness by
 induction on `t` — gives `SameDeck → M_G(v) = M_H(σv)` for matched pairs;
-(c) **value-separated ⟹ rigid** (Discovery B): the telescoping
-`n_t − m_t = n_{t−1} − m_{t−1}` plus the all-or-nothing case split; corollary:
-graphs with a value-separated vertex are reconstructible (strictly extends
-`nonempty_iso_of_regular`);
+(c) ~~value-separated ⟹ rigid~~ **done** (`ValueSeparated.rigidVertex`;
+graphs with a value-separated vertex are reconstructible,
+`nonempty_iso_of_valueSeparated`);
 (d) **experiment**: for `n ≤ 10`, compute the fraction of graphs with a
 value-separated (resp. rigid) vertex — the complement *is* the wall,
 enumerated; if empty up to some `n`, that is a theorem-shaped discovery.
