@@ -205,10 +205,14 @@ component-decomposition machinery (`Disconnected.lean`):
         vertex of a regular graph is rigid; regular reconstruction is now
         the corollary. "Graphs with a rigid vertex" is the project's first
         new formally-verified reconstructible class.
-  - [ ] Shift-recurrence lemma (Discovery A, `symmetry-breaking.md`):
-        `S(t) = C(t) − D'(t) + S(t−1)` determines the neighbour-card-degree
-        multiset uniquely — no Hall condition needed (the imagined level-2
-        obstruction dissolves); yields `SameDeck → M_G(v) = M_H(σ v)`.
+  - [x] **Shift-recurrence lemma (Discovery A) — PROVED in count form**
+        (`SameDeck.nbrCount_eq`, `ValueSeparated.lean`; standard axioms):
+        same-deck graphs admit a matching `σ` with, for every `v` and every
+        card-degree value `t`, equal neighbour and non-neighbour counts at
+        `t` — the neighbour-degree profile is deck-forced; the only
+        labelling freedom is which vertices *within* a class are neighbours
+        (no Hall condition needed; the imagined level-2 obstruction
+        dissolves).
   - [x] **Value-separated ⟹ rigid — PROVED** (Discovery B;
         `ValueSeparated.lean`, standard axioms): `ValueSeparated.rigidVertex`
         via the telescoping induction `nbr_nonNbr_transfer` over value-class

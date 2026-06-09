@@ -113,9 +113,10 @@ bulk/flank theory is a rigidity proof for interval cards).
 **Formal next steps** (ordered):
 (a) ~~define rigidity; prove the rigid-card criterion~~ **done**
 (`RigidVertex`, `nonempty_iso_of_rigidVertex`);
-(b) the shift-recurrence lemma (Discovery A): per-value identity
-`D'(t) = C(t) − S(t) + S(t−1)` from `degree_deleteVert`, then uniqueness by
-induction on `t` — gives `SameDeck → M_G(v) = M_H(σv)` for matched pairs;
+(b) ~~the shift-recurrence lemma (Discovery A)~~ **done** in count form
+(`SameDeck.nbrCount_eq`): for every matched pair and every value `t`, the
+neighbour and non-neighbour counts at card-degree `t` agree — the
+neighbour-degree profile is deck-forced along the matching;
 (c) ~~value-separated ⟹ rigid~~ **done** (`ValueSeparated.rigidVertex`;
 graphs with a value-separated vertex are reconstructible,
 `nonempty_iso_of_valueSeparated`);

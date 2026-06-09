@@ -60,13 +60,13 @@ section Counts
 variable (G) (v : V)
 
 /-- Number of neighbours of the deleted vertex with card-degree `t`. -/
-private def nbrCount (t : ℕ) : ℕ :=
+def nbrCount (t : ℕ) : ℕ :=
   ((Finset.univ : Finset {w : V // w ≠ v}).filter
     fun x : {w : V // w ≠ v} =>
       (G.deleteVert v).degree x = t ∧ G.Adj v ↑x).card
 
 /-- Number of non-neighbours of the deleted vertex with card-degree `t`. -/
-private def nonNbrCount (t : ℕ) : ℕ :=
+def nonNbrCount (t : ℕ) : ℕ :=
   ((Finset.univ : Finset {w : V // w ≠ v}).filter
     fun x : {w : V // w ≠ v} =>
       (G.deleteVert v).degree x = t ∧ ¬ G.Adj v ↑x).card
@@ -306,6 +306,30 @@ theorem ValueSeparated.rigidVertex {v : V} (hsep : G.ValueSeparated v) :
     obtain ⟨y, hy⟩ := Finset.card_pos.mp hpos
     rw [Finset.mem_filter] at hy
     exact hsep x y hno hy.2.2 hy.2.1.symm
+
+/-- **Discovery A, public deck form: the value-class neighbour profile of
+every matched card is deck-forced.** For same-deck graphs there is a vertex
+matching `σ` such that, for every vertex `v` and every card-degree value
+`t`, the number of `v`-neighbours of card-degree `t` in `G − v` equals the
+number of `σv`-neighbours of card-degree `t` in `H − σv` (and likewise for
+non-neighbours). In particular the neighbour-degree multiset of `v` is
+deck-determined along the matching: the only labelling freedom the deck
+ever leaves is *which* vertices within a card-degree class are the
+neighbours. This is the formal content of the shift-recurrence discovery in
+`research/attacks/symmetry-breaking.md`. -/
+theorem SameDeck.nbrCount_eq (h : G.SameDeck H) (hV : 3 ≤ Fintype.card V) :
+    ∃ σ : V ≃ V, ∀ (v : V) (t : ℕ),
+      nbrCount G v t = nbrCount H (σ v) t ∧
+        nonNbrCount G v t = nonNbrCount H (σ v) t := by
+  classical
+  have hmul : G.degreeMultiset = H.degreeMultiset := h.degreeMultiset_eq hV
+  have he : G.edgeFinset.card = H.edgeFinset.card := h.card_edgeFinset_eq hV
+  obtain ⟨σ, hσ⟩ := h
+  refine ⟨σ, fun v t => ?_⟩
+  obtain ⟨ψ⟩ := hσ v
+  have hdeg : G.degree v = H.degree (σ v) :=
+    degree_eq_of_card_edgeFinset_eq_of_deleteVert_iso he ψ
+  exact nbr_nonNbr_transfer ψ hmul hdeg t
 
 omit [DecidableRel H.Adj] in
 /-- **Graphs with a value-separated vertex are reconstructible** — Discovery
